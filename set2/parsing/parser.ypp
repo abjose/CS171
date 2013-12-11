@@ -1,0 +1,173 @@
+%{
+#include <stdint.h>
+#include <FlexLexer.h>
+#include <string>
+#include <deque>
+#include <memory>
+#include "blocks/camera_block.hh"
+#include "blocks/transform_block.hh"
+#include "blocks/separator_block.hh"
+#include "blocks/scene_block.hh"
+#include "wireframe.hh"
+
+int yyerror(const char *s);
+int yylex();
+
+// print debug statements?
+bool debug = false;
+// vector for storing input numbers
+std::deque<float> in;
+// unique_ptr to a CameraBlock
+std::unique_ptr<CameraBlock> camera(new CameraBlock);
+// unique_ptr to a TransformBlock
+std::unique_ptr<TransformBlock> transform(new TransformBlock);
+// unique_ptr to a SeperatorBock
+std::unique_ptr<SeparatorBlock> separator(new SeparatorBlock);
+// unique_ptr to a SceneBlock
+std::unique_ptr<SceneBlock> scene(new SceneBlock);
+%}
+
+%union {
+    float fval;
+}
+
+%defines
+%token <fval> NUMBER
+%token SEPARATOR
+%token LBRACE RBRACE COMMA
+%token LBRACKET RBRACKET
+%token PCAMERA POS ORIENT NDIST FDIST
+%token LEFT RIGHT TOP BOTTOM
+%token TRANSFORM TRANSLAT SFACTOR ROT
+%token COORD3 POINT
+%token IFACESET COORDINDEX
+
+
+%%
+
+blocks: block | block blocks
+block:  camerablock | sepblock
+
+camerablock: PCAMERA open cameralines close {
+  scene->set_camera(std::move(camera));
+}
+cameralines: cameraline | cameraline cameralines
+cameraline: positionline | orientline | ndistline | fdistline | 
+            leftline | rightline | topline | bottomline
+positionline: POS triple {
+  if(debug) std::cout << "Got position: " << in[2] << ' ' << in[1] 
+		      << ' ' << in[0] << std::endl;
+  camera->set_position(in[2],in[1],in[0]);
+}
+orientline: ORIENT quad {
+  if(debug) std::cout << "Got orientation: " << in[3] << ' ' << in[2] 
+		      << ' ' << in[1] << ' ' << in[0] << std::endl;
+  camera->set_orientation(in[3],in[2],in[1],in[0]);
+}
+ndistline: NDIST NUMBER { camera->near  = $2; }
+fdistline: FDIST NUMBER { camera->far   = $2;  }
+leftline: LEFT NUMBER   { camera->left  = $2; }
+rightline: RIGHT NUMBER { camera->right = $2; }
+topline: TOP NUMBER     { camera->top   = $2; }
+bottomline: BOTTOM NUMBER { camera->bottom = $2; }
+
+sepblock: SEPARATOR open sepitems close {
+  scene->add_separator(std::move(separator));
+  // re-init separator
+  separator = std::unique_ptr<SeparatorBlock>(new SeparatorBlock);
+}
+sepitems: sepitem | sepitem sepitems
+sepitem:  transformline
+          | vertexline
+          | IFACESET open ifslines close 
+
+vertexline: COORD3 open POINT sqopen triples sqclose close {
+  // read in triples
+  for(int i=in.size()-1; i>0; i -= 3) {
+    if(debug) std::cout << "Vertex triple: " << in[i] << ' ' << in[i-1] 
+			<< ' ' << in[i-2] << std::endl;
+    separator->add_vertex(in[i], in[i-1], in[i-2]);
+  }
+}
+
+transformline: TRANSFORM open translines close {
+  separator->add_transform(std::move(transform));
+  // re-init transform
+  transform = std::unique_ptr<TransformBlock>(new TransformBlock);
+}
+translines: transline | transline translines
+transline:  translateline | scaleline | rotline
+translateline: TRANSLAT triple {
+  if(debug) std::cout << "Got translation: " << in[2] << ' ' << in[1] 
+		      << ' ' << in[0] << std::endl;
+  transform->set_translation(in[2],in[1],in[0]);
+  //transform->display();
+}
+scaleline: SFACTOR triple {
+  if(debug) std::cout << "Got scale: " << ' ' << in[2] << ' ' 
+		      << in[1] << ' ' << in[0] << std::endl;
+  transform->set_scale(in[2],in[1],in[0]);
+  //transform->display();
+}
+rotline: ROT quad {
+  if(debug) std::cout << "Got rotation: " << ' ' << in[2] << ' ' 
+		      << in[1] << ' ' << in[0] << std::endl;
+  transform->set_rotation(in[3],in[2],in[1],in[0]);
+  //transform->display();
+}
+
+ifslines: ifsline | ifsline ifslines
+ifsline:  COORDINDEX sqopen singles sqclose {
+  // read in vertex vertices
+  for (int i=in.size()-1; i >= 0; i--)
+    separator->add_poly_vert(in[i]);
+}
+
+single: NUMBER {
+  if(debug) std::cout << "SINGLE:\t" << $1 << std::endl;
+  in.push_front($1);
+}
+singles: single | single COMMA singles
+
+triple:  single single single
+triples: triple | triple COMMA triples
+
+quad:    single single single single
+
+open:    LBRACE
+close:   RBRACE
+sqopen:  LBRACKET {
+  in.clear();
+}
+sqclose: RBRACKET
+
+
+%%
+
+static FlexLexer *lexer;
+
+int yyerror(const char * s)
+{
+   std::cerr << "Parse error: " << s << std::endl;
+   return 0;
+}
+
+int yylex() {
+   return lexer->yylex();
+}
+
+std::unique_ptr<SceneBlock> parse_test(std::istream &datafile) {
+   // Construct the lexer.
+   lexer = new yyFlexLexer(&datafile);
+   // Run the parser.
+   if(yyparse()) {
+       std::cerr << "Parse failed!" << std::endl;
+       exit(1);
+   }
+
+   // see if everything's there
+   //scene->display();
+
+   delete lexer;
+   return std::move(scene);
+}

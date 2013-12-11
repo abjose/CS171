@@ -1,0 +1,9 @@
+To compile:
+- cd to this directory
+- type 'make'
+An executable 'hw0' should appear
+
+To run:
+type './hw0' in the terminal
+
+A blue sphere should appear in a new window.

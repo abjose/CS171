@@ -1,0 +1,87 @@
+/* Parses records containing a number and zero or more subrecords */
+%{
+#include <stdint.h>
+#include <FlexLexer.h>
+#include <string>
+#include <vector>
+#include "../matrix/canvas.hh"
+
+int yyerror(const char *s);
+int yylex();
+
+static Canvas c; 
+// previous point
+float px,py;
+%}
+
+%union
+{
+    float fval;
+}
+
+%defines
+%token <fval> FLOAT
+%token LINETOK
+
+%%
+
+commands : 
+| commands command;
+
+command :
+new_line | line_segment;
+
+new_line : 
+LINETOK FLOAT FLOAT {
+  // Things could be really simple. Just have a variable storing previous point
+  // maybe a flag for 'new line', and draw line here rather than storing shit.
+  // Actually if this takes the first point of the line then don't even need 
+  // a flag.
+  //std::cout << "  Line!" << $2 << $3 << std::endl;
+  px = $2;
+  py = $3;
+};
+
+line_segment : 
+FLOAT FLOAT {
+  //std::cout << "  Point!" << $1 << $2 << std::endl;	
+  c.scale_draw_line(px, py, $1, $2);
+  px = $1;
+  py = $2;
+};
+
+%%
+
+static FlexLexer *lexer;
+
+int yyerror(const char * s)
+{
+   std::cerr << "Parse error: " << s << std::endl;
+   return 0;
+}
+
+int yylex()
+{
+   return lexer->yylex();
+}
+
+//std::vector<Matrix<float,4,4> > parse_test(std::istream &datafile)
+//void parse_test(std::istream &datafile, Canvas &canv) {
+Canvas& parse_test(std::istream &datafile, 
+                float xmin, float ymin,
+		float xmax, float ymax,
+	 	int xres, int yres) {
+   // init canvas
+   c = Canvas(xmin, ymin, xmax, ymax, xres, yres);
+   // Construct the lexer.
+   lexer = new yyFlexLexer(&datafile);
+   // Run the parser.
+   if(yyparse()) {
+       std::cerr << "Parse failed!" << std::endl;
+       exit(1);
+   }
+
+   delete lexer;
+   //return canvas;
+   return c;
+}

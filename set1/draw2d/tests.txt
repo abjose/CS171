@@ -1,0 +1,2 @@
+scaleFactor 100 100 100
+scaleFactor .01 .01 .01

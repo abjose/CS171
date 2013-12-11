@@ -1,0 +1,3 @@
+g++ -Wall test.cc -o test
+
+you should make a makefile

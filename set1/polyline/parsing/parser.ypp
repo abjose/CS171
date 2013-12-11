@@ -1,0 +1,91 @@
+%{
+#include <iostream>
+#include <fstream>
+#include <stdint.h>
+#include <FlexLexer.h>
+#include <string>
+#include <list>
+#include <vector>
+#include "polyline.hh"
+#include "../matrix/matrix.hh"
+#include "../matrix/transform.hh"
+
+int yyerror(const char *s);
+int yylex();
+
+// note: getting weird errors when using vector of pointers
+static std::vector<Matrix<float,4,4> > transform_stack;
+%}
+
+%union
+{
+    float fval;
+    //int ival;
+    //Record recval;
+    //list<Record>* reclist;
+}
+
+%defines
+%token <fval> FLOAT
+%token TRANSTOK
+%token SCALETOK
+%token ROTTOK
+
+%%
+
+// IS THIS NECESSARY????
+commands : 
+| commands command;
+
+command :
+translate | rotate | scale;
+
+translate : 
+TRANSTOK FLOAT FLOAT FLOAT {
+  Matrix<float,4,4> m = translation_matrix<float>($2,$3,$4);
+  transform_stack.push_back(m);
+  //std::cout << "  Translation!" << $2 << $3 <<  $4 << std::endl;
+};
+
+rotate : 
+ROTTOK FLOAT FLOAT FLOAT FLOAT {
+  Matrix<float,4,4> m = rotation_matrix<float>($2,$3,$4,$5);
+  transform_stack.push_back(m);      
+  //std::cout << "  Translation!" << $2 << $3 <<  $4 << $5 << std::endl;
+};
+
+scale : 
+SCALETOK FLOAT FLOAT FLOAT {
+  Matrix<float,4,4> m = scale_matrix<float>($2,$3,$4);
+  transform_stack.push_back(m);
+  std::cout << "  Scale!" << $2 << $3 <<  $4 << std::endl;
+};
+
+%%
+
+static FlexLexer *lexer;
+
+int yyerror(const char * s)
+{
+   std::cerr << "Parse error: " << s << std::endl;
+   return 0;
+}
+
+int yylex()
+{
+   return lexer->yylex();
+}
+
+std::vector<Matrix<float,4,4> > parse_test(std::istream &datafile) {
+   // Construct the lexer.
+   lexer = new yyFlexLexer(&datafile);
+   // Run the parser.
+   if(yyparse())
+   {
+       std::cerr << "Parse failed!" << std::endl;
+       exit(1);
+   }
+
+   delete lexer;
+   return transform_stack;
+}
