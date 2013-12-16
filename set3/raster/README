@@ -1,0 +1,11 @@
+raster.h and raster.cpp
+Bill Clark
+
+This program is intended to simplify rasterizing triangles.  Vertices
+are defined as arbitrarily-lengthed arrays of floats.  Whatever data
+is included at each vertex is interpolated across the triangle, and
+each pixel gets the interpolated values passed to it, via a drawPixel
+function.
+
+This code should be self-explanatory, as I include voluminous comments
+in both files.  Read raster.h for instructions.
