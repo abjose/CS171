@@ -5,6 +5,7 @@
 #include <deque>
 #include <memory>
 #include "blocks/camera_block.hh"
+#include "blocks/light_block.hh"
 #include "blocks/transform_block.hh"
 #include "blocks/separator_block.hh"
 #include "blocks/scene_block.hh"
@@ -14,13 +15,18 @@ int yyerror(const char *s);
 int yylex();
 
 // print debug statements?
-bool debug = false;
+//bool debug = false;
+bool debug = true;
 // vector for storing input numbers
 std::deque<float> in;
 // unique_ptr to a CameraBlock
 std::unique_ptr<CameraBlock> camera(new CameraBlock);
+// unique_ptr to a LightBlock
+std::unique_ptr<LightBlock> light(new LightBlock);
 // unique_ptr to a TransformBlock
 std::unique_ptr<TransformBlock> transform(new TransformBlock);
+// unique_ptr to a MaterialBlock
+std::unique_ptr<MaterialBlock> material(new MaterialBlock);
 // unique_ptr to a SeperatorBock
 std::unique_ptr<SeparatorBlock> separator(new SeparatorBlock);
 // unique_ptr to a SceneBlock
@@ -40,13 +46,15 @@ std::unique_ptr<SceneBlock> scene(new SceneBlock);
 %token LEFT RIGHT TOP BOTTOM
 %token TRANSFORM TRANSLAT SFACTOR ROT
 %token COORD3 POINT
-%token IFACESET COORDINDEX
-
+%token NORMAL VECTOR
+%token IFACESET COORDINDEX NORMALINDEX
+%token POINTLIGHT LLOC LCOLOR
+%token MATERIAL AMBCOLOR DIFFCOLOR SPECCOLOR SHININESS
 
 %%
 
 blocks: block | block blocks
-block:  camerablock | sepblock
+block:  camerablock | sepblock | lightblock
 
 camerablock: PCAMERA open cameralines close {
   scene->set_camera(std::move(camera));
@@ -66,10 +74,22 @@ orientline: ORIENT quad {
 }
 ndistline: NDIST NUMBER { camera->near  = $2; }
 fdistline: FDIST NUMBER { camera->far   = $2;  }
-leftline: LEFT NUMBER   { camera->left  = $2; }
+leftline:  LEFT  NUMBER { camera->left  = $2; }
 rightline: RIGHT NUMBER { camera->right = $2; }
-topline: TOP NUMBER     { camera->top   = $2; }
+topline:   TOP   NUMBER { camera->top   = $2; }
 bottomline: BOTTOM NUMBER { camera->bottom = $2; }
+
+lightblock: POINTLIGHT open pointlightlines close {
+  scene->set_light(std::move(light));
+}
+pointlightlines: pointlightline | pointlightline pointlightlines
+pointlightline: light_loc | light_col
+light_loc: LLOC triple {
+  light->set_location(in[2],in[1],in[0]);
+}
+light_col: LCOLOR triple {
+  light->set_color(in[2],in[1],in[0]);
+}
 
 sepblock: SEPARATOR open sepitems close {
   scene->add_separator(std::move(separator));
@@ -79,7 +99,9 @@ sepblock: SEPARATOR open sepitems close {
 sepitems: sepitem | sepitem sepitems
 sepitem:  transformline
           | vertexline
+          | normalline
           | IFACESET open ifslines close 
+          | material
 
 vertexline: COORD3 open POINT sqopen triples sqclose close {
   // read in triples
@@ -87,6 +109,15 @@ vertexline: COORD3 open POINT sqopen triples sqclose close {
     if(debug) std::cout << "Vertex triple: " << in[i] << ' ' << in[i-1] 
 			<< ' ' << in[i-2] << std::endl;
     separator->add_vertex(in[i], in[i-1], in[i-2]);
+  }
+}
+
+normalline: NORMAL open VECTOR sqopen triples sqclose close {
+  // read in triples
+  for(int i=in.size()-1; i>0; i -= 3) {
+    if(debug) std::cout << "Normal triple: " << in[i] << ' ' << in[i-1] 
+			<< ' ' << in[i-2] << std::endl;
+    separator->add_normal(in[i], in[i-1], in[i-2]);
   }
 }
 
@@ -117,11 +148,37 @@ rotline: ROT quad {
 }
 
 ifslines: ifsline | ifsline ifslines
-ifsline:  COORDINDEX sqopen singles sqclose {
-  // read in vertex vertices
+ifsline: normalindexline | coordindexline
+normalindexline: NORMALINDEX sqopen singles sqclose {
+  // read in normals
   for (int i=in.size()-1; i >= 0; i--)
-    separator->add_poly_vert(in[i]);
+    separator->add_normal_index(in[i]);
 }
+coordindexline:  COORDINDEX sqopen singles sqclose {
+  // read in vertices
+  for (int i=in.size()-1; i >= 0; i--)
+    separator->add_poly_index(in[i]);
+}
+
+material: MATERIAL open materiallines close {
+  separator->set_material(std::move(material));
+}
+materiallines: materialline | materialline materiallines
+materialline: ambient | diffuse | specular | shininess
+ambient: AMBCOLOR triple {
+  material->set_ambient(in[2],in[1],in[0]);
+}
+diffuse: DIFFCOLOR triple {
+  material->set_diffuse(in[2],in[1],in[0]);
+}
+specular: SPECCOLOR triple {
+  material->set_specular(in[2],in[1],in[0]);
+}
+shininess: SHININESS single {
+  material->shininess = in[0];
+}
+
+
 
 single: NUMBER {
   if(debug) std::cout << "SINGLE:\t" << $1 << std::endl;

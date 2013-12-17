@@ -5,7 +5,8 @@
 int main(int argc, char *argv[]) {
   // read cmd line args
   int xres, yres;
-  xres = std::stoi(argv[1]); yres = std::stoi(argv[2]); 
+  //xres = std::stoi(argv[1]); yres = std::stoi(argv[2]); 
+  xres = 400; yres = 400;
 
   // make a new canvas and scene for the parser
   Canvas c(-1, -1, 1, 1, xres, yres);
@@ -18,7 +19,7 @@ int main(int argc, char *argv[]) {
   scene->render(c);
 
   // spit the ppm to std output
-  std::cout << c.to_ppm() << std::endl;
+  //std::cout << c.to_ppm() << std::endl;
   
   return 0;
 }

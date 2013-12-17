@@ -7,14 +7,19 @@
 #include "../matrix/transform.hh"
 #include "../matrix/canvas.hh"
 #include "transform_block.hh"
+#include "material_block.hh"
 
 class SeparatorBlock {
 private:
   std::unique_ptr<TransformBlock> transform;
+  std::unique_ptr<MaterialBlock> material;
   std::vector<Matrix<float,3,1> > vertex_list; 
+  std::vector<Matrix<float,3,1> > normal_list; 
   std::vector<Matrix<float,4,1> > final_vertices;
   std::vector<std::vector<int> > poly_list; 
+  std::vector<std::vector<int> > poly_normal_list; 
   std::vector<int> temp_poly;
+  std::vector<int> temp_poly_normal;
 
 public:
   // default constructor
@@ -31,11 +36,16 @@ public:
     //transform->display();
     transform->combine_transform(std::move(t));
   }
+  void set_material(std::unique_ptr<MaterialBlock> m) {
+    material = std::move(m);
+  }
   void add_vertex(float x, float y, float z) {
     vertex_list.push_back(makeVector(x,y,z));
   }
-  //void add_poly(std::vector<int> poly) {
-  void add_poly_vert(int vertex) {
+  void add_normal(float x, float y, float z) {
+    normal_list.push_back(makeVector(x,y,z));
+  }
+  void add_poly_index(int vertex) {
     if (vertex == -1) {
       // should experiment with this -- see if all this copying is necessary
       std::vector<int> new_poly = temp_poly;
@@ -43,6 +53,16 @@ public:
       temp_poly.clear();
     } else {
       temp_poly.push_back(vertex);
+    }
+  }
+  void add_normal_index(int normal) {
+    if (normal == -1) {
+      // should experiment with this -- see if all this copying is necessary
+      std::vector<int> new_poly_normal = temp_poly_normal;
+      poly_normal_list.push_back(new_poly_normal);
+      temp_poly_normal.clear();
+    } else {
+      temp_poly_normal.push_back(normal);
     }
   }
 

@@ -36,9 +36,22 @@ rotation           return ROT;
 Coordinate3        return COORD3;
 point              return POINT;
 
+Normal             return NORMAL;
+vector             return VECTOR;
+
 IndexedFaceSet     return IFACESET;
 coordIndex         return COORDINDEX;
+normalIndex        return NORMALINDEX;
 
+PointLight         return POINTLIGHT;
+location           return LLOC;
+color              return LCOLOR;
+
+Material           return MATERIAL;
+ambientColor       return AMBCOLOR;
+diffuseColor       return DIFFCOLOR;
+specularColor      return SPECCOLOR;
+shininess          return SHININESS;
 
 #.*$         /* Eat comments   */
 [ \t\r\n]+   /* Eat whitespace */

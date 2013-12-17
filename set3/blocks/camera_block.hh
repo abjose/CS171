@@ -1,7 +1,6 @@
 #ifndef __CAMERA_BLOCK_H_GUARD__
 #define __CAMERA_BLOCK_H_GUARD__
 
-#include <vector>
 #include "../matrix/matrix.hh"
 #include "../matrix/transform.hh"
 
