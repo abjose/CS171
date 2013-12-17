@@ -47,10 +47,21 @@ public:
   }
   void add_poly_index(int vertex) {
     if (vertex == -1) {
-      // should experiment with this -- see if all this copying is necessary
-      std::vector<int> new_poly = temp_poly;
-      poly_list.push_back(new_poly);
-      temp_poly.clear();
+      if (temp_poly.size() > 3) {
+	// tringulate non-triangle polygon
+	// should probably test that there aren't < 3 vertices...
+	int base = temp_poly[0];
+	for(int i=2; i <= temp_poly.size(); i++) {
+	  int vs[] = {base, temp_poly[i], temp_poly[i-1]};
+	  std::vector<int> tri (vs, vs + sizeof(vs)/sizeof(int));
+	  poly_list.push_back(tri);
+	}
+      } else {
+	// should experiment with this -- see if all this copying is necessary
+	std::vector<int> new_poly = temp_poly;
+	poly_list.push_back(new_poly);
+	temp_poly.clear();
+      }
     } else {
       temp_poly.push_back(vertex);
     }
