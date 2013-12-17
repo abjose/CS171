@@ -108,8 +108,14 @@ public:
   void display() {
     std::cout << "SHOWING SEPERATOR'S TRANSFORM\n";
     transform->display();
+    std::cout << "SHOWING SEPERATOR'S MATERIAL\n";
+    material->display();
     std::cout << "SHOWING SEPERATOR'S VERTICES\n";
     for (auto &it: vertex_list) {
+      it.display();
+    }
+    std::cout << "SHOWING SEPERATOR'S NORMALS\n";
+    for (auto &it: normal_list) {
       it.display();
     }
     std::cout << "SHOWING SEPERATOR'S POLYGONS\n";
@@ -117,6 +123,14 @@ public:
       std::cout << "Polygon: ";
       for (auto &vert: it) {
 	std::cout << vert << ", ";
+      }
+      std::cout << std::endl;
+    }
+    std::cout << "SHOWING SEPERATOR'S NORMAL SETS\n";
+    for (auto &it: poly_normal_list) {
+      std::cout << "Normal set: ";
+      for (auto &normal: it) {
+	std::cout << normal << ", ";
       }
       std::cout << std::endl;
     }

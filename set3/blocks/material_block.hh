@@ -5,9 +5,9 @@
 
 class MaterialBlock{
 private:
-  Matrix<float,3,1> ambient;
-  Matrix<float,3,1> diffuse;
-  Matrix<float,3,1> specular;
+  Matrix<float,4,1> ambient;
+  Matrix<float,4,1> diffuse;
+  Matrix<float,4,1> specular;
 
 public:
   // public because laziness
