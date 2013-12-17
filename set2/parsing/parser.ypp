@@ -118,7 +118,7 @@ rotline: ROT quad {
 
 ifslines: ifsline | ifsline ifslines
 ifsline:  COORDINDEX sqopen singles sqclose {
-  // read in vertex vertices
+  // read in vertices
   for (int i=in.size()-1; i >= 0; i--)
     separator->add_poly_vert(in[i]);
 }
