@@ -12,6 +12,7 @@
 class SeparatorBlock {
 private:
   std::unique_ptr<TransformBlock> transform;
+  std::unique_ptr<TransformBlock> transform_sans_trans;
   std::unique_ptr<MaterialBlock> material;
   std::vector<Matrix<float,3,1> > vertex_list; 
   std::vector<Matrix<float,3,1> > normal_list; 
@@ -25,16 +26,15 @@ public:
   // default constructor
   SeparatorBlock() {
     transform = std::unique_ptr<TransformBlock>(new TransformBlock);
+    transform_sans_trans = std::unique_ptr<TransformBlock>(new TransformBlock);
   }
 
-  // destructor
-  ~SeparatorBlock() {}
-
   void add_transform(std::unique_ptr<TransformBlock> t) {
-    //transform = std::move(t);
-    //std::cout << "ADDING TRANSFORM IN SEPLIST\n";
-    //transform->display();
+    // gross
+    Matrix<float,4,4> r = t->get_rotation();
+    Matrix<float,4,4> s = t->get_scale();
     transform->combine_transform(std::move(t));
+    transform_sans_trans->combine_transform_sans_trans(r,s);
   }
   void set_material(std::unique_ptr<MaterialBlock> m) {
     material = std::move(m);
@@ -71,7 +71,11 @@ public:
     // figure out final transform matrix and transform all vertices by it
     Matrix<float,4,4> final_transform = persp_proj * inv_cam * 
                                         transform->get_final_transform();
-    
+    Matrix<float,4,4> final_transform_sans_trans 
+      = transform_sans_trans->get_final_transform();
+    final_transform_sans_trans.inverse();
+    final_transform_sans_trans.transpose();
+
     for(auto &it: vertex_list) {
       // need to homogenize, is this right?
       Matrix<float,4,1> v;
@@ -82,6 +86,17 @@ public:
       //v.display();
       final_vertices.push_back(v);
     }
+
+    for(auto &it: normal_list) {
+      Matrix<float,4,1> n;
+      float a[] = {it[0], it[1], it[2], 1.0};
+      n.copy(a);
+      n = final_transform_sans_trans * n;
+      n.homogenize();
+      //n.display();
+      final_vertices.push_back(n);
+    }
+
   }
 
   void render(Canvas &c) {
@@ -108,6 +123,8 @@ public:
   void display() {
     std::cout << "SHOWING SEPERATOR'S TRANSFORM\n";
     transform->display();
+    std::cout << "SHOWING SEPERATOR'S TRANSFORM (no translations)\n";
+    transform_sans_trans->display();
     std::cout << "SHOWING SEPERATOR'S MATERIAL\n";
     material->display();
     std::cout << "SHOWING SEPERATOR'S VERTICES\n";

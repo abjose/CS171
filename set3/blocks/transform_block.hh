@@ -30,10 +30,18 @@ public:
   void set_scale(float a, float b, float c) {
     scale = scale_matrix(a,b,c);
   }
+  Matrix<float,4,4> get_rotation() {
+    return rotation;
+  }
+  Matrix<float,4,4> get_scale() {
+    return scale;
+  }
   void combine_transform(std::unique_ptr<TransformBlock> t2) {
-    // kinda gross
-    // do TRS each time
     transform = transform * t2->translation * t2->rotation * t2->scale;
+  }
+  void combine_transform_sans_trans(Matrix<float,4,4> rotation,
+				    Matrix<float,4,4> scale) {
+    transform = transform * rotation * scale;
   }
 
   void display() {
