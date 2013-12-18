@@ -150,7 +150,8 @@ public:
   }
 
   // return tranpose as new matrix
-  Matrix transpose() {
+  //Matrix transpose() {
+  Matrix<T,C,R> transpose() {
     Matrix<T,C,R> res;
     for (int row=0; row<R; row++)
 	for (int col=0; col<C; col++)
