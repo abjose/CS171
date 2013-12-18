@@ -58,6 +58,7 @@ public:
 	}
       } else {
 	// should experiment with this -- see if all this copying is necessary
+	// can technically get rid of this if above works
 	std::vector<int> new_poly = temp_poly;
 	poly_list.push_back(new_poly);
 	temp_poly.clear();
@@ -82,12 +83,8 @@ public:
     // figure out final transform matrix and transform all vertices by it
     Matrix<float,4,4> final_transform = persp_proj * inv_cam * 
                                         transform->get_final_transform();
-    Matrix<float,4,4> final_transform_sans_trans 
-      = transform_sans_trans->get_final_transform();
-    final_transform_sans_trans.inverse();
-    final_transform_sans_trans.transpose();
-
-    for(auto &it: vertex_list) {
+   
+    for (auto &it: vertex_list) {
       // need to homogenize, is this right?
       Matrix<float,4,1> v;
       float a[] = {it[0], it[1], it[2], 1.0};
@@ -96,9 +93,16 @@ public:
       v.homogenize();
       //v.display();
       final_vertices.push_back(v);
-    }
+    }    
+  }
 
-    for(auto &it: normal_list) {
+  void transform_normals() {
+    Matrix<float,4,4> final_transform_sans_trans 
+      = transform_sans_trans->get_final_transform();
+    final_transform_sans_trans.inverse();
+    final_transform_sans_trans = final_transform_sans_trans.transpose();
+
+    for (auto &it: normal_list) {
       Matrix<float,4,1> n;
       float a[] = {it[0], it[1], it[2], 1.0};
       n.copy(a);
@@ -107,7 +111,46 @@ public:
       //n.display();
       final_vertices.push_back(n);
     }
+  }
 
+  void cull_backfaces(Matrix<float,4,4> persp_proj,
+			  Matrix<float,4,4> inv_cam) {
+    // polygons should all be triangles
+    // note: this will be backwards if polygons aren't ccw - try reversing
+    // if nothing shows
+    std::vector<std::vector<int> > culled_list; 
+    Matrix<float,4,4> final_transform = persp_proj * inv_cam * 
+                                        transform->get_final_transform();
+
+    //Matrix<float,3,1> v0p,v1p,v2p;
+    Matrix<float,3,1> v0,v1,v2, a,b;
+    Matrix<float,4,1> n;
+    for (auto &it : poly_list) {
+      v0 = vertex_list[it[0]];
+      v1 = vertex_list[it[1]];
+      v2 = vertex_list[it[2]];
+      
+      // get cross product
+      a = v2-v1; b = v0-v1;
+      // copy into a vector for transforming
+      float a[] = {a[1]*b[2] - a[2]*b[1], 
+		   a[2]*b[0] - a[0]*b[2],
+		   a[0]*b[1] - a[1]*b[0], 
+		   1.0};
+      n.copy(a);
+
+      // transform into NDC
+      n = final_transform * n;
+
+      // check if n_z is positive
+      if(n[2] > 0) { 
+	// add triangle to "show" list (which will replace current poly list)
+	culled_list.push_back(it);
+      }
+    }
+
+    // now replace old poly list with culled one
+    poly_list = culled_list; 
   }
 
   void render(Canvas &c) {
