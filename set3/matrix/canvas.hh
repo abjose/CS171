@@ -1,20 +1,22 @@
 #ifndef __CANVAS_H_GUARD__
 #define __CANVAS_H_GUARD__
 
+#include <iostream>
 #include <cassert>
 #include <string>
 #include <vector>
+#include <limits>
 
 // really wanted to use Matrix for this, stupid templates
 // TODO: should make usage of X,Y vs R,C more...better.
 // TODO: add z-buff stuff
-// TODO: add back templating stuff for type
 template <typename T>
 class Canvas {
 
 private:
   int R,C;
   float xMin, yMin, xMax, yMax;
+  //Canvas<T> z_buff = *this; //??
   std::vector<T> matrix;
 
 public:
@@ -50,6 +52,7 @@ public:
     xMin = xmin; xMax = xmax;
     yMin = ymin; yMax = ymax;
     matrix = std::vector<T> (R*C);
+    //z_buff.clear(std::numeric_limits<int>::max());
   }
 
   Canvas() {
@@ -215,6 +218,20 @@ public:
     ref(x,y) = data;
   }
 
+
+  void set_pixel_with_zbuff(float xf, float yf, T data, bool scale=false) {
+    // set pixel, but check the z-buffer as well
+    // wait, this shouldn't be here
+    // HMM, maybe so you don't have to deal with a z-buffer, just use RGBA
+    // and set the A value to be the Z value of the pixel? then can just check
+    // that...
+    // but need to make sure to default to inifinity ...
+
+    // need to make sure that doing canvas.clear(Matrix ...) doesn't make it
+    // so each element referenes the same matrix
+    // should also define something in matrix (and also canvas) so can print
+    // normally (like in a cout thing)
+  }
   
   //------------------------------------------
   // output
@@ -227,6 +244,16 @@ public:
 	std::cout << ref(r,c) << " ";
       std::cout << std::endl;
     }
+  }
+
+  std::ostream &operator<<(std::ostream &os) {  
+    os << R << "x" << C << " canvas:\n";
+    for (int r=0; r<R; r++) {
+      for (int c=0; c<C; c++)
+	os << ref(r,c) << " ";
+      os << std::endl;
+    }
+    return os;
   }
 
   std::string to_ppm() {
@@ -246,6 +273,7 @@ public:
     return out;
   }
 };
+
 
 
 #endif // __CANVAS_H_GUARD__
