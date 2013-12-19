@@ -144,8 +144,9 @@ public:
     
     while(true) {
       //ref(x0,y0) = WHITE;
-      if (in_bounds(y0,x0))
+      if (in_bounds(C-y0,x0)) {
 	ref(C-y0,x0) = WHITE;
+      }
       if (x0 == x1 && y0 == y1) break;
       float e2 = 2*err;
       if (e2 > -dy) { 
@@ -154,9 +155,9 @@ public:
       } 
       if (x0 == x1 && y0 == y1) {
 	//ref(x0,y0) = WHITE;
-	// IF WANT TO FLIP VERT, JUST DO 1-y0??
-	if (in_bounds(y0,x0))
+	if (in_bounds(C-y0,x0)) {
 	  ref(C-y0,x0) = WHITE;
+	}
 	break;
       }
       if (e2 < dx) {
