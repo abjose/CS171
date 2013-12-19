@@ -246,11 +246,11 @@ public:
     }
   }
 
-  std::ostream &operator<<(std::ostream &os) {  
+  friend std::ostream &operator<<(std::ostream &os, const Canvas &m) {  
     os << R << "x" << C << " canvas:\n";
     for (int r=0; r<R; r++) {
       for (int c=0; c<C; c++)
-	os << ref(r,c) << " ";
+	os << m(r,c) << " ";
       os << std::endl;
     }
     return os;
@@ -273,7 +273,6 @@ public:
     return out;
   }
 };
-
 
 
 #endif // __CANVAS_H_GUARD__

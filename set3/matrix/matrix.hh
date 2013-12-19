@@ -111,15 +111,16 @@ public:
     }
   }
 
-  std::ostream &operator<<(std::ostream &os) {  
-    os << R << "x" << C << " canvas:\n";
+  friend std::ostream &operator<<(std::ostream &os, const Matrix &m) {  
+    os << R << "x" << C << " matrix:\n";
     for (int r=0; r<R; r++) {
       for (int c=0; c<C; c++)
-	os << ref(r,c) << " ";
+	os << m(r,c) << " ";
       os << std::endl;
     }
     return os;
   }
+
 
   //------------------------------------------
   // math-y things
