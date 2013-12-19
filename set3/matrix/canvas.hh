@@ -101,31 +101,31 @@ public:
   }
 
   // nonchecked subscripting get/set
-  const int &operator()(int r, int c) const { 
+  const T &operator()(int r, int c) const { 
     return matrix[r*C+c]; 
   }
-  int &operator()(int r, int c) { 
+  T &operator()(int r, int c) { 
     return matrix[r*C+c]; 
   }
   // non-checked accessor
-  const int &ref(int row, int col) const { return matrix[col + row*C]; }
+  const T &ref(int row, int col) const { return matrix[col + row*C]; }
   // non-checked LValue setter
-  int &ref(int row, int col) { return matrix[col + row*C]; }
+  T &ref(int row, int col) { return matrix[col + row*C]; }
 
   // flat addressing
-  const int &operator[](int i) const { 
+  const T &operator[](int i) const { 
     assert(in_bounds(i)); 
     return matrix[i]; 
   }
-  int &operator[](int i) { 
+  T &operator[](int i) { 
     assert(in_bounds(i)); 
     return matrix[i]; 
   }
   // to make accessing nicer here
-  const int &ref(int i) const { 
+  const T &ref(int i) const { 
     return (*this)[i]; 
   }
-  int &ref(int i) { 
+  T &ref(int i) { 
     return (*this)[i]; 
   }
 
@@ -246,11 +246,11 @@ public:
     }
   }
 
-  friend std::ostream &operator<<(std::ostream &os, const Canvas &m) {  
-    os << R << "x" << C << " canvas:\n";
-    for (int r=0; r<R; r++) {
-      for (int c=0; c<C; c++)
-	os << m(r,c) << " ";
+  friend std::ostream &operator<<(std::ostream &os, const Canvas &C) {
+    os << C.nrows() << "x" << C.ncols() << " canvas:\n";
+    for (int r=0; r<C.nrows(); r++) {
+      for (int c=0; c<C.ncols(); c++)
+	os << C(r,c) << " ";
       os << std::endl;
     }
     return os;
