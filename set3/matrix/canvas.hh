@@ -6,12 +6,16 @@
 #include <vector>
 
 // really wanted to use Matrix for this, stupid templates
+// TODO: should make usage of X,Y vs R,C more...better.
+// TODO: add z-buff stuff
+// TODO: add back templating stuff for type
+template <typename T>
 class Canvas {
 
 private:
   int R,C;
   float xMin, yMin, xMax, yMax;
-  std::vector<int> matrix;
+  std::vector<T> matrix;
 
 public:
   const int WHITE = 255;
@@ -26,14 +30,11 @@ public:
 	    float xmin, float ymin,
 	    float xmax, float ymax,
 	    int xres, int yres) {
-    //std::cout << "got 1!!\n";
     matrix.clear();
     R=xres; C=yres;
-    //std::cout << "got 2!!\n";
     xMin = xmin; xMax = xmax;
     yMin = ymin; yMax = ymax;
     matrix = arr;
-    //std::cout << "got 3!!\n";
   }
   
 
@@ -48,7 +49,7 @@ public:
     R=xres; C=yres;
     xMin = xmin; xMax = xmax;
     yMin = ymin; yMax = ymax;
-    matrix = std::vector<int> (R*C);
+    matrix = std::vector<T> (R*C);
   }
 
   Canvas() {
@@ -77,7 +78,7 @@ public:
   }
 
   // clear matrix and set elements to 'val'
-  void clear(int val) { 
+  void clear(T val) { 
     for (int i=0; i < size(); i++) 
       matrix[i]=val; 
   }
@@ -127,12 +128,38 @@ public:
 
 
   //------------------------------------------
+  // scaling
+  //------------------------------------------
+
+  // Helper function to convert a real x position into an integer pixel coord.
+  int getPixelX(float x) {
+    return (int)((x - xMin) / (xMax - xMin) * C);
+  }
+
+  // Helper function to convert a real y position into an integer pixel coord.
+  int getPixelY(float y) {
+    return (int)((y - yMin) / (yMax - yMin) * R);
+  }
+
+
+  //------------------------------------------
   // line-creation
   //------------------------------------------
 
-  void draw_line(int x0, int y0, int x1, int y1) {
+  void draw_line(float x0f, float y0f, float x1f, float y1f,
+		 T data, bool scale=false) {
     /* Use Bresenham's line drawing algorithm to draw a line on the canvas. 
        Pseudocode from Wikipedia. */
+    int x0,y0,x1,y1;
+    // we can scale if we want to 
+    if (scale) {
+      x0 = getPixelX(x0f); y0 = getPixelY(y0f);
+      x1 = getPixelX(x1f); y1 = getPixelY(y1f);
+    } else {
+      x0 = (int) x0f; y0 = (int) y0f;
+      x1 = (int) x1f; y1 = (int) y1f;
+    }
+    
     float dx = std::abs(x1-x0);
     float dy = std::abs(y1-y0);
     float sx, sy;
@@ -145,7 +172,7 @@ public:
     while(true) {
       //ref(x0,y0) = WHITE;
       if (in_bounds(C-y0,x0)) {
-	ref(C-y0,x0) = WHITE;
+	ref(C-y0,x0) = data;
       }
       if (x0 == x1 && y0 == y1) break;
       float e2 = 2*err;
@@ -156,7 +183,7 @@ public:
       if (x0 == x1 && y0 == y1) {
 	//ref(x0,y0) = WHITE;
 	if (in_bounds(C-y0,x0)) {
-	  ref(C-y0,x0) = WHITE;
+	  ref(C-y0,x0) = data;
 	}
 	break;
       }
@@ -167,26 +194,30 @@ public:
     }
   }
 
-  void scale_draw_line(float x1, float y1, float x2, float y2) {
-    float xrange = xMax-xMin;
-    float yrange = yMax-yMin;
-    //std::cout << xMin << ", " << xMax << std::endl;
-    //std::cout << yMin << ", " << yMax << std::endl;
-    //std::cout << xrange << ", " << yrange << std::endl;
-    // find scaled versions
-    int x1_s = ((x1-xMin)/xrange) * C;
-    int y1_s = ((y1-yMin)/yrange) * R;
-    int x2_s = ((x2-xMin)/xrange) * C;
-    int y2_s = ((y2-yMin)/yrange) * R;
-    //std::cout << x1_s << ", " << y1_s << std::endl;
-    //std::cout << x2_s << ", " << y2_s << std::endl;
-    // draw line
-    draw_line(x1_s, y1_s, x2_s, y2_s);
-  }
-
 
   //------------------------------------------
-  // display
+  // other drawing stuff
+  //------------------------------------------
+
+  // should move coordinate scaling/conversion stuff to its own function
+  // and then maybe get rid of two versions of each function, just have an
+  // extra value like scale=False that you can set to do the conversions
+
+  void set_pixel(float xf, float yf, T data, bool scale=false) {
+    int x, y;
+    // we can scale if we want to 
+    if (scale) {
+      x = getPixelX(xf); y = getPixelY(yf);
+    } else {
+      x = (int) xf; y = (int) yf;
+    }
+
+    ref(x,y) = data;
+  }
+
+  
+  //------------------------------------------
+  // output
   //------------------------------------------
 
   void display() const {
