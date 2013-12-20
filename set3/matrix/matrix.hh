@@ -8,6 +8,7 @@
 
 
 #include <cassert>
+#include <cmath>
 #include <vector>
 #include <iostream>
 
@@ -136,6 +137,7 @@ public:
     return d;
   }
 
+  // TODO: hmm, should this always be a float/
   T magnitude() const {
     assert(R==1 || C==1);
     T mag = 0;
@@ -155,8 +157,12 @@ public:
   Matrix normalize() {
     //void normalize() {
     T mag = magnitude();
-    assert(mag != 0);
-    *this /= mag;
+    //assert(mag != 0);
+    // should just make 0 vector if magnitude is 0?
+    if (abs(mag) < 0.000001)
+      clear(0);
+    else
+      *this /= mag;
     return *this;
   }
 
@@ -170,7 +176,6 @@ public:
     return res;
   }
   
-
   void set_diagonal(const Matrix<T,R,1> &diag) {
     // don't reallly have to assert square...
     assert(R==C);
@@ -184,9 +189,17 @@ public:
     clear(0);
     for (int i=0; i < R; i++) 
       ref(i,i) = 1;
-
   }
 
+  void zero_clip() {
+    for (int i=0; i < size(); i++)
+      if (ref(i) < 0) ref(i) = 0;
+  }
+
+  void one_clip() {
+    for (int i=0; i < size(); i++)
+      if (ref(i) > 1) ref(i) = 1;
+  }  
 
   //------------------------------------------
   // scalar arithmetic
