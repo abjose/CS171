@@ -100,8 +100,8 @@ public:
   }
 
   void transform_normals() {
-    Matrix<float,4,4> final_transform_sans_trans 
-      = transform_sans_trans->get_final_transform();
+    Matrix<float,4,4> final_transform_sans_trans = 
+      transform_sans_trans->get_final_transform();
     final_transform_sans_trans.inverse();
     final_transform_sans_trans = final_transform_sans_trans.transpose();
 
@@ -160,8 +160,9 @@ public:
     poly_list = culled_list; 
   }
 
-  void render(Canvas<Matrix<float,3,1> >& c, 
-	      LightBlock& light, CameraBlock& camera) {
+  void render(std::shared_ptr<Canvas> c,
+	      std::shared_ptr<LightBlock> light, 
+	      std::shared_ptr<CameraBlock> camera) {
     // for each polygon (triangle)
     for(auto &poly: poly_list) {
       // make shit into shared_ptrs??

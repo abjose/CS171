@@ -3,12 +3,12 @@
 
 // TODO: move this to a sensible directory
 // TODO: add z-buff stuff...presumable to draw_pixels funcs
-// TODO: change some references to shared_ptrs
+// TODO: change references to shared_ptrs
 
 Matrix<float,3,1> light_func(Matrix<float,3,1> n, Matrix<float,3,1> v,
 			     std::shared_ptr<MaterialBlock> material, 
 			     //std::vector<LightBlock*> lights, 
-			     LightBlock& light, 
+			     std::shared_ptr<LightBlock> light, 
 			     Matrix<float,3,1> camerapos) {
   // let n = surface normal (nx,ny,nz)
   // let v = point in space (x,y,z)
@@ -31,8 +31,8 @@ Matrix<float,3,1> light_func(Matrix<float,3,1> n, Matrix<float,3,1> v,
     // get the light position and color from the light
     // let lx = light position (x,y,z)
     // let lc = light color (r,g,b)
-    Matrix<float,3,1> lx = light.location;
-    Matrix<float,3,1> lc = light.color;
+    Matrix<float,3,1> lx = light->location;
+    Matrix<float,3,1> lc = light->color;
     
     // first calculate the addition this light makes to the diffuse part
     //Matrix<float,3,1> ddiffuse = zero_clip(lc * (n . unit(lx - v)));
@@ -63,16 +63,16 @@ Matrix<float,3,1> light_func(Matrix<float,3,1> n, Matrix<float,3,1> v,
   return rgb;
 }
 
-void draw_pixels_with_constant_color(Canvas<Matrix<float,3,1> > &c, 
+void draw_pixels_with_constant_color(std::shared_ptr<Canvas> c, 
 				     Matrix<float,3,1> color) {
   // iterate through pixels_to_draw vector
   for (auto& it : pixels_to_draw)
     // NOTE SURE THESE SHOULD BE SCALED!!
     //c.set_pixel(it[0],it[1],color,true);
-    c.set_pixel(it[0],it[1],color);
+    c->set_pixel(it[0],it[1],color);
 }
 
-void draw_pixels(Canvas<Matrix<float,3,1> >& c) {
+void draw_pixels(std::shared_ptr<Canvas> c) {
   // iterate through pixels_to_draw vector
   float x,y,r,g,b;
   for (auto& it : pixels_to_draw) {
@@ -83,7 +83,7 @@ void draw_pixels(Canvas<Matrix<float,3,1> >& c) {
     float a[] = {r,g,b};
     color.copy(a);
     //c.set_pixel(x,y,color,true);
-    c.set_pixel(x,y,color);
+    c->set_pixel(x,y,color);
   }
 }
 
@@ -99,10 +99,10 @@ void flat_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
 		  Matrix<float,3,1> t2, Matrix<float,3,1> n2,
 		  std::shared_ptr<MaterialBlock> material, 
 		  //std::vector<LightBlock*> lights
-		  LightBlock& light,
-		  CameraBlock& camera, 
+		  std::shared_ptr<LightBlock> light,
+		  std::shared_ptr<CameraBlock> camera, 
 		  std::shared_ptr<TransformBlock> transform,
-		  Canvas<Matrix<float,3,1> >& c) {
+		  std::shared_ptr<Canvas> c) {
   // TODO: allow multiple lights...
   // Compute the averge location and average normal of each of the 3 
   // vertices. Remember to normalize your normals.
@@ -119,12 +119,12 @@ void flat_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
   // Calculate the corresponding color of the average location and normal 
   // with the lighting function.
   Matrix<float,3,1> color = light_func(avg_norm, avg_loc, 
-				       material, light, camera.position);
+				       material, light, camera->position);
 
   // Convert your locations to NDC by applying the perspective and 
   // camera transforms.
-  Matrix<float,4,4> final_transform = camera.get_perspective_projection() * 
-                                      camera.get_inverse_transform() * 
+  Matrix<float,4,4> final_transform = camera->get_perspective_projection() * 
+                                      camera->get_inverse_transform() * 
                                       transform->get_final_transform();
   Matrix<float,4,1> temp_loc;
   float a[] = {avg_loc[0],avg_loc[1],avg_loc[2],1};

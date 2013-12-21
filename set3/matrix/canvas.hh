@@ -27,7 +27,7 @@ public:
   int ncols() const { return C; }
   
   // directly copy elements from an array
-  void copy(const std::vector<int> &arr, 
+  void copy(const std::vector<pixel> &arr, 
 	    float xmin, float ymin,
 	    float xmax, float ymax,
 	    int xres, int yres) {
@@ -80,7 +80,7 @@ public:
   }
 
   // clear matrix and set elements to 'val'
-  void clear(T val) { 
+  void clear(pixel val) { 
     for (int i=0; i < size(); i++) 
       matrix[i]=val; 
   }
@@ -217,9 +217,10 @@ public:
     out += std::to_string(WHITE) + "\n\n";
 
     // add pixel values
-    for(int val: matrix) {
-      std::string str = std::to_string(val);
-      out += str +" "+ str +" "+ str + "\n";
+    for(auto& val: matrix) {
+      //std::string str = std::to_string(val);
+      //out += str +" "+ str +" "+ str + "\n";
+      out += "FIX PPM STUFF!\n";
     }
     
     return out;

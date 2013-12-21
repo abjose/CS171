@@ -28,7 +28,7 @@ public:
     sep_list.push_back(s);
   }
 
-  void render() {//Canvas &c) {
+  void render(std::shared_ptr<Canvas> c) {
     // ADD Z-BUFFER
     // ...hmm, could pass reference to z-buffer to rasterization thing?
 
@@ -46,9 +46,10 @@ public:
     Matrix<float,4,4> inv_cam = camera->get_inverse_transform();
     for(auto &sep: sep_list) {
       // get each separator to get it's final list of points
-      sep->transform_vertices(p_proj, inv_cam);
+      //sep->transform_vertices(p_proj, inv_cam);
+      //sep->transform_normals();
       // then get each separator to rasterize the polygons on the canvas
-      //sep->render(c);
+      sep->render(c, light, camera);
     }
   }
   
