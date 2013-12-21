@@ -4,23 +4,23 @@
 #include "../matrix/matrix.hh"
 
 class MaterialBlock{
-private:
-  Matrix<float,4,1> ambient;
-  Matrix<float,4,1> diffuse;
-  Matrix<float,4,1> specular;
-
 public:
-  // public because laziness
+  //private:
+  Matrix<float,3,1> ambient;
+  Matrix<float,3,1> diffuse;
+  Matrix<float,3,1> specular;
+
+  //public:
   float shininess;
 
   void set_ambient(float r, float g, float b) {
-    ambient[0] = r; ambient[1] = g; ambient[2] = b; ambient[3] = 1;
+    ambient[0] = r; ambient[1] = g; ambient[2] = b;
   }
   void set_diffuse(float r, float g, float b) {
-    diffuse[0] = r; diffuse[1] = g; diffuse[2] = b; diffuse[3] = 1;
+    diffuse[0] = r; diffuse[1] = g; diffuse[2] = b;
   }
   void set_specular(float r, float g, float b) {
-    specular[0] = r; specular[1] = g; specular[2] = b; specular[3] = 1;
+    specular[0] = r; specular[1] = g; specular[2] = b;
   }
 
   void display() {

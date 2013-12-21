@@ -6,7 +6,9 @@
 
 
 class CameraBlock{
-private:
+public:
+  //private:
+  Matrix<float,3,1> position;
   Matrix<float,4,4> view_translation;
   Matrix<float,4,4> view_rotation;
 
@@ -23,6 +25,8 @@ public:
 
   void set_position(float x, float y, float z) {
     view_translation = translation_matrix(x,y,z);
+    // not sure this is right...
+    position = makeVector<float>(x,y,z);
   }
   void set_orientation(float x, float y, float z, float theta) {
     view_rotation = rotation_matrix(x,y,z,theta);

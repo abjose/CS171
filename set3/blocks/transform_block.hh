@@ -1,6 +1,7 @@
 #ifndef __TRANSFORM_BLOCK_H_GUARD__
 #define __TRANSFORM_BLOCK_H_GUARD__
 
+#include <memory>
 #include "../matrix/matrix.hh"
 #include "../matrix/transform.hh"
 

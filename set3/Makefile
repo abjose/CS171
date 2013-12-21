@@ -1,6 +1,6 @@
-OBJECTS=parser.tab.o lexer.yy.o raster.o shaded.o
+OBJECTS=parser.tab.o lexer.yy.o raster.o lighting.o shaded.o
 SOURCES=*.cc *.hh
-CFLAGS=-std=c++0x -g
+CFLAGS=-std=c++0x -g #-pedantic -Wall -Wextra
 LDFLAGS=
 
 all: shaded
@@ -18,7 +18,10 @@ lexer.yy.cpp: parsing/lexer.lex
 	flex -+ -o lexer.yy.cpp parsing/lexer.lex
 
 raster.o: raster/raster.h raster/raster.cpp
-	g++ -c $(CFLGAS) -o $@ raster/raster.cpp
+	g++ -c $(CFLAGS) -o $@ raster/raster.cpp
+
+#lexer.yy.o: lexer.yy.cpp
+#	g++ -c -std=c++0x -g -o $@ lexer.yy.cpp
 
 # necessary?
 .cpp.o:

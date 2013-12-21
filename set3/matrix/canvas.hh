@@ -7,7 +7,6 @@
 #include <vector>
 #include <limits>
 
-// really wanted to use Matrix for this, stupid templates
 // TODO: should make usage of X,Y vs R,C more...better.
 // TODO: add z-buff stuff
 template <typename T>
@@ -231,8 +230,14 @@ public:
     // so each element referenes the same matrix
     // should also define something in matrix (and also canvas) so can print
     // normally (like in a cout thing)
+
+    // could make another version of Canvas that uses this? and inherits from
+    // Canvas...like Zanvas or something.
+
+    // or could just pass a reference to a z-buffer from sceneblock or something
+    // that would probably be easiest
   }
-  
+
   //------------------------------------------
   // output
   //------------------------------------------
@@ -262,6 +267,7 @@ public:
     // add size
     out += std::to_string(R) +" "+ std::to_string(C) + "\n";
     // add max intensity
+    // TODO: need to fix this
     out += std::to_string(WHITE) + "\n\n";
 
     // add pixel values

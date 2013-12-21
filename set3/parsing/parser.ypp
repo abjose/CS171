@@ -223,7 +223,7 @@ std::unique_ptr<SceneBlock> parse_test(std::istream &datafile) {
    }
 
    // see if everything's there
-   scene->display();
+   //scene->display();
 
    delete lexer;
    return std::move(scene);

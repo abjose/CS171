@@ -1,5 +1,5 @@
-#ifndef RASTER_H
-#define RASTER_H
+#ifndef __RASTER_H__
+#define __RASTER_H__
 
 #include <math.h>
 
@@ -30,4 +30,4 @@ void initDraw(float xMin, float xMax, float yMin, float yMax, int xr, int yr);
 //  defined by the vertices.
 void raster(vertex verts[3], void (*drawPixel)(int, int, float *));
 
-#endif // RASTER_H
+#endif // __RASTER_H__

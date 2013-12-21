@@ -6,6 +6,7 @@
 #include "../matrix/matrix.hh"
 #include "../matrix/transform.hh"
 #include "../matrix/canvas.hh"
+#include "../lighting.hh"
 #include "transform_block.hh"
 #include "material_block.hh"
 
@@ -107,7 +108,11 @@ public:
       float a[] = {it[0], it[1], it[2], 1.0};
       n.copy(a);
       n = final_transform_sans_trans * n;
-      n.homogenize();
+      // not sure if need to homogenize...shouldn't make a difference if 
+      // normalizing?
+      //n.homogenize();
+      // definitely need to normalize
+      n.normalize();
       //n.display();
       final_vertices.push_back(n);
     }
@@ -130,6 +135,8 @@ public:
       v1 = vertex_list[it[1]];
       v2 = vertex_list[it[2]];
       
+      
+      // TODO: move cross product into matrix class?
       // get cross product
       a = v2-v1; b = v0-v1;
       // copy into a vector for transforming
@@ -153,24 +160,10 @@ public:
     poly_list = culled_list; 
   }
 
-  void render(Canvas &c) {
+  void render() {//Canvas &c) {
     // render vertices onto the canvas appropriately
     for(auto &poly: poly_list) {
-    //  std::cout << "On polygon: ";
-    //  for(auto &vertex: poly) {
-    //    std::cout << vertex << ", ";
-    //  }
-    //  std::cout << std::endl;
       
-      // set initial vert to final vertex so lines close polygon
-      int prev_vert = poly[poly.size()-1];
-      for(auto &curr_vert: poly) {
-	Matrix<float,4,1> p0 = final_vertices[curr_vert];
-	Matrix<float,4,1> p1 = final_vertices[prev_vert];
-	c.scale_draw_line(p0[0], p0[1], p1[0], p1[1]);
-	//std::cout << "Drawing a line: (" << p0[0] << ", " << p0[2] << ") to (" << p1[0] << ", " << p1[1] << ")\n";
-	prev_vert = curr_vert; // heh heh heh
-      }
     }
   }
 
