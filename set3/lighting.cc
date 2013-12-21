@@ -3,20 +3,22 @@
 
 // TODO: move this to a sensible directory
 // TODO: add z-buff stuff...presumable to draw_pixels funcs
+// TODO: change some references to shared_ptrs
 
 Matrix<float,3,1> light_func(Matrix<float,3,1> n, Matrix<float,3,1> v,
-			     MaterialBlock& material, 
-			     std::vector<LightBlock*> lights, 
+			     std::shared_ptr<MaterialBlock> material, 
+			     //std::vector<LightBlock*> lights, 
+			     LightBlock& light, 
 			     Matrix<float,3,1> camerapos) {
   // let n = surface normal (nx,ny,nz)
   // let v = point in space (x,y,z)
   // let lights = [light0, light1, ... ]
   // let camerapos = (x,y,z)
   
-  Matrix<float,3,1> scolor = material.specular; // (r,g,b)
-  Matrix<float,3,1> dcolor = material.diffuse;  // (r,g,b)
-  Matrix<float,3,1> acolor = material.ambient;  // (r,g,b)
-  float shiny =  material.shininess;     // (a scalar, an exponent >= 0)
+  Matrix<float,3,1> scolor = material->specular; // (r,g,b)
+  Matrix<float,3,1> dcolor = material->diffuse;  // (r,g,b)
+  Matrix<float,3,1> acolor = material->ambient;  // (r,g,b)
+  float shiny =  material->shininess;     // (a scalar, an exponent >= 0)
     
   // start off the diffuse and specular at pitch black
   Matrix<float,3,1> diffuse  = makeVector<float>(0,0,0);
@@ -25,12 +27,12 @@ Matrix<float,3,1> light_func(Matrix<float,3,1> n, Matrix<float,3,1> v,
   // it here to rely on distance from the camera)
   Matrix<float,3,1> ambient = acolor;
 
-  for (auto& light : lights) {
+  //for (auto& light : lights) {
     // get the light position and color from the light
     // let lx = light position (x,y,z)
     // let lc = light color (r,g,b)
-    Matrix<float,3,1> lx = light->location;
-    Matrix<float,3,1> lc = light->color;
+    Matrix<float,3,1> lx = light.location;
+    Matrix<float,3,1> lc = light.color;
     
     // first calculate the addition this light makes to the diffuse part
     //Matrix<float,3,1> ddiffuse = zero_clip(lc * (n . unit(lx - v)));
@@ -48,7 +50,7 @@ Matrix<float,3,1> light_func(Matrix<float,3,1> n, Matrix<float,3,1> v,
     Matrix<float,3,1> dspecular = (lc * pow(k,shiny)).zero_clip();
     // accumulate that
     specular += dspecular;
-  }
+  //}
 
   // after working on all the lights, clamp the diffuse value to 1
   diffuse.one_clip();
@@ -95,8 +97,11 @@ void draw_flat(int x, int y, float *data) {
 void flat_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
 		  Matrix<float,3,1> t1, Matrix<float,3,1> n1,
 		  Matrix<float,3,1> t2, Matrix<float,3,1> n2,
-		  MaterialBlock& material, std::vector<LightBlock*> lights,
-		  CameraBlock& camera, TransformBlock& transform,
+		  std::shared_ptr<MaterialBlock> material, 
+		  //std::vector<LightBlock*> lights
+		  LightBlock& light,
+		  CameraBlock& camera, 
+		  std::shared_ptr<TransformBlock> transform,
 		  Canvas<Matrix<float,3,1> >& c) {
   // TODO: allow multiple lights...
   // Compute the averge location and average normal of each of the 3 
@@ -114,13 +119,13 @@ void flat_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
   // Calculate the corresponding color of the average location and normal 
   // with the lighting function.
   Matrix<float,3,1> color = light_func(avg_norm, avg_loc, 
-				       material, lights,camera.position);
+				       material, light, camera.position);
 
   // Convert your locations to NDC by applying the perspective and 
   // camera transforms.
   Matrix<float,4,4> final_transform = camera.get_perspective_projection() * 
                                       camera.get_inverse_transform() * 
-                                      transform.get_final_transform();
+                                      transform->get_final_transform();
   Matrix<float,4,1> temp_loc;
   float a[] = {avg_loc[0],avg_loc[1],avg_loc[2],1};
   temp_loc.copy(a);

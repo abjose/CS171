@@ -11,19 +11,21 @@
 
 class SceneBlock {
 private:
-  std::unique_ptr<CameraBlock> camera;
-  std::unique_ptr<LightBlock> light;
-  std::vector<std::unique_ptr<SeparatorBlock> > sep_list;
+  int shading;
+  std::shared_ptr<CameraBlock> camera;
+  // modify so can take a list of lights
+  std::shared_ptr<LightBlock> light;
+  std::vector<std::shared_ptr<SeparatorBlock> > sep_list;
 
 public:
-  void set_camera(std::unique_ptr<CameraBlock> c) {
-    camera = std::move(c);
+  void set_camera(std::shared_ptr<CameraBlock> c) {
+    camera = c;
   }
-  void set_light(std::unique_ptr<LightBlock> l) {
-    light = std::move(l);
+  void set_light(std::shared_ptr<LightBlock> l) {
+    light = l;
   }
-  void add_separator(std::unique_ptr<SeparatorBlock> s) {
-    sep_list.push_back(std::move(s));
+  void add_separator(std::shared_ptr<SeparatorBlock> s) {
+    sep_list.push_back(s);
   }
 
   void render() {//Canvas &c) {

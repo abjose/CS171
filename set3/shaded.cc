@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
   // make a new canvas and scene for the parser
   Canvas<Matrix<float,3,1> > c(xMin, yMin, xMax, yMax, xres, yres);
   //Canvas<Matrix<float,3,1> > c(-5, -5, 5, 5, xres, yres);
-  std::unique_ptr<SceneBlock> scene;
+  std::shared_ptr<SceneBlock> scene;
   scene = parse_test(std::cin);
 
   // render to the canvas

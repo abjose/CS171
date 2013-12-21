@@ -4,6 +4,6 @@
 #include <memory>
 #include "blocks/scene_block.hh"
 
-std::unique_ptr<SceneBlock> parse_test(std::istream &datafile);
+std::shared_ptr<SceneBlock> parse_test(std::istream &datafile);
 
 #endif // __SHADED_H_GUARD__

@@ -9,12 +9,14 @@
 #include "../lighting.hh"
 #include "transform_block.hh"
 #include "material_block.hh"
+#include "light_block.hh"
+#include "camera_block.hh"
 
 class SeparatorBlock {
 private:
-  std::unique_ptr<TransformBlock> transform;
-  std::unique_ptr<TransformBlock> transform_sans_trans;
-  std::unique_ptr<MaterialBlock> material;
+  std::shared_ptr<TransformBlock> transform;
+  std::shared_ptr<TransformBlock> transform_sans_trans;
+  std::shared_ptr<MaterialBlock> material;
   std::vector<Matrix<float,3,1> > vertex_list; 
   std::vector<Matrix<float,3,1> > normal_list; 
   std::vector<Matrix<float,4,1> > final_vertices;
@@ -26,19 +28,19 @@ private:
 public:
   // default constructor
   SeparatorBlock() {
-    transform = std::unique_ptr<TransformBlock>(new TransformBlock);
-    transform_sans_trans = std::unique_ptr<TransformBlock>(new TransformBlock);
+    transform = std::shared_ptr<TransformBlock>(new TransformBlock);
+    transform_sans_trans = std::shared_ptr<TransformBlock>(new TransformBlock);
   }
 
-  void add_transform(std::unique_ptr<TransformBlock> t) {
+  void add_transform(std::shared_ptr<TransformBlock> t) {
     // gross
     Matrix<float,4,4> r = t->get_rotation();
     Matrix<float,4,4> s = t->get_scale();
-    transform->combine_transform(std::move(t));
+    transform->combine_transform(t);
     transform_sans_trans->combine_transform_sans_trans(r,s);
   }
-  void set_material(std::unique_ptr<MaterialBlock> m) {
-    material = std::move(m);
+  void set_material(std::shared_ptr<MaterialBlock> m) {
+    material = m;
   }
   void add_vertex(float x, float y, float z) {
     vertex_list.push_back(makeVector(x,y,z));
@@ -91,7 +93,7 @@ public:
       float a[] = {it[0], it[1], it[2], 1.0};
       v.copy(a);
       v = final_transform * v;
-      v.homogenize();
+      v = v.homogenize();
       //v.display();
       final_vertices.push_back(v);
     }    
@@ -107,19 +109,17 @@ public:
       Matrix<float,4,1> n;
       float a[] = {it[0], it[1], it[2], 1.0};
       n.copy(a);
-      n = final_transform_sans_trans * n;
+      n = (final_transform_sans_trans * n).normalize();
       // not sure if need to homogenize...shouldn't make a difference if 
       // normalizing?
-      //n.homogenize();
-      // definitely need to normalize
-      n.normalize();
+      //n = n.homogenize();
       //n.display();
       final_vertices.push_back(n);
     }
   }
 
   void cull_backfaces(Matrix<float,4,4> persp_proj,
-			  Matrix<float,4,4> inv_cam) {
+		      Matrix<float,4,4> inv_cam) {
     // polygons should all be triangles
     // note: this will be backwards if polygons aren't ccw - try reversing
     // if nothing shows
@@ -160,10 +160,16 @@ public:
     poly_list = culled_list; 
   }
 
-  void render() {//Canvas &c) {
-    // render vertices onto the canvas appropriately
+  void render(Canvas<Matrix<float,3,1> >& c, 
+	      LightBlock& light, CameraBlock& camera) {
+    // for each polygon (triangle)
     for(auto &poly: poly_list) {
-      
+      // make shit into shared_ptrs??
+      // call the proper shading function -- just flat for now
+      flat_shading(vertex_list[poly[0]], normal_list[poly[0]],
+		   vertex_list[poly[1]], normal_list[poly[1]],
+		   vertex_list[poly[2]], normal_list[poly[2]],
+		   material, light, camera, transform, c);
     }
   }
 

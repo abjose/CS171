@@ -37,7 +37,7 @@ public:
   Matrix<float,4,4> get_scale() {
     return scale;
   }
-  void combine_transform(std::unique_ptr<TransformBlock> t2) {
+  void combine_transform(std::shared_ptr<TransformBlock> t2) {
     transform = transform * t2->translation * t2->rotation * t2->scale;
   }
   void combine_transform_sans_trans(Matrix<float,4,4> rotation,
