@@ -9,7 +9,7 @@
 #include "blocks/transform_block.hh"
 #include "blocks/separator_block.hh"
 #include "blocks/scene_block.hh"
-#include "wireframe.hh"
+#include "shaded.hh"
 
 int yyerror(const char *s);
 int yylex();
