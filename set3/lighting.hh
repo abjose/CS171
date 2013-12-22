@@ -4,6 +4,8 @@
 #include <vector>
 #include <math.h>
 #include <memory>
+#include <map>
+#include <utility>
 #include "raster/raster.h"
 #include "blocks/light_block.hh"
 #include "blocks/material_block.hh"
@@ -20,6 +22,8 @@
 // this right?
 // vector of float arrays for drawing pixels onto the canvas
 static std::vector<float*> pixels_to_draw;
+static std::map<std::pair<int,int>,float> z_buff;
+// set defaults large?
 
 Matrix<float,3,1> light_func(Matrix<float,3,1> n, Matrix<float,3,1> v,
 			     std::shared_ptr<MaterialBlock> material, 
