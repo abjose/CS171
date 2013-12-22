@@ -267,10 +267,10 @@ public:
     Matrix<T,R,C2> res;
     for (int r=0; r<R; r++)
       for (int c=0; c<C2; c++) {
-	T dot = 0;
+	T d = 0;
 	for (int i=0; i<C; i++)
-	  dot += ref(r,i) * m2(i,c);
-	res(r,c) = dot;
+	  d += ref(r,i) * m2(i,c);
+	res(r,c) = d;
       }
     return res;
   }

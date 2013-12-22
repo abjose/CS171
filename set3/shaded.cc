@@ -20,17 +20,16 @@ int main(int argc, char *argv[]) {
   initDraw(xMin, xMax, yMin, yMax, xres, yres);
 
   // make a new canvas and scene for the parser
-  Canvas c(xMin, yMin, xMax, yMax, xres, yres);
-  //Canvas c(-5, -5, 5, 5, xres, yres);
+  auto c = std::make_shared<Canvas>(Canvas(xMin, yMin, xMax, yMax, xres, yres));
   std::shared_ptr<SceneBlock> scene;
   scene = parse_test(std::cin);
 
   // render to the canvas
   //scene->display();
-  scene->render(std::make_shared<Canvas>(c));
+  scene->render(c);
 
   // spit the ppm to std output
-  //std::cout << c.to_ppm() << std::endl;
+  std::cout << c->to_ppm() << std::endl;
   
   return 0;
 }

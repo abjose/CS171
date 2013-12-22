@@ -19,8 +19,6 @@ private:
   std::vector<pixel> matrix;
 
 public:
-  const int WHITE = 255;
-
   // return size
   int size() const { return R*C; }
   int nrows() const { return R; }
@@ -213,15 +211,14 @@ public:
     // add size
     out += std::to_string(R) +" "+ std::to_string(C) + "\n";
     // add max intensity
-    // TODO: need to fix this
-    out += std::to_string(WHITE) + "\n\n";
+    out += "255\n\n";
+    //out += "1\n\n";
 
     // add pixel values
-    for(auto& val: matrix) {
-      //std::string str = std::to_string(val);
-      //out += str +" "+ str +" "+ str + "\n";
-      out += "FIX PPM STUFF!\n";
-    }
+    for(auto& val: matrix)
+      out += std::to_string((int) (255*val[0])) +" "+ 
+	std::to_string((int) (255*val[1])) +" "+ 
+	std::to_string((int) (255*val[2])) + "\n";
     
     return out;
   }

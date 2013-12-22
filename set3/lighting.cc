@@ -21,8 +21,8 @@ Matrix<float,3,1> light_func(Matrix<float,3,1> n, Matrix<float,3,1> v,
   float shiny =  material->shininess;     // (a scalar, an exponent >= 0)
     
   // start off the diffuse and specular at pitch black
-  Matrix<float,3,1> diffuse  = makeVector<float>(0,0,0);
-  Matrix<float,3,1> specular = makeVector<float>(0,0,0);
+  Matrix<float,3,1> diffuse  = makeVector3<float>(0,0,0);
+  Matrix<float,3,1> specular = makeVector3<float>(0,0,0);
   // copy the ambient color (for the eyelight extra credit code, you can change 
   // it here to rely on distance from the camera)
   Matrix<float,3,1> ambient = acolor;
@@ -53,7 +53,7 @@ Matrix<float,3,1> light_func(Matrix<float,3,1> n, Matrix<float,3,1> v,
   //}
 
   // after working on all the lights, clamp the diffuse value to 1
-  diffuse.one_clip();
+  diffuse = diffuse.one_clip();
   // note that diffuse, dcolor,specular and scolor are all (r,g,b).
   // * here represents component-wise multiplication
   //rgb = one_clip(ambient + diffuse*dcolor + specular*scolor)
@@ -97,7 +97,7 @@ void draw_flat(int x, int y, float *data) {
   // if haven't seen this value before, go ahead and do stuff
   // should move this z-buff stuff into its own function when you know it works
   auto xy = std::make_pair(x,y);
-  float z = data[0]; // sure this is z?
+  float z = data[2];
   if(z_buff.count(xy) == 0 || z < z_buff[xy]) {
     z_buff[xy] = z;
     pixels_to_draw.push_back(new float[2] {(float) x, (float) y});
@@ -118,7 +118,7 @@ void flat_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
   // sure the normals come from the file?
   Matrix<float,3,1> avg_loc  = (t0 + t1 + t2) / 3;
   Matrix<float,3,1> avg_norm = (n0 + n1 + n2) / 3;
-  avg_norm.normalize();
+  avg_norm = avg_norm.normalize();
 
   // TODO: Make it easier to initialize matrices or append indices to them...
   // could just have a constructor that takes an array or something?
@@ -132,20 +132,30 @@ void flat_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
 
   // Convert your locations to NDC by applying the perspective and 
   // camera transforms.
+  //std::cout << camera->get_perspective_projection() << std::endl;
   Matrix<float,4,4> final_transform = camera->get_perspective_projection() * 
                                       camera->get_inverse_transform() * 
                                       transform->get_final_transform();
-  Matrix<float,4,1> temp_loc;
-  float a[] = {avg_loc[0],avg_loc[1],avg_loc[2],1};
-  temp_loc.copy(a);
-  temp_loc = final_transform * temp_loc;
-  temp_loc.homogenize();
-  avg_loc[0] = temp_loc[0]; avg_loc[1] = temp_loc[1]; avg_loc[2] = temp_loc[2];
+  Matrix<float,4,1> temp_loc = makeVector4<float>(avg_loc[0],avg_loc[1],
+						  avg_loc[2],1);
+  temp_loc = (final_transform * temp_loc).homogenize();
+  avg_loc = makeVector3<float>(temp_loc[0],temp_loc[1],temp_loc[2]);
 
   // TODO: Err, couldn't you just convert to NDC in separator block and skip
   //       a lot of this stuff?
   //       I guess make sure works current way, then modify and see if still
   //       works.
+
+  // test
+  auto t0_4 = makeVector4<float>(t0[0],t0[1],t0[2],1);
+  t0_4      = (final_transform * t0_4).homogenize();
+  t0        = makeVector3<float>(t0_4[0],t0_4[1],t0_4[2]);
+  auto t1_4 = makeVector4<float>(t1[0],t1[1],t1[2],1);
+  t1_4      = (final_transform * t1_4).homogenize();
+  t1        = makeVector3<float>(t1_4[0],t1_4[1],t1_4[2]);
+  auto t2_4 = makeVector4<float>(t2[0],t2[1],t2[2],1);
+  t2_4      = (final_transform * t2_4).homogenize();
+  t2        = makeVector3<float>(t2_4[0],t2_4[1],t2_4[2]);
 
   // Call Bill's code with 3 vertices, each with data array = {x, y, z} 
   // (since we're only interpolating across locations)

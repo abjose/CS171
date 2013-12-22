@@ -91,6 +91,8 @@ light_col: LCOLOR triple {
   light->set_color(in[2],in[1],in[0]);
 }
 
+// SOMETHING'S WRONG WITH TRANSFORM!!
+
 sepblock: SEPARATOR open sepitems close {
   scene->add_separator(separator);
   // re-init separator
@@ -124,6 +126,7 @@ normalline: NORMAL open VECTOR sqopen triples sqclose close {
 transformline: TRANSFORM open translines close {
   separator->add_transform(transform);
   // re-init transform
+  //transform = std::make_shared<TransformBlock>();
   transform = std::shared_ptr<TransformBlock>(new TransformBlock);
 }
 translines: transline | transline translines
