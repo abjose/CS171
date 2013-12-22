@@ -26,7 +26,7 @@ public:
   void set_position(float x, float y, float z) {
     view_translation = translation_matrix(x,y,z);
     // not sure this is right...
-    position = makeVector<float>(x,y,z);
+    position = makeVector3<float>(x,y,z);
   }
   void set_orientation(float x, float y, float z, float theta) {
     view_rotation = rotation_matrix(x,y,z,theta);

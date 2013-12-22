@@ -25,6 +25,9 @@ private:
   std::vector<int> temp_poly;
   std::vector<int> temp_poly_normal;
 
+
+  // TODO: MAKE SURE MATRIX OPERATIONS ARE STILL OK AFTER CHANGING HOW THEY WORK
+
 public:
   // default constructor
   SeparatorBlock() {
@@ -34,19 +37,19 @@ public:
 
   void add_transform(std::shared_ptr<TransformBlock> t) {
     // gross
-    Matrix<float,4,4> r = t->get_rotation();
-    Matrix<float,4,4> s = t->get_scale();
+    //std::cout << "MEOW\n" << transform->get_final_transform() << std::endl;
     transform->combine_transform(t);
-    transform_sans_trans->combine_transform_sans_trans(r,s);
+    transform_sans_trans->combine_transform_sans_trans(t);
+    //std::cout << "MEOW2\n" << transform->get_final_transform() << std::endl;
   }
   void set_material(std::shared_ptr<MaterialBlock> m) {
     material = m;
   }
   void add_vertex(float x, float y, float z) {
-    vertex_list.push_back(makeVector(x,y,z));
+    vertex_list.push_back(makeVector3<float>(x,y,z));
   }
   void add_normal(float x, float y, float z) {
-    normal_list.push_back(makeVector(x,y,z));
+    normal_list.push_back(makeVector3<float>(x,y,z));
   }
   void add_poly_index(int vertex) {
     if (vertex == -1) {
@@ -92,8 +95,7 @@ public:
       Matrix<float,4,1> v;
       float a[] = {it[0], it[1], it[2], 1.0};
       v.copy(a);
-      v = final_transform * v;
-      v = v.homogenize();
+      v = (final_transform * v).homogenize();
       //v.display();
       final_vertices.push_back(v);
     }    
@@ -140,11 +142,11 @@ public:
       // get cross product
       a = v2-v1; b = v0-v1;
       // copy into a vector for transforming
-      float a[] = {a[1]*b[2] - a[2]*b[1], 
+      float z[] = {a[1]*b[2] - a[2]*b[1], 
 		   a[2]*b[0] - a[0]*b[2],
 		   a[0]*b[1] - a[1]*b[0], 
 		   1.0};
-      n.copy(a);
+      n.copy(z);
 
       // transform into NDC
       n = final_transform * n;
@@ -153,6 +155,8 @@ public:
       if(n[2] > 0) { 
 	// add triangle to "show" list (which will replace current poly list)
 	culled_list.push_back(it);
+      } else {
+	//std::cout << "FOUND BACKFACE\n";
       }
     }
 
@@ -165,7 +169,6 @@ public:
 	      std::shared_ptr<CameraBlock> camera) {
     // for each polygon (triangle)
     for(auto &poly: poly_list) {
-      // make shit into shared_ptrs??
       // call the proper shading function -- just flat for now
       flat_shading(vertex_list[poly[0]], normal_list[poly[0]],
 		   vertex_list[poly[1]], normal_list[poly[1]],
@@ -207,9 +210,6 @@ public:
     }
   }
 };
-
-
-
 
 
 #endif // __SEPARATOR_BLOCK_H_GUARD__
