@@ -161,7 +161,7 @@ public:
     T mag = magnitude();
     //assert(mag != 0);
     // should just make 0 vector if magnitude is 0?
-    if (abs(mag) < 0.000001)
+    if (mag == 0) //abs(mag) < 0.000001)
       m2.clear(0);
     else
       m2 /= mag;

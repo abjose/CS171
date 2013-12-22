@@ -19,7 +19,8 @@ private:
   std::shared_ptr<MaterialBlock> material;
   std::vector<Matrix<float,3,1> > vertex_list; 
   std::vector<Matrix<float,3,1> > normal_list; 
-  std::vector<Matrix<float,4,1> > final_vertices;
+  //std::vector<Matrix<float,3,1> > final_vertices;
+  //std::vector<Matrix<float,3,1> > final_normals;
   std::vector<std::vector<int> > poly_list; 
   std::vector<std::vector<int> > poly_normal_list; 
   std::vector<int> temp_poly;
@@ -84,40 +85,74 @@ public:
     }
   }
 
-  void transform_vertices(Matrix<float,4,4> persp_proj,
-			  Matrix<float,4,4> inv_cam) {
-    // figure out final transform matrix and transform all vertices by it
-    Matrix<float,4,4> final_transform = persp_proj * inv_cam * 
-                                        transform->get_final_transform();
-   
+
+  void verts_object_to_world() {
+    auto final_transform = transform->get_final_transform();
+    std::vector<Matrix<float,3,1> > final_vertices;
     for (auto &it: vertex_list) {
-      // need to homogenize, is this right?
-      Matrix<float,4,1> v;
-      float a[] = {it[0], it[1], it[2], 1.0};
-      v.copy(a);
+      // need to homogenize...each time?
+      auto v = makeVector4<float>(it[0], it[1], it[2], 1.0);
       v = (final_transform * v).homogenize();
-      //v.display();
-      final_vertices.push_back(v);
+      final_vertices.push_back(makeVector3<float>(v[0],v[1],v[2]));
     }    
+    vertex_list = final_vertices;
+  }
+  void verts_world_to_camera(Matrix<float,4,4> inv_cam) {
+    std::vector<Matrix<float,3,1> > final_vertices;
+    for (auto &it: vertex_list) {
+      // need to homogenize...each time?
+      auto v = makeVector4<float>(it[0], it[1], it[2], 1.0);
+      v = (inv_cam * v).homogenize();
+      final_vertices.push_back(makeVector3<float>(v[0],v[1],v[2]));
+    }    
+    vertex_list = final_vertices;
+  }
+  void verts_world_to_NDC(Matrix<float,4,4> persp_proj) {
+    std::vector<Matrix<float,3,1> > final_vertices;
+    for (auto &it: vertex_list) {
+      // need to homogenize...each time?
+      auto v = makeVector4<float>(it[0], it[1], it[2], 1.0);
+      v = (persp_proj * v).homogenize();
+      final_vertices.push_back(makeVector3<float>(v[0],v[1],v[2]));
+    }    
+    vertex_list = final_vertices;
+
   }
 
-  void transform_normals() {
+
+  void norms_object_to_world() {
+    std::vector<Matrix<float,3,1> > final_normals;
     Matrix<float,4,4> final_transform_sans_trans = 
       transform_sans_trans->get_final_transform();
     final_transform_sans_trans.inverse();
     final_transform_sans_trans = final_transform_sans_trans.transpose();
 
     for (auto &it: normal_list) {
-      Matrix<float,4,1> n;
-      float a[] = {it[0], it[1], it[2], 1.0};
-      n.copy(a);
+      auto n = makeVector4<float>(it[0], it[1], it[2], 1.0);
       n = (final_transform_sans_trans * n).normalize();
-      // not sure if need to homogenize...shouldn't make a difference if 
-      // normalizing?
-      //n = n.homogenize();
-      //n.display();
-      final_vertices.push_back(n);
+      final_normals.push_back(makeVector3<float>(n[0],n[1],n[2]));
     }
+    normal_list = final_normals;
+  }
+  //need?
+  void norms_world_to_camera(Matrix<float,4,4> inv_cam) {
+    std::vector<Matrix<float,3,1> > final_normals;
+    for (auto &it: normal_list) {
+      auto n = makeVector4<float>(it[0], it[1], it[2], 1.0);
+      n = (inv_cam * n).normalize();
+      final_normals.push_back(makeVector3<float>(n[0],n[1],n[2]));
+    }
+    normal_list = final_normals;
+  }
+  //need?
+  void norms_world_to_NDC(Matrix<float,4,4> persp_proj) {
+    std::vector<Matrix<float,3,1> > final_normals;
+    for (auto &it: normal_list) {
+      auto n = makeVector4<float>(it[0], it[1], it[2], 1.0);
+      n = (persp_proj * n).normalize();
+      final_normals.push_back(makeVector3<float>(n[0],n[1],n[2]));
+    }
+    normal_list = final_normals;
   }
 
   void cull_backfaces(Matrix<float,4,4> persp_proj,

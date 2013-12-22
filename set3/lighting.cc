@@ -119,52 +119,50 @@ void flat_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
   Matrix<float,3,1> avg_loc  = (t0 + t1 + t2) / 3;
   Matrix<float,3,1> avg_norm = (n0 + n1 + n2) / 3;
   avg_norm = avg_norm.normalize();
+  //std::cout << avg_loc << std::endl;
+  //std::cout << avg_norm << std::endl;
+  //std::cout << n0 << std::endl;
+  //std::cout << n1 << std::endl;
+  //std::cout << n2 << std::endl;
+  
 
-  // TODO: Make it easier to initialize matrices or append indices to them...
-  // could just have a constructor that takes an array or something?
-  // and/or a constructor that takes another matrix and attemps to copy
-  // its contents even if it's not the right size...maybe just for vectors.
- 
+  // get camera position into world coords
+  auto cp = camera->position;
+  auto cp4 = (transform->get_final_transform() * 
+	      makeVector4<float>(cp[0],cp[1],cp[2],1)).homogenize();
+  cp = makeVector3<float>(cp4[0],cp4[1],cp4[2]);
+
+  // get light position into world coords
+  auto lp = light->location;
+  auto lp4 = (transform->get_final_transform() * 
+	      makeVector4<float>(lp[0],lp[1],lp[2],1)).homogenize();
+  light->location = makeVector3<float>(lp4[0],lp4[1],lp4[2]);
+
   // Calculate the corresponding color of the average location and normal 
   // with the lighting function.
-  Matrix<float,3,1> color = light_func(avg_norm, avg_loc, 
-				       material, light, camera->position);
+  auto color = light_func(avg_norm, avg_loc, material, light, cp);
+  //std::cout << color << std::endl;
 
   // Convert your locations to NDC by applying the perspective and 
   // camera transforms.
-  //std::cout << camera->get_perspective_projection() << std::endl;
-  Matrix<float,4,4> final_transform = camera->get_perspective_projection() * 
-                                      camera->get_inverse_transform() * 
-                                      transform->get_final_transform();
-  Matrix<float,4,1> temp_loc = makeVector4<float>(avg_loc[0],avg_loc[1],
-						  avg_loc[2],1);
-  temp_loc = (final_transform * temp_loc).homogenize();
-  avg_loc = makeVector3<float>(temp_loc[0],temp_loc[1],temp_loc[2]);
-
-  // TODO: Err, couldn't you just convert to NDC in separator block and skip
-  //       a lot of this stuff?
-  //       I guess make sure works current way, then modify and see if still
-  //       works.
-
-  // test
+  Matrix<float,4,4> final_transform = 
+    camera->get_perspective_projection() * camera->get_inverse_transform();
+  // make one-liners...:o
   auto t0_4 = makeVector4<float>(t0[0],t0[1],t0[2],1);
   t0_4      = (final_transform * t0_4).homogenize();
-  t0        = makeVector3<float>(t0_4[0],t0_4[1],t0_4[2]);
   auto t1_4 = makeVector4<float>(t1[0],t1[1],t1[2],1);
   t1_4      = (final_transform * t1_4).homogenize();
-  t1        = makeVector3<float>(t1_4[0],t1_4[1],t1_4[2]);
   auto t2_4 = makeVector4<float>(t2[0],t2[1],t2[2],1);
   t2_4      = (final_transform * t2_4).homogenize();
-  t2        = makeVector3<float>(t2_4[0],t2_4[1],t2_4[2]);
 
   // Call Bill's code with 3 vertices, each with data array = {x, y, z} 
   // (since we're only interpolating across locations)
   vertex verts[3];
   for (int i = 0; i < 3; i++) verts[i].numData = 3; // just x,y,z
   // TODO: pass input stuff as vectors so can just loop?
-  verts[0].data = new float[3] {t0[0], t0[1], t0[2]};
-  verts[1].data = new float[3] {t1[0], t1[1], t1[2]};
-  verts[2].data = new float[3] {t2[0], t2[1], t2[2]};
+  verts[0].data = new float[3] {t0_4[0], t0_4[1], t0_4[2]};
+  verts[1].data = new float[3] {t1_4[0], t1_4[1], t1_4[2]};
+  verts[2].data = new float[3] {t2_4[0], t2_4[1], t2_4[2]};
   pixels_to_draw.clear();
   raster(verts, draw_flat);
 
