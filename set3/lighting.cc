@@ -66,10 +66,12 @@ Matrix<float,3,1> light_func(Matrix<float,3,1> n, Matrix<float,3,1> v,
 void draw_pixels_with_constant_color(std::shared_ptr<Canvas> c, 
 				     Matrix<float,3,1> color) {
   // iterate through pixels_to_draw vector
-  for (auto& it : pixels_to_draw)
+  for (auto& it : pixels_to_draw) {
+    //std::cout << "LOOK A PIXEL: " << it[0] << ", " << it[1] << "\n"  << color << "\n";
     // NOTE SURE THESE SHOULD BE SCALED!!
     //c.set_pixel(it[0],it[1],color,true);
     c->set_pixel(it[0],it[1],color);
+  }
 }
 
 void draw_pixels(std::shared_ptr<Canvas> c) {
@@ -92,7 +94,14 @@ void draw_flat(int x, int y, float *data) {
   // in the flat_shading function so don't have to do any funky stuff
   // with making this a class or anything
   // uhhh, should these be scaled later or not?
-  pixels_to_draw.push_back(new float[2] {(float) x, (float) y});
+  // if haven't seen this value before, go ahead and do stuff
+  // should move this z-buff stuff into its own function when you know it works
+  auto xy = std::make_pair(x,y);
+  float z = data[0]; // sure this is z?
+  if(z_buff.count(xy) == 0 || z < z_buff[xy]) {
+    z_buff[xy] = z;
+    pixels_to_draw.push_back(new float[2] {(float) x, (float) y});
+  } 
 }
 void flat_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
 		  Matrix<float,3,1> t1, Matrix<float,3,1> n1,
