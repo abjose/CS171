@@ -2,8 +2,7 @@
 #include "lighting.hh"
 
 // TODO: move this to a sensible directory
-// TODO: add z-buff stuff...presumable to draw_pixels funcs
-// TODO: change references to shared_ptrs
+// TODO: lighting seems to be on...the opposite of the right side?
 
 Matrix<float,3,1> light_func(Matrix<float,3,1> n, Matrix<float,3,1> v,
 			     std::shared_ptr<MaterialBlock> material, 
@@ -104,28 +103,16 @@ void flat_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
 		  std::shared_ptr<Canvas> c) {
   // Compute the averge location and average normal of each of the 3 
   // vertices. Remember to normalize your normals.
-  // sure the normals come from the file?
   Matrix<float,3,1> avg_loc  = (t0 + t1 + t2) / 3;
   Matrix<float,3,1> avg_norm = (n0 + n1 + n2) / 3;
   avg_norm = avg_norm.normalize();
-  //std::cout << avg_loc << std::endl;
-  //std::cout << avg_norm << std::endl;
-  //std::cout << n0 << std::endl;
-  //std::cout << n1 << std::endl;
-  //std::cout << n2 << std::endl;
   
-  // eh
-  auto cp = camera->position;
-
   // Calculate the corresponding color of the average location and normal 
   // with the lighting function.
-  auto color = light_func(avg_norm, avg_loc, material, lights, cp);
-  //std::cout << color << std::endl;
+  auto color =light_func(avg_norm, avg_loc, material, lights, camera->position);
 
   // Convert your locations to NDC by applying the perspective and 
   // camera transforms.
-  //auto test = translation_matrix(cp[0],cp[1],cp[2]) * camera->view_rotation;
-  //test.inverse();
   Matrix<float,4,4> final_transform = 
     camera->get_perspective_projection() * camera->get_inverse_transform();
     //camera->get_perspective_projection() * test;
