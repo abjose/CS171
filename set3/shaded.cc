@@ -7,7 +7,7 @@ int main(int argc, char *argv[]) {
   // read cmd line args
   int mode, xres, yres;
   //xres = std::stoi(argv[1]); yres = std::stoi(argv[2]); 
-  mode = 0; // flat
+  mode = 1;
   xres = 400; yres = 400;
   float xMin = -1; float yMin = -1;
   float xMax =  1; float yMax =  1;
@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
 
   // render to the canvas
   //scene->display();
-  scene->render(c);
+  scene->render(c, mode);
 
   // spit the ppm to std output
   std::cout << c->to_ppm() << std::endl;

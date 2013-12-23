@@ -27,7 +27,7 @@ public:
     sep_list.push_back(s);
   }
 
-  void render(std::shared_ptr<Canvas> c) {
+  void render(std::shared_ptr<Canvas> c, int shading_type) {
     // ADD Z-BUFFER
     // ...hmm, could pass reference to z-buffer to rasterization thing?
 
@@ -51,7 +51,7 @@ public:
       sep->verts_object_to_world();
       sep->norms_object_to_world();
       // then get each separator to rasterize the polygons on the canvas
-      sep->render(c, lights, camera);
+      sep->render(c, lights, camera, shading_type);
     }
   }
   

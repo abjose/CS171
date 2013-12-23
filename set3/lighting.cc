@@ -71,16 +71,8 @@ void draw_pixels_with_constant_color(std::shared_ptr<Canvas> c,
 
 void draw_pixels(std::shared_ptr<Canvas> c) {
   // iterate through pixels_to_draw vector
-  float x,y,r,g,b;
   for (auto& it : pixels_to_draw) {
-    x = it[0]; y = it[1];
-    r = it[2]; g = it[3]; b = it[4];
-    // maybe just do this all in other draw fns, have pixels_to_draw be tuples?
-    Matrix<float,3,1> color;
-    float a[] = {r,g,b};
-    color.copy(a);
-    //c.set_pixel(x,y,color,true);
-    c->set_pixel(x,y,color);
+    c->set_pixel(it[0],it[1], makeVector3<float>(it[2],it[3],it[4]));
   }
 }
 
@@ -143,16 +135,49 @@ void flat_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
 
 
 void draw_gourand(int x, int y, float *data) {
+  // should move this z-buff stuff into its own function when you know it works
+  auto xy = std::make_pair(x,y);
+  float z = data[2];
+  if(z_buff.count(xy) == 0 || z < z_buff[xy]) {
+    z_buff[xy] = z;
+    pixels_to_draw.push_back(new float[5] 
+			     {(float) x, (float) y, data[3], data[4], data[5]});
+  } 
 }
-void gourand_shading() {
+void gourand_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
+		     Matrix<float,3,1> t1, Matrix<float,3,1> n1,
+		     Matrix<float,3,1> t2, Matrix<float,3,1> n2,
+		     std::shared_ptr<MaterialBlock> material, 
+		     std::vector<std::shared_ptr<LightBlock> > lights,
+		     std::shared_ptr<CameraBlock> camera, 
+		     std::shared_ptr<TransformBlock> transform,
+		     std::shared_ptr<Canvas> c) {
   // Call the lighting function on each of the 3 vertices and their 
   // corresponding normals, to get a unique color for each.
+  auto c0 = light_func(n0, t0, material, lights, camera->position);
+  auto c1 = light_func(n1, t1, material, lights, camera->position);
+  auto c2 = light_func(n2, t2, material, lights, camera->position);
 
   // Convert your positions to NDC.
+  Matrix<float,4,4> T = camera->get_perspective_projection() * 
+    camera->get_inverse_transform();
+  auto t0_4 = (T * makeVector4<float>(t0[0],t0[1],t0[2],1)).homogenize();
+  auto t1_4 = (T * makeVector4<float>(t1[0],t1[1],t1[2],1)).homogenize();
+  auto t2_4 = (T * makeVector4<float>(t2[0],t2[1],t2[2],1)).homogenize();
 
   // Call Bill's code with 3 vertices, each with data array = {x, y, z, r, g, b}
   // (since we're interpolating across both location and color). 
+  vertex verts[6];
+  for (int i = 0; i < 3; i++) verts[i].numData = 6; // x,y,z,r,g,b
+  // TODO: pass input stuff as vectors so can just loop?
+  verts[0].data = new float[6] {t0_4[0], t0_4[1], t0_4[2], c0[0], c0[1], c0[2]};
+  verts[1].data = new float[6] {t1_4[0], t1_4[1], t1_4[2], c1[0], c1[1], c1[2]};
+  verts[2].data = new float[6] {t2_4[0], t2_4[1], t2_4[2], c2[0], c2[1], c2[2]};
+  pixels_to_draw.clear();
+  raster(verts, draw_gourand);
+
   // Then, draw each of these pixels with their corresponding interpolated color
+  draw_pixels(c);
 }
 
 

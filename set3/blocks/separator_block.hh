@@ -202,25 +202,29 @@ public:
 
   void render(std::shared_ptr<Canvas> c,
 	      std::vector<std::shared_ptr<LightBlock> > lights, 
-	      std::shared_ptr<CameraBlock> camera) {
-    // for each polygon (should all be triangles)
+	      std::shared_ptr<CameraBlock> camera,
+	      int shading_type) {
     assert(poly_list.size() == poly_normal_list.size());
-    //for(auto &poly: poly_list) {
+    // for each polygon (should all be triangles)
     for (int i=0; i < poly_list.size(); i++) {
-      // call the proper shading function -- just flat for now
-      /*
-      flat_shading(vertex_list[poly[0]], normal_list[poly[0]],
-		   vertex_list[poly[1]], normal_list[poly[1]],
-		   vertex_list[poly[2]], normal_list[poly[2]],
-		   material, light, camera, transform, c);
-      */
+      // call the proper shading function
       auto poly = poly_list[i];
       auto norm = poly_normal_list[i];
-      flat_shading(vertex_list[poly[0]], normal_list[norm[0]],
-		   vertex_list[poly[1]], normal_list[norm[1]],
-		   vertex_list[poly[2]], normal_list[norm[2]],
-		   material, lights, camera, transform, c);
-      
+
+      switch(shading_type) {
+      case 0: // flat shading
+	flat_shading(vertex_list[poly[0]], normal_list[norm[0]],
+		     vertex_list[poly[1]], normal_list[norm[1]],
+		     vertex_list[poly[2]], normal_list[norm[2]],
+		     material, lights, camera, transform, c);
+	break;
+      case 1: // gourand shading
+	gourand_shading(vertex_list[poly[0]], normal_list[norm[0]],
+			vertex_list[poly[1]], normal_list[norm[1]],
+			vertex_list[poly[2]], normal_list[norm[2]],
+			material, lights, camera, transform, c);
+	break;
+      }
     }
   }
 
