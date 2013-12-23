@@ -15,8 +15,8 @@ int yyerror(const char *s);
 int yylex();
 
 // print debug statements?
-bool debug = false;
-//bool debug = true;
+//bool debug = false;
+bool debug = true;
 // vector for storing input numbers
 std::deque<float> in;
 // shared_ptr to a CameraBlock
@@ -80,7 +80,9 @@ topline:   TOP   NUMBER { camera->top   = $2; }
 bottomline: BOTTOM NUMBER { camera->bottom = $2; }
 
 lightblock: POINTLIGHT open pointlightlines close {
-  scene->set_light(light);
+  scene->add_light(light);
+  // re-init light
+  light = std::shared_ptr<LightBlock>(new LightBlock);
 }
 pointlightlines: pointlightline | pointlightline pointlightlines
 pointlightline: light_loc | light_col
@@ -187,10 +189,10 @@ single: NUMBER {
   if(debug) std::cout << "SINGLE:\t" << $1 << std::endl;
   in.push_front($1);
 }
-singles: single | single COMMA singles
+singles: single | singles COMMA single
 
 triple:  single single single
-triples: triple | triple COMMA triples
+triples: triple | triples COMMA triple
 
 quad:    single single single single
 
