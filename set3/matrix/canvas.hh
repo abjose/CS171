@@ -158,28 +158,8 @@ public:
       x = (int) xf; y = (int) yf;
     }
 
-    ref(x,y) = data;
-  }
-
-
-  void set_pixel_with_zbuff(float xf, float yf, pixel data, bool scale=false) {
-    // set pixel, but check the z-buffer as well
-    // wait, this shouldn't be here
-    // HMM, maybe so you don't have to deal with a z-buffer, just use RGBA
-    // and set the A value to be the Z value of the pixel? then can just check
-    // that...
-    // but need to make sure to default to inifinity ...
-
-    // need to make sure that doing canvas.clear(Matrix ...) doesn't make it
-    // so each element referenes the same matrix
-    // should also define something in matrix (and also canvas) so can print
-    // normally (like in a cout thing)
-
-    // could make another version of Canvas that uses this? and inherits from
-    // Canvas...like Zanvas or something.
-
-    // or could just pass a reference to a z-buffer from sceneblock or something
-    // that would probably be easiest
+    //ref(x,y) = data;
+    ref(C-y,x) = data;
   }
 
   //------------------------------------------

@@ -57,7 +57,7 @@ Matrix<float,3,1> light_func(Matrix<float,3,1> n, Matrix<float,3,1> v,
   // note that diffuse, dcolor,specular and scolor are all (r,g,b).
   // * here represents component-wise multiplication
   //rgb = one_clip(ambient + diffuse*dcolor + specular*scolor)
-  diffuse[0] *= dcolor[0]; diffuse[1] *= dcolor[1]; diffuse[2] *= dcolor[2];
+  diffuse[0]  *= dcolor[0]; diffuse[1]  *= dcolor[1]; diffuse[2]  *= dcolor[2];
   specular[0] *= scolor[0]; specular[1] *= scolor[1]; specular[2] *= scolor[2];
   Matrix<float,3,1> rgb = (ambient + diffuse + specular).one_clip();
   return rgb;
