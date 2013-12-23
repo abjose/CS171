@@ -67,10 +67,7 @@ void draw_pixels_with_constant_color(std::shared_ptr<Canvas> c,
 				     Matrix<float,3,1> color) {
   // iterate through pixels_to_draw vector
   for (auto& it : pixels_to_draw) {
-    //std::cout << "LOOK A PIXEL: " << it[0] << ", " << it[1] << "\n"  << color << "\n";
-    // NOTE SURE THESE SHOULD BE SCALED!!
-    //c.set_pixel(it[0],it[1],color,true);
-    c->set_pixel(it[0],it[1],color);
+    c->set_pixel((int) it[0], (int) it[1], color);
   }
 }
 
@@ -90,11 +87,6 @@ void draw_pixels(std::shared_ptr<Canvas> c) {
 }
 
 void draw_flat(int x, int y, float *data) {
-  // could just add to a vector of color - point things to go through
-  // in the flat_shading function so don't have to do any funky stuff
-  // with making this a class or anything
-  // uhhh, should these be scaled later or not?
-  // if haven't seen this value before, go ahead and do stuff
   // should move this z-buff stuff into its own function when you know it works
   auto xy = std::make_pair(x,y);
   float z = data[2];
@@ -125,18 +117,8 @@ void flat_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
   //std::cout << n1 << std::endl;
   //std::cout << n2 << std::endl;
   
-
-  // get camera position into world coords
+  // eh
   auto cp = camera->position;
-  auto cp4 = (transform->get_final_transform() * 
-	      makeVector4<float>(cp[0],cp[1],cp[2],1)).homogenize();
-  cp = makeVector3<float>(cp4[0],cp4[1],cp4[2]);
-
-  // get light position into world coords
-  auto lp = light->location;
-  auto lp4 = (transform->get_final_transform() * 
-	      makeVector4<float>(lp[0],lp[1],lp[2],1)).homogenize();
-  light->location = makeVector3<float>(lp4[0],lp4[1],lp4[2]);
 
   // Calculate the corresponding color of the average location and normal 
   // with the lighting function.
@@ -145,8 +127,11 @@ void flat_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
 
   // Convert your locations to NDC by applying the perspective and 
   // camera transforms.
+  //auto test = translation_matrix(cp[0],cp[1],cp[2]) * camera->view_rotation;
+  //test.inverse();
   Matrix<float,4,4> final_transform = 
     camera->get_perspective_projection() * camera->get_inverse_transform();
+    //camera->get_perspective_projection() * test;
   // make one-liners...:o
   auto t0_4 = makeVector4<float>(t0[0],t0[1],t0[2],1);
   t0_4      = (final_transform * t0_4).homogenize();

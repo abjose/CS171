@@ -46,7 +46,7 @@ public:
     Matrix<float,4,4> inv_cam = camera->get_inverse_transform();
     for(auto &sep: sep_list) {
       // get each separator to get it's final list of points
-      sep->cull_backfaces(p_proj, inv_cam);
+      //sep->cull_backfaces(p_proj, inv_cam); // don't think this works
       //sep->transform_vertices(p_proj, inv_cam);
       //sep->transform_normals();
       sep->verts_object_to_world();
