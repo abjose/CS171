@@ -19,15 +19,11 @@ private:
   std::shared_ptr<MaterialBlock> material;
   std::vector<Matrix<float,3,1> > vertex_list; 
   std::vector<Matrix<float,3,1> > normal_list; 
-  //std::vector<Matrix<float,3,1> > final_vertices;
-  //std::vector<Matrix<float,3,1> > final_normals;
   std::vector<std::vector<int> > poly_list; 
   std::vector<std::vector<int> > poly_normal_list; 
   std::vector<int> temp_poly;
   std::vector<int> temp_poly_normal;
 
-
-  // TODO: MAKE SURE MATRIX OPERATIONS ARE STILL OK AFTER CHANGING HOW THEY WORK
 
 public:
   // default constructor
@@ -75,6 +71,10 @@ public:
     }
   }
   void add_normal_index(int normal) {
+    // DOES THIS NEED TO BE 'TRIANGULATED' IN SOME WAY TOO?
+    // don't think so...
+    // actually, do think so...but will only be a problem when everything
+    // isn't already a triangle
     if (normal == -1) {
       // should experiment with this -- see if all this copying is necessary
       std::vector<int> new_poly_normal = temp_poly_normal;
@@ -131,6 +131,7 @@ public:
       auto n = makeVector4<float>(it[0], it[1], it[2], 1.0);
       n = (final_transform_sans_trans * n).normalize();
       final_normals.push_back(makeVector3<float>(n[0],n[1],n[2]));
+      //std::cout << n << std::endl;
     }
     normal_list = final_normals;
   }
@@ -202,13 +203,24 @@ public:
   void render(std::shared_ptr<Canvas> c,
 	      std::shared_ptr<LightBlock> light, 
 	      std::shared_ptr<CameraBlock> camera) {
-    // for each polygon (triangle)
-    for(auto &poly: poly_list) {
+    // for each polygon (should all be triangles)
+    assert(poly_list.size() == poly_normal_list.size());
+    //for(auto &poly: poly_list) {
+    for (int i=0; i < poly_list.size(); i++) {
       // call the proper shading function -- just flat for now
+      /*
       flat_shading(vertex_list[poly[0]], normal_list[poly[0]],
 		   vertex_list[poly[1]], normal_list[poly[1]],
 		   vertex_list[poly[2]], normal_list[poly[2]],
 		   material, light, camera, transform, c);
+      */
+      auto poly = poly_list[i];
+      auto norm = poly_normal_list[i];
+      flat_shading(vertex_list[poly[0]], normal_list[norm[0]],
+		   vertex_list[poly[1]], normal_list[norm[1]],
+		   vertex_list[poly[2]], normal_list[norm[2]],
+		   material, light, camera, transform, c);
+      
     }
   }
 
