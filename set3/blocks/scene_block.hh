@@ -13,16 +13,15 @@ class SceneBlock {
 private:
   int shading;
   std::shared_ptr<CameraBlock> camera;
-  // modify so can take a list of lights
-  std::shared_ptr<LightBlock> light;
+  std::vector<std::shared_ptr<LightBlock> > lights;
   std::vector<std::shared_ptr<SeparatorBlock> > sep_list;
 
 public:
   void set_camera(std::shared_ptr<CameraBlock> c) {
     camera = c;
   }
-  void set_light(std::shared_ptr<LightBlock> l) {
-    light = l;
+  void add_light(std::shared_ptr<LightBlock> l) {
+    lights.push_back(l);
   }
   void add_separator(std::shared_ptr<SeparatorBlock> s) {
     sep_list.push_back(s);
@@ -52,15 +51,16 @@ public:
       sep->verts_object_to_world();
       sep->norms_object_to_world();
       // then get each separator to rasterize the polygons on the canvas
-      sep->render(c, light, camera);
+      sep->render(c, lights, camera);
     }
   }
   
   void display() {
     std::cout << "DISPLAYING SCENE'S CAMERA: \n";
     camera->display();
-    std::cout << "DISPLAYING SCENE'S LIGHT: \n";
-    light->display();
+    std::cout << "DISPLAYING SCENE'S LIGHTS: \n";
+    for (auto &l: lights)
+      l->display();
     std::cout << "DISPLAYING SCENE'S SEPARATORS\n";
     for (auto &it: sep_list) {
       it->display();

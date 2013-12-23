@@ -7,8 +7,7 @@
 
 Matrix<float,3,1> light_func(Matrix<float,3,1> n, Matrix<float,3,1> v,
 			     std::shared_ptr<MaterialBlock> material, 
-			     //std::vector<LightBlock*> lights, 
-			     std::shared_ptr<LightBlock> light, 
+			     std::vector<std::shared_ptr<LightBlock> > lights, 
 			     Matrix<float,3,1> camerapos) {
   // let n = surface normal (nx,ny,nz)
   // let v = point in space (x,y,z)
@@ -27,7 +26,7 @@ Matrix<float,3,1> light_func(Matrix<float,3,1> n, Matrix<float,3,1> v,
   // it here to rely on distance from the camera)
   Matrix<float,3,1> ambient = acolor;
 
-  //for (auto& light : lights) {
+  for (auto& light : lights) {
     // get the light position and color from the light
     // let lx = light position (x,y,z)
     // let lc = light color (r,g,b)
@@ -50,7 +49,7 @@ Matrix<float,3,1> light_func(Matrix<float,3,1> n, Matrix<float,3,1> v,
     Matrix<float,3,1> dspecular = (lc * pow(k,shiny)).zero_clip();
     // accumulate that
     specular += dspecular;
-  //}
+  }
 
   // after working on all the lights, clamp the diffuse value to 1
   diffuse = diffuse.one_clip();
@@ -99,12 +98,10 @@ void flat_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
 		  Matrix<float,3,1> t1, Matrix<float,3,1> n1,
 		  Matrix<float,3,1> t2, Matrix<float,3,1> n2,
 		  std::shared_ptr<MaterialBlock> material, 
-		  //std::vector<LightBlock*> lights
-		  std::shared_ptr<LightBlock> light,
+		  std::vector<std::shared_ptr<LightBlock> > lights,
 		  std::shared_ptr<CameraBlock> camera, 
 		  std::shared_ptr<TransformBlock> transform,
 		  std::shared_ptr<Canvas> c) {
-  // TODO: allow multiple lights...
   // Compute the averge location and average normal of each of the 3 
   // vertices. Remember to normalize your normals.
   // sure the normals come from the file?
@@ -122,7 +119,7 @@ void flat_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
 
   // Calculate the corresponding color of the average location and normal 
   // with the lighting function.
-  auto color = light_func(avg_norm, avg_loc, material, light, cp);
+  auto color = light_func(avg_norm, avg_loc, material, lights, cp);
   //std::cout << color << std::endl;
 
   // Convert your locations to NDC by applying the perspective and 

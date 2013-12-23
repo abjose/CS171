@@ -201,7 +201,7 @@ public:
   }
 
   void render(std::shared_ptr<Canvas> c,
-	      std::shared_ptr<LightBlock> light, 
+	      std::vector<std::shared_ptr<LightBlock> > lights, 
 	      std::shared_ptr<CameraBlock> camera) {
     // for each polygon (should all be triangles)
     assert(poly_list.size() == poly_normal_list.size());
@@ -219,7 +219,7 @@ public:
       flat_shading(vertex_list[poly[0]], normal_list[norm[0]],
 		   vertex_list[poly[1]], normal_list[norm[1]],
 		   vertex_list[poly[2]], normal_list[norm[2]],
-		   material, light, camera, transform, c);
+		   material, lights, camera, transform, c);
       
     }
   }

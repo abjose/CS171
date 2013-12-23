@@ -27,7 +27,7 @@ static std::map<std::pair<int,int>,float> z_buff;
 
 Matrix<float,3,1> light_func(Matrix<float,3,1> n, Matrix<float,3,1> v,
 			     std::shared_ptr<MaterialBlock> material, 
-			     //std::vector<LightBlock*> lights, 
+			     std::vector<std::shared_ptr<LightBlock> > lights, 
 			     std::shared_ptr<LightBlock> light, 
 			     Matrix<float,3,1> camerapos);
 
@@ -41,8 +41,7 @@ void flat_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
 		  Matrix<float,3,1> t1, Matrix<float,3,1> n1,
 		  Matrix<float,3,1> t2, Matrix<float,3,1> n2,
 		  std::shared_ptr<MaterialBlock> material, 
-		  //std::vector<LightBlock*> lights
-		  std::shared_ptr<LightBlock> light,
+		  std::vector<std::shared_ptr<LightBlock> > lights,
 		  std::shared_ptr<CameraBlock> camera, 
 		  std::shared_ptr<TransformBlock> transform,
 		  std::shared_ptr<Canvas> c);
