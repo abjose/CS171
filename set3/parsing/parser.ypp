@@ -15,8 +15,8 @@ int yyerror(const char *s);
 int yylex();
 
 // print debug statements?
-//bool debug = false;
-bool debug = true;
+bool debug = false;
+//bool debug = true;
 // vector for storing input numbers
 std::deque<float> in;
 // shared_ptr to a CameraBlock
@@ -93,8 +93,6 @@ light_col: LCOLOR triple {
   light->set_color(in[2],in[1],in[0]);
 }
 
-// SOMETHING'S WRONG WITH TRANSFORM!!
-
 sepblock: SEPARATOR open sepitems close {
   scene->add_separator(separator);
   // re-init separator
@@ -167,6 +165,7 @@ coordindexline:  COORDINDEX sqopen singles sqclose {
 
 material: MATERIAL open materiallines close {
   separator->set_material(material);
+  material = std::shared_ptr<MaterialBlock>(new MaterialBlock);
 }
 materiallines: materialline | materialline materiallines
 materialline: ambient | diffuse | specular | shininess
