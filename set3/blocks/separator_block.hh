@@ -168,36 +168,35 @@ public:
     assert(poly_list.size() == poly_normal_list.size());
     std::vector<std::vector<int> > culled_polys;     
     std::vector<std::vector<int> > culled_norms; 
-    Matrix<float,4,4> final_transform = persp_proj * inv_cam * 
-                                        transform->get_final_transform();
+    Matrix<float,4,4> T = persp_proj * inv_cam * 
+      transform_sans_trans->get_final_transform();
     Matrix<float,3,1> v0,v1,v2, a,b;
     Matrix<float,4,1> n;
     for (int i=0; i < poly_list.size(); i++) {
       auto poly = poly_list[i];
       auto norm = poly_normal_list[i];
-
       v0 = vertex_list[poly[0]];
       v1 = vertex_list[poly[1]];
       v2 = vertex_list[poly[2]];
       
-      // TODO: move cross product into matrix class?
-      // get cross product
-      //a = v2-v1; b = v0-v1;
-      a = v1-v0; b = v2-v1;
+      // get cross product -- TODO: move into matrix class?
+      a = (v1-v0).normalize(); b = (v2-v1).normalize();
       n = makeVector4<float>(a[1]*b[2] - a[2]*b[1], 
 			     a[2]*b[0] - a[0]*b[2],
 			     a[0]*b[1] - a[1]*b[0], 
-			     1.0);
+			     1.0).normalize();
       // transform into NDC
-      n = (final_transform * n).normalize();
+      n = (T * n).normalize();
+
+      auto test_n = makeVector3<float>(n[0],n[1],n[2]);
+      test_n = test_n.normalize();
 
       // check if n_z is positive
-      if(n[2] > 0) { 
+      //if(n[2] > 0) { 
+      if(test_n[2] > 0) { 
 	// add triangle to "show" list (which will replace current poly list)
 	culled_polys.push_back(poly);
 	culled_norms.push_back(norm);
-      } else {
-	//std::cout << "FOUND BACKFACE\n";
       }
     }
 
