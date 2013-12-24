@@ -5,7 +5,7 @@
 // TODO: lighting seems to be on...the opposite of the right side?
 //       does anything need to be done to lighting to put into world coords?
 // TODO: change vertex variables to 'v' instead of 't'?
-// TODO: IMPLEMENT PHONG, BACKFACE CULLING, NORMAL TRIANGLING...
+// TODO: IMPLEMENT BACKFACE CULLING, NORMAL TRIANGLING...
 //       THENNNN WORK ON LIGHTING PROBLEMS
 
 
@@ -78,7 +78,6 @@ void draw_pixels_with_constant_color(std::shared_ptr<Canvas> c,
 				     Matrix<float,3,1> color) {
   // iterate through pixels_to_draw vector
   for (auto& it : pixels_to_draw) {
-    //std::cout << color[0] << ", " << color[1] << ", " << color[2] << std::endl;
     c->set_pixel((int) it[0], (int) it[1], color);
   }
 }
@@ -98,8 +97,9 @@ void draw_pixels(std::shared_ptr<Canvas> c,
   // iterate through pixels_to_draw vector
   for (auto& it : pixels_to_draw) {
     // it = {x,y, x0,y0,z0, nx,ny,nz}
+    // x0 y0 z0 are in world space
     auto v = makeVector3<float>(it[2],it[3],it[4]);
-    auto n = makeVector3<float>(it[5],it[6],it[7]);
+    auto n = makeVector3<float>(it[5],it[6],it[7]).normalize();
     auto color = light_func(n, v, material, lights, camera->position);
     c->set_pixel(it[0],it[1], color);
   }
@@ -210,8 +210,9 @@ void draw_phong(int x, int y, float *data) {
     z_buff[xy] = z;
     pixels_to_draw.push_back(new float[8] 
 			     {(float) x, (float) y, 
-				 data[0], data[1], data[2],
-				 data[3], data[4], data[5]});
+				 //data[0], data[1], data[2],
+				 data[3], data[4], data[5],
+				 data[6], data[7], data[8]});
   } 
 }
 void phong_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
@@ -222,7 +223,6 @@ void phong_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
 		   std::shared_ptr<CameraBlock> camera, 
 		   std::shared_ptr<TransformBlock> transform,
 		   std::shared_ptr<Canvas> c) {
-
   // Convert your 3 vertex locations to NDC.
   Matrix<float,4,4> T = camera->get_perspective_projection() * 
     camera->get_inverse_transform();
@@ -233,17 +233,23 @@ void phong_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
   // Call Bill's code with 3 vertices, each with data array = 
   // {x, y, z, nx, ny, nz} (since we're interpolating across both location and 
   // normals).
-  vertex verts[6];
-  for (int i = 0; i < 3; i++) verts[i].numData = 6; // x,y,z,nx,ny,nz
-  verts[0].data = new float[6] {t0_4[0], t0_4[1], t0_4[2], n0[0], n0[1], n0[2]};
-  verts[1].data = new float[6] {t1_4[0], t1_4[1], t1_4[2], n1[0], n1[1], n1[2]};
-  verts[2].data = new float[6] {t2_4[0], t2_4[1], t2_4[2], n2[0], n2[1], n2[2]};
+  vertex verts[3];
+  for (int i = 0; i < 3; i++) verts[i].numData = 9; // x,y,z,nx,ny,nz
+  verts[0].data = new float[9] {t0_4[0], t0_4[1], t0_4[2], 
+				t0[0], t0[1], t0[2],
+				n0[0], n0[1], n0[2]};
+  verts[1].data = new float[9] {t1_4[0], t1_4[1], t1_4[2], 
+				t1[0], t1[1], t1[2],
+				n1[0], n1[1], n1[2]};
+  verts[2].data = new float[9] {t2_4[0], t2_4[1], t2_4[2], 
+				t2[0], t2[1], t2[2],
+				n2[0], n2[1], n2[2]};
   pixels_to_draw.clear();
   raster(verts, draw_phong);
 
   // Call the lighting function on each of the new pixel locations and their
   // corresponding interpolated location to get the calculated color,
   // and draw that pixel.
-
+  // NOTE: make sure to pass world loc to lighting function
   draw_pixels(c, material, lights, camera);
 }

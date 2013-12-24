@@ -156,43 +156,46 @@ public:
     // polygons should all be triangles
     // note: this will be backwards if polygons aren't ccw - try reversing
     // if nothing shows
-    std::vector<std::vector<int> > culled_list; 
+    // will have to cull normals too? 
+    assert(poly_list.size() == poly_normal_list.size());
+    std::vector<std::vector<int> > culled_polys;     
+    std::vector<std::vector<int> > culled_norms; 
     Matrix<float,4,4> final_transform = persp_proj * inv_cam * 
                                         transform->get_final_transform();
-
-    //Matrix<float,3,1> v0p,v1p,v2p;
     Matrix<float,3,1> v0,v1,v2, a,b;
     Matrix<float,4,1> n;
-    for (auto &it : poly_list) {
-      v0 = vertex_list[it[0]];
-      v1 = vertex_list[it[1]];
-      v2 = vertex_list[it[2]];
-      
+    for (int i=0; i < poly_list.size(); i++) {
+      auto poly = poly_list[i];
+      auto norm = poly_normal_list[i];
+
+      v0 = vertex_list[poly[0]];
+      v1 = vertex_list[poly[1]];
+      v2 = vertex_list[poly[2]];
       
       // TODO: move cross product into matrix class?
       // get cross product
-      a = v2-v1; b = v0-v1;
-      // copy into a vector for transforming
-      float z[] = {a[1]*b[2] - a[2]*b[1], 
-		   a[2]*b[0] - a[0]*b[2],
-		   a[0]*b[1] - a[1]*b[0], 
-		   1.0};
-      n.copy(z);
-
+      //a = v2-v1; b = v0-v1;
+      a = v1-v0; b = v2-v1;
+      n = makeVector4<float>(a[1]*b[2] - a[2]*b[1], 
+			     a[2]*b[0] - a[0]*b[2],
+			     a[0]*b[1] - a[1]*b[0], 
+			     1.0);
       // transform into NDC
-      n = final_transform * n;
+      n = (final_transform * n).normalize();
 
       // check if n_z is positive
       if(n[2] > 0) { 
 	// add triangle to "show" list (which will replace current poly list)
-	culled_list.push_back(it);
+	culled_polys.push_back(poly);
+	culled_norms.push_back(norm);
       } else {
 	//std::cout << "FOUND BACKFACE\n";
       }
     }
 
-    // now replace old poly list with culled one
-    poly_list = culled_list; 
+    // now replace old lists with culled ones
+    poly_list = culled_polys; 
+    poly_normal_list = culled_norms; 
   }
 
   void render(std::shared_ptr<Canvas> c,
@@ -205,7 +208,7 @@ public:
       // call the proper shading function
       auto poly = poly_list[i];
       auto norm = poly_normal_list[i];
-
+      
       switch(shading_type) {
       case 0: // flat shading
 	flat_shading(vertex_list[poly[0]], normal_list[norm[0]],

@@ -5,6 +5,7 @@
 #include <cassert>
 #include <string>
 #include <vector>
+#include <math.h>
 #include <limits>
 
 // TODO: should make usage of X,Y vs R,C more...better.
@@ -157,9 +158,9 @@ public:
     } else {
       x = (int) xf; y = (int) yf;
     }
-
-    //ref(x,y) = data;
-    ref(C-y,x) = data;
+    
+    ref(std::min(R-y,R-1),x) = data;
+    //ref(C-y,x) = data;  // i think need to use R instead of C...
   }
 
   //------------------------------------------

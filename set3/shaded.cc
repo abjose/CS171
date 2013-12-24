@@ -7,7 +7,7 @@ int main(int argc, char *argv[]) {
   // read cmd line args
   int mode, xres, yres;
   //xres = std::stoi(argv[1]); yres = std::stoi(argv[2]); 
-  mode = 2;
+  mode = 1;
   xres = 400; yres = 400;
   float xMin = -1; float yMin = -1;
   float xMax =  1; float yMax =  1;
