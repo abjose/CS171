@@ -7,6 +7,8 @@
 // TODO: change vertex variables to 'v' instead of 't'?
 // TODO: IMPLEMENT BACKFACE CULLING, NORMAL TRIANGLING...
 //       THENNNN WORK ON LIGHTING PROBLEMS
+// Pretty weird that flat shading seems to work well (for lighting...) 
+// but not the others...makes me think normals are screwed up.
 
 
 Matrix<float,3,1> light_func(Matrix<float,3,1> n, Matrix<float,3,1> v,
@@ -122,6 +124,7 @@ void flat_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
 		  std::shared_ptr<CameraBlock> camera, 
 		  std::shared_ptr<TransformBlock> transform,
 		  std::shared_ptr<Canvas> c) {
+  //std::cout << "merp - in flat_shading\n";
   // Compute the averge location and average normal of each of the 3 
   // vertices. Remember to normalize your normals.
   auto avg_loc  = (t0 + t1 + t2) / 3;
@@ -176,9 +179,9 @@ void gouraud_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
 		     std::shared_ptr<Canvas> c) {
   // Call the lighting function on each of the 3 vertices and their 
   // corresponding normals, to get a unique color for each.
-  auto c0 = light_func(n0, t0, material, lights, camera->position);
-  auto c1 = light_func(n1, t1, material, lights, camera->position);
-  auto c2 = light_func(n2, t2, material, lights, camera->position);
+  auto c0 = light_func(n0.normalize(), t0, material, lights, camera->position);
+  auto c1 = light_func(n1.normalize(), t1, material, lights, camera->position);
+  auto c2 = light_func(n2.normalize(), t2, material, lights, camera->position);
 
   // Convert your positions to NDC.
   Matrix<float,4,4> T = camera->get_perspective_projection() * 
@@ -229,6 +232,9 @@ void phong_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
   auto t0_4 = (T * makeVector4<float>(t0[0],t0[1],t0[2],1)).homogenize();
   auto t1_4 = (T * makeVector4<float>(t1[0],t1[1],t1[2],1)).homogenize();
   auto t2_4 = (T * makeVector4<float>(t2[0],t2[1],t2[2],1)).homogenize();
+  n0 = n0.normalize();
+  n1 = n1.normalize();
+  n2 = n2.normalize();
 
   // Call Bill's code with 3 vertices, each with data array = 
   // {x, y, z, nx, ny, nz} (since we're interpolating across both location and 

@@ -49,11 +49,11 @@ public:
     if (vertex == -1) {
       if (temp_poly.size() > 3) {
 	// tringulate non-triangle polygon
-	// should probably test that there aren't < 3 vertices...
-	int base = temp_poly[0];
-	for(int i=2; i <= temp_poly.size(); i++) {
-	  int vs[] = {base, temp_poly[i], temp_poly[i-1]};
-	  std::vector<int> tri (vs, vs + sizeof(vs)/sizeof(int));
+	for(int i=2; i < temp_poly.size(); i++) {
+	  std::vector<int> tri(3,0);// (vs, vs + sizeof(vs)/sizeof(int));
+	  tri[0] = temp_poly[0];
+	  tri[1] = temp_poly[i-1];
+	  tri[2] = temp_poly[i];
 	  poly_list.push_back(tri);
 	}
       } else {
@@ -68,15 +68,21 @@ public:
     }
   }
   void add_normal_index(int normal) {
-    // DOES THIS NEED TO BE 'TRIANGULATED' IN SOME WAY TOO?
-    // don't think so...
-    // actually, do think so...but will only be a problem when everything
-    // isn't already a triangle
     if (normal == -1) {
-      // should experiment with this -- see if all this copying is necessary
-      std::vector<int> new_poly_normal = temp_poly_normal;
-      poly_normal_list.push_back(new_poly_normal);
-      temp_poly_normal.clear();
+      if (temp_poly_normal.size() > 3) {
+	for(int i=2; i < temp_poly_normal.size(); i++) {
+	  std::vector<int> tri(3,0);// (vs, vs + sizeof(vs)/sizeof(int));
+	  tri[0] = temp_poly_normal[0];
+	  tri[1] = temp_poly_normal[i-1];
+	  tri[2] = temp_poly_normal[i];
+	  poly_normal_list.push_back(tri);
+	}
+      } else {
+	// should experiment with this -- see if all this copying is necessary
+	std::vector<int> new_poly_normal = temp_poly_normal;
+	poly_normal_list.push_back(new_poly_normal);
+	temp_poly_normal.clear();
+      }
     } else {
       temp_poly_normal.push_back(normal);
     }
@@ -87,6 +93,7 @@ public:
     auto final_transform = transform->get_final_transform();
     std::vector<Matrix<float,3,1> > final_vertices;
     for (auto &it: vertex_list) {
+      //std::cout << "In verts_object_to_world...converting...\n";
       // need to homogenize...each time?
       auto v = makeVector4<float>(it[0], it[1], it[2], 1.0);
       v = (final_transform * v).homogenize();
@@ -135,8 +142,10 @@ public:
     std::vector<Matrix<float,3,1> > final_normals;
     for (auto &it: normal_list) {
       auto n = makeVector4<float>(it[0], it[1], it[2], 1.0);
-      n = (inv_cam * n).normalize();
-      final_normals.push_back(makeVector3<float>(n[0],n[1],n[2]));
+      n = (inv_cam * n);//.normalize();
+      final_normals.push_back(makeVector3<float>(n[0],n[1],n[2]).normalize());
+      // TODO: pretty weird that when you normalize here, doesn't seem to
+      //       'last' to lighting stuff (because different when normalize there)
     }
     normal_list = final_normals;
   }
@@ -156,7 +165,6 @@ public:
     // polygons should all be triangles
     // note: this will be backwards if polygons aren't ccw - try reversing
     // if nothing shows
-    // will have to cull normals too? 
     assert(poly_list.size() == poly_normal_list.size());
     std::vector<std::vector<int> > culled_polys;     
     std::vector<std::vector<int> > culled_norms; 
