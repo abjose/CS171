@@ -7,7 +7,7 @@ int main(int argc, char *argv[]) {
   // read cmd line args
   int mode, xres, yres;
   //xres = std::stoi(argv[1]); yres = std::stoi(argv[2]); 
-  mode = 1;
+  mode = 2;
   xres = 400; yres = 400;
   float xMin = -1; float yMin = -1;
   float xMax =  1; float yMax =  1;
@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
   // make a new canvas and scene for the parser
   auto c = std::make_shared<Canvas>(Canvas(xMin, yMin, xMax, yMax, xres, yres));
   std::shared_ptr<SceneBlock> scene;
-  scene = parse_test(std::cin);
+  scene = parse(std::cin);
 
   // render to the canvas
   //scene->display();

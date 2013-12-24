@@ -33,11 +33,8 @@ public:
   }
 
   void add_transform(std::shared_ptr<TransformBlock> t) {
-    // gross
-    //std::cout << "MEOW\n" << transform->get_final_transform() << std::endl;
     transform->combine_transform(t);
     transform_sans_trans->combine_transform_sans_trans(t);
-    //std::cout << "MEOW2\n" << transform->get_final_transform() << std::endl;
   }
   void set_material(std::shared_ptr<MaterialBlock> m) {
     material = m;
@@ -116,7 +113,6 @@ public:
       final_vertices.push_back(makeVector3<float>(v[0],v[1],v[2]));
     }    
     vertex_list = final_vertices;
-
   }
 
 
@@ -131,7 +127,6 @@ public:
       auto n = makeVector4<float>(it[0], it[1], it[2], 1.0);
       n = (final_transform_sans_trans * n).normalize();
       final_normals.push_back(makeVector3<float>(n[0],n[1],n[2]));
-      //std::cout << n << std::endl;
     }
     normal_list = final_normals;
   }
@@ -218,11 +213,17 @@ public:
 		     vertex_list[poly[2]], normal_list[norm[2]],
 		     material, lights, camera, transform, c);
 	break;
-      case 1: // gourand shading
-	gourand_shading(vertex_list[poly[0]], normal_list[norm[0]],
+      case 1: // gouraud shading
+	gouraud_shading(vertex_list[poly[0]], normal_list[norm[0]],
 			vertex_list[poly[1]], normal_list[norm[1]],
 			vertex_list[poly[2]], normal_list[norm[2]],
 			material, lights, camera, transform, c);
+	break;
+      case 2: // phong shading
+	phong_shading(vertex_list[poly[0]], normal_list[norm[0]],
+		      vertex_list[poly[1]], normal_list[norm[1]],
+		      vertex_list[poly[2]], normal_list[norm[2]],
+		      material, lights, camera, transform, c);
 	break;
       }
     }

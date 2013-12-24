@@ -217,7 +217,7 @@ int yylex() {
    return lexer->yylex();
 }
 
-std::shared_ptr<SceneBlock> parse_test(std::istream &datafile) {
+std::shared_ptr<SceneBlock> parse(std::istream &datafile) {
    // Construct the lexer.
    lexer = new yyFlexLexer(&datafile);
    // Run the parser.

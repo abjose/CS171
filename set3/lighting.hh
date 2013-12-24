@@ -33,7 +33,10 @@ Matrix<float,3,1> light_func(Matrix<float,3,1> n, Matrix<float,3,1> v,
 
 void draw_pixels_with_constant_color(std::shared_ptr<Canvas> c, 
 				     Matrix<float,3,1> color);
-
+void draw_pixels(std::shared_ptr<Canvas> c,
+		 std::shared_ptr<MaterialBlock> material, 
+		 std::vector<std::shared_ptr<LightBlock> > lights,
+		 std::shared_ptr<CameraBlock> camera);
 void draw_pixels(std::shared_ptr<Canvas> c);
 
 void draw_flat(int x, int y, float *data);
@@ -46,7 +49,7 @@ void flat_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
 		  std::shared_ptr<TransformBlock> transform,
 		  std::shared_ptr<Canvas> c);
 
-void gourand_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
+void gouraud_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
 		     Matrix<float,3,1> t1, Matrix<float,3,1> n1,
 		     Matrix<float,3,1> t2, Matrix<float,3,1> n2,
 		     std::shared_ptr<MaterialBlock> material, 
@@ -54,9 +57,16 @@ void gourand_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
 		     std::shared_ptr<CameraBlock> camera, 
 		     std::shared_ptr<TransformBlock> transform,
 		     std::shared_ptr<Canvas> c);
-void gourand_shading();
+void gouraud_shading();
 
 void draw_phong(int x, int y, float *data);
-void phong_shading();
+void phong_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
+		   Matrix<float,3,1> t1, Matrix<float,3,1> n1,
+		   Matrix<float,3,1> t2, Matrix<float,3,1> n2,
+		   std::shared_ptr<MaterialBlock> material, 
+		   std::vector<std::shared_ptr<LightBlock> > lights,
+		   std::shared_ptr<CameraBlock> camera, 
+		   std::shared_ptr<TransformBlock> transform,
+		   std::shared_ptr<Canvas> c);
 
 #endif // __LIGHTING_H_GUARD__
