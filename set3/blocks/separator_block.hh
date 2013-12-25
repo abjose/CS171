@@ -184,19 +184,23 @@ public:
       n = makeVector4<float>(a[1]*b[2] - a[2]*b[1], 
 			     a[2]*b[0] - a[0]*b[2],
 			     a[0]*b[1] - a[1]*b[0], 
-			     1.0).normalize();
+			     1.0);//.normalize();
       // transform into NDC
       n = (T * n).normalize();
 
-      auto test_n = makeVector3<float>(n[0],n[1],n[2]);
-      test_n = test_n.normalize();
+      //auto test_n = makeVector3<float>(n[0],n[1],n[2]);
+      //test_n = test_n.normalize();
+      //std::cerr << test_n << std::endl;
 
       // check if n_z is positive
-      //if(n[2] > 0) { 
-      if(test_n[2] > 0) { 
+      if(n[2] > 0) { 
+      //if(test_n[2] < 0) { 
 	// add triangle to "show" list (which will replace current poly list)
 	culled_polys.push_back(poly);
 	culled_norms.push_back(norm);
+      } else {
+	std::cerr << "found backface!\n";
+	//std::cerr << n[2] << std::endl;
       }
     }
 
