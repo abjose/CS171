@@ -1,0 +1,234 @@
+%{
+#include <stdint.h>
+#include <FlexLexer.h>
+#include <string>
+#include <deque>
+#include <memory>
+#include "blocks/camera_block.hh"
+#include "blocks/light_block.hh"
+#include "blocks/transform_block.hh"
+#include "blocks/separator_block.hh"
+#include "blocks/scene_block.hh"
+//#include "shaded.hh"
+
+int yyerror(const char *s);
+int yylex();
+
+// print debug statements?
+bool debug = false;
+//bool debug = true;
+// vector for storing input numbers
+std::deque<float> in;
+// shared_ptr to a CameraBlock
+std::shared_ptr<CameraBlock> camera(new CameraBlock);
+// shared_ptr to a LightBlock
+std::shared_ptr<LightBlock> light(new LightBlock);
+// shared_ptr to a TransformBlock
+std::shared_ptr<TransformBlock> transform(new TransformBlock);
+// shared_ptr to a MaterialBlock
+std::shared_ptr<MaterialBlock> material(new MaterialBlock);
+// shared_ptr to a SeperatorBock
+std::shared_ptr<SeparatorBlock> separator(new SeparatorBlock);
+// shared_ptr to a SceneBlock
+std::shared_ptr<SceneBlock> scene(new SceneBlock);
+%}
+
+%union {
+    float fval;
+}
+
+%defines
+%token <fval> NUMBER
+%token SEPARATOR
+%token LBRACE RBRACE COMMA
+%token LBRACKET RBRACKET
+%token PCAMERA POS ORIENT NDIST FDIST
+%token LEFT RIGHT TOP BOTTOM
+%token TRANSFORM TRANSLAT SFACTOR ROT
+%token COORD3 POINT
+%token NORMAL VECTOR
+%token IFACESET COORDINDEX NORMALINDEX
+%token POINTLIGHT LLOC LCOLOR
+%token MATERIAL AMBCOLOR DIFFCOLOR SPECCOLOR SHININESS
+
+%%
+
+blocks: block | block blocks
+block:  camerablock | sepblock | lightblock
+
+camerablock: PCAMERA open cameralines close {
+  scene->set_camera(camera);
+}
+cameralines: cameraline | cameraline cameralines
+cameraline: positionline | orientline | ndistline | fdistline | 
+            leftline | rightline | topline | bottomline
+positionline: POS triple {
+  if(debug) std::cout << "Got position: " << in[2] << ' ' << in[1] 
+		      << ' ' << in[0] << std::endl;
+  camera->set_position(in[2],in[1],in[0]);
+}
+orientline: ORIENT quad {
+  if(debug) std::cout << "Got orientation: " << in[3] << ' ' << in[2] 
+		      << ' ' << in[1] << ' ' << in[0] << std::endl;
+  camera->set_orientation(in[3],in[2],in[1],in[0]);
+}
+ndistline: NDIST NUMBER { camera->near  = $2; }
+fdistline: FDIST NUMBER { camera->far   = $2;  }
+leftline:  LEFT  NUMBER { camera->left  = $2; }
+rightline: RIGHT NUMBER { camera->right = $2; }
+topline:   TOP   NUMBER { camera->top   = $2; }
+bottomline: BOTTOM NUMBER { camera->bottom = $2; }
+
+lightblock: POINTLIGHT open pointlightlines close {
+  scene->add_light(light);
+  // re-init light
+  light = std::shared_ptr<LightBlock>(new LightBlock);
+}
+pointlightlines: pointlightline | pointlightline pointlightlines
+pointlightline: light_loc | light_col
+light_loc: LLOC triple {
+  light->set_location(in[2],in[1],in[0]);
+}
+light_col: LCOLOR triple {
+  light->set_color(in[2],in[1],in[0]);
+}
+
+sepblock: SEPARATOR open sepitems close {
+  scene->add_separator(separator);
+  // re-init separator
+  separator = std::shared_ptr<SeparatorBlock>(new SeparatorBlock);
+}
+sepitems: sepitem | sepitem sepitems
+sepitem:  transformline
+          | vertexline
+          | normalline
+          | IFACESET open ifslines close 
+          | material
+
+vertexline: COORD3 open POINT sqopen triples sqclose close {
+  // read in triples
+  for(int i=in.size()-1; i>0; i -= 3) {
+    if(debug) std::cout << "Vertex triple: " << in[i] << ' ' << in[i-1] 
+			<< ' ' << in[i-2] << std::endl;
+    separator->add_vertex(in[i], in[i-1], in[i-2]);
+  }
+}
+
+normalline: NORMAL open VECTOR sqopen triples sqclose close {
+  // read in triples
+  for(int i=in.size()-1; i>0; i -= 3) {
+    if(debug) std::cout << "Normal triple: " << in[i] << ' ' << in[i-1] 
+			<< ' ' << in[i-2] << std::endl;
+    separator->add_normal(in[i], in[i-1], in[i-2]);
+  }
+}
+
+transformline: TRANSFORM open translines close {
+  separator->add_transform(transform);
+  // re-init transform
+  //transform = std::make_shared<TransformBlock>();
+  transform = std::shared_ptr<TransformBlock>(new TransformBlock);
+}
+translines: transline | transline translines
+transline:  translateline | scaleline | rotline
+translateline: TRANSLAT triple {
+  if(debug) std::cout << "Got translation: " << in[2] << ' ' << in[1] 
+		      << ' ' << in[0] << std::endl;
+  transform->set_translation(in[2],in[1],in[0]);
+  //transform->display();
+}
+scaleline: SFACTOR triple {
+  if(debug) std::cout << "Got scale: " << ' ' << in[2] << ' ' 
+		      << in[1] << ' ' << in[0] << std::endl;
+  transform->set_scale(in[2],in[1],in[0]);
+  //transform->display();
+}
+rotline: ROT quad {
+  if(debug) std::cout << "Got rotation: " << ' ' << in[2] << ' ' 
+		      << in[1] << ' ' << in[0] << std::endl;
+  transform->set_rotation(in[3],in[2],in[1],in[0]);
+  //transform->display();
+}
+
+ifslines: ifsline | ifsline ifslines
+ifsline: normalindexline | coordindexline
+normalindexline: NORMALINDEX sqopen singles sqclose {
+  // read in normals
+  for (int i=in.size()-1; i >= 0; i--)
+    separator->add_normal_index(in[i]);
+}
+coordindexline:  COORDINDEX sqopen singles sqclose {
+  // read in vertices
+  for (int i=in.size()-1; i >= 0; i--)
+    separator->add_poly_index(in[i]);
+}
+
+material: MATERIAL open materiallines close {
+  separator->set_material(material);
+  material = std::shared_ptr<MaterialBlock>(new MaterialBlock);
+}
+materiallines: materialline | materialline materiallines
+materialline: ambient | diffuse | specular | shininess
+ambient: AMBCOLOR triple {
+  material->set_ambient(in[2],in[1],in[0]);
+}
+diffuse: DIFFCOLOR triple {
+  material->set_diffuse(in[2],in[1],in[0]);
+}
+specular: SPECCOLOR triple {
+  material->set_specular(in[2],in[1],in[0]);
+}
+shininess: SHININESS single {
+  material->shininess = in[0];
+}
+
+
+
+single: NUMBER {
+  if(debug) std::cout << "SINGLE:\t" << $1 << std::endl;
+  in.push_front($1);
+}
+singles: single | singles COMMA single
+
+triple:  single single single
+triples: triple | triples COMMA triple
+
+quad:    single single single single
+
+open:    LBRACE
+close:   RBRACE
+sqopen:  LBRACKET {
+  in.clear();
+}
+sqclose: RBRACKET
+
+
+%%
+
+static FlexLexer *lexer;
+
+int yyerror(const char * s)
+{
+   std::cerr << "Parse error: " << s << std::endl;
+   return 0;
+}
+
+int yylex() {
+   return lexer->yylex();
+}
+
+std::shared_ptr<SceneBlock> parse(std::istream &datafile) {
+   // Construct the lexer.
+   lexer = new yyFlexLexer(&datafile);
+   // Run the parser.
+   if(yyparse()) {
+       std::cerr << "Parse failed!" << std::endl;
+       exit(1);
+   }
+
+   // see if everything's there
+   //scene->display();
+
+   delete lexer;
+   return scene;
+}
