@@ -39,11 +39,13 @@ public:
     
     for(auto &sep: sep_list) {
       glPushMatrix();
-      sep->verts_object_to_world();
+      //sep->verts_object_to_world();
       //sep->norms_object_to_world();
 
-      //sep->render(c, lights, camera, shading_type);
+      // TODO: try copying something you know works here instead
       sep->render();
+
+
       // TODO: update function calls to not use tons of arguments
       // TODO: if normals don't seem right, just...push and pop stuff
       //       so can do normals correctly. Maybe worth just modifying

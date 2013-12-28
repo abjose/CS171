@@ -17,22 +17,13 @@ void redraw()
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+  glMatrixMode(GL_MODELVIEW); // might not need
+  //glLoadIdentity();  // might...not need?
+  //glPushMatrix();
+
   //gluSphere(quad, 2.0, 256, 256);
   //gluCylinder(quad, 3.0, 2.0, 3.0, 256, 256);
-
-  glMatrixMode(GL_MODELVIEW); // might not need
-  glLoadIdentity();  // might...not need?
-  glPushMatrix();
-  //glTranslate3f(1, 0, 0);
-  //glPushMatrix();
-  //glRotate(120, 1, 0, 0);
-  // render some stuff
-  //glPopMatrix();
-  //glPushMatrix();
-  //glRotate(120, 0, 1, 0);
-  //glPopMatrix();
-
-
+  
   scene->render();
 
   /*
@@ -51,7 +42,7 @@ void redraw()
     pop
   */
   
-  glPopMatrix();
+  //glPopMatrix();
 
   glutSwapBuffers();
 }
@@ -132,6 +123,7 @@ void initLights() {
  * before every different one you wanted to use.
  */
 void initMaterial() {
+  // TODO: need to change this for each separator...can just move this code?
   GLfloat emit[] = {0.0, 0.0, 0.0, 1.0};
   GLfloat  amb[] = {0.0, 0.0, 0.0, 1.0};
   GLfloat diff[] = {0.0, 0.0, 1.0, 1.0};
@@ -194,8 +186,8 @@ void initGL()
   initMaterial();
 
   // initialize the "quadric" used by GLU to render high-level objects.
-  //quad = gluNewQuadric();
-  //gluQuadricOrientation(quad, GLU_OUTSIDE);
+  quad = gluNewQuadric();
+  gluQuadricOrientation(quad, GLU_OUTSIDE);
 }
 
 /**
@@ -249,7 +241,7 @@ int main(int argc, char* argv[])
   initGL();
 
   // render the parsed scene
-  scene->display();
+  //scene->display();
   //scene->render(c, mode);
 
   // set up GLUT callbacks.
