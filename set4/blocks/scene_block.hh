@@ -28,11 +28,11 @@ public:
   }
 
   void render(std::shared_ptr<Canvas> c, int shading_type) {
-    Matrix<float,4,4> p_proj = camera->get_perspective_projection();
-    Matrix<float,4,4> inv_cam = camera->get_inverse_transform();
+    //Matrix<float,4,4> p_proj = camera->get_perspective_projection();
+    //Matrix<float,4,4> inv_cam = camera->get_inverse_transform();
     for(auto &sep: sep_list) {
       // could just push and pop matrices at the beginning and end?
-      sep->cull_backfaces(p_proj, inv_cam);
+      //sep->cull_backfaces(p_proj, inv_cam);
       sep->verts_object_to_world();
       sep->norms_object_to_world();
 

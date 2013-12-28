@@ -12,14 +12,10 @@ public:
   //public:
 
   void set_location(float x, float y, float z) {
-    location[0] = x;
-    location[1] = y;
-    location[2] = z;
+    location = makeVector3<float>(x,y,z);
   }
   void set_color(float r, float g, float b) {
-    color[0] = r;
-    color[1] = g;
-    color[2] = b;
+    color = makeVector3<float>(r,g,b);
   }
 
   void display() {

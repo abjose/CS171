@@ -14,13 +14,13 @@ public:
   float shininess;
 
   void set_ambient(float r, float g, float b) {
-    ambient[0] = r; ambient[1] = g; ambient[2] = b;
+    ambient = makeVector3<float>(r,g,b);
   }
   void set_diffuse(float r, float g, float b) {
-    diffuse[0] = r; diffuse[1] = g; diffuse[2] = b;
+    diffuse = makeVector3<float>(r,g,b);
   }
   void set_specular(float r, float g, float b) {
-    specular[0] = r; specular[1] = g; specular[2] = b;
+    specular = makeVector3<float>(r,g,b);
   }
 
   void display() {

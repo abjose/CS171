@@ -1,6 +1,6 @@
 OBJECTS=parser.tab.o lexer.yy.o raster.o lighting.o shaded.o
 SOURCES=*.cc *.hh
-CFLAGS=-std=c++0x -g #-pedantic -Wall -Wextra
+CFLAGS=-std=c++0x -Wall -g #-pedantic -Wall -Wextra
 LDFLAGS=
 
 all: shaded
@@ -9,7 +9,7 @@ shaded: $(OBJECTS)
 	g++ $(LDFLAGS) $(CFLAGS) -o shaded $^
 
 clean:
-	rm *.o lexer.yy.cpp parser.tab.cpp parser.tab.hpp shaded
+	rm -f *.o lexer.yy.cpp parser.tab.cpp parser.tab.hpp shaded
 
 parser.tab.cpp parser.tab.hpp: parsing/parser.ypp
 	bison -d parsing/parser.ypp

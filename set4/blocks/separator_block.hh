@@ -13,8 +13,8 @@
 
 class SeparatorBlock {
 private:
-  std::shared_ptr<TransformBlock> transform;
-  std::shared_ptr<TransformBlock> transform_sans_trans;
+  std::vector<std::shared_ptr<TransformBlock> > transforms;
+  //std::shared_ptr<TransformBlock> transform_sans_trans;
   std::shared_ptr<MaterialBlock> material;
   std::vector<Matrix<float,3,1> > vertex_list; 
   std::vector<Matrix<float,3,1> > normal_list; 
@@ -32,8 +32,9 @@ public:
   }
 
   void add_transform(std::shared_ptr<TransformBlock> t) {
-    transform->combine_transform(t);
-    transform_sans_trans->combine_transform_sans_trans(t);
+    transforms.push_back(t);
+    //transform->combine_transform(t);
+    //transform_sans_trans->combine_transform_sans_trans(t);
   }
   void set_material(std::shared_ptr<MaterialBlock> m) {
     material = m;
@@ -157,55 +158,6 @@ public:
       final_normals.push_back(makeVector3<float>(n[0],n[1],n[2]));
     }
     normal_list = final_normals;
-  }
-
-  void cull_backfaces(Matrix<float,4,4> persp_proj,
-		      Matrix<float,4,4> inv_cam) {
-    // polygons should all be triangles
-    // note: this will be backwards if polygons aren't ccw - try reversing
-    // if nothing shows
-    assert(poly_list.size() == poly_normal_list.size());
-    std::vector<std::vector<int> > culled_polys;     
-    std::vector<std::vector<int> > culled_norms; 
-    Matrix<float,4,4> T = persp_proj * inv_cam * 
-      transform_sans_trans->get_final_transform();
-    Matrix<float,3,1> v0,v1,v2, a,b;
-    Matrix<float,4,1> n;
-    for (int i=0; i < poly_list.size(); i++) {
-      auto poly = poly_list[i];
-      auto norm = poly_normal_list[i];
-      v0 = vertex_list[poly[0]];
-      v1 = vertex_list[poly[1]];
-      v2 = vertex_list[poly[2]];
-      
-      // get cross product -- TODO: move into matrix class?
-      a = (v1-v0).normalize(); b = (v2-v1).normalize();
-      n = makeVector4<float>(a[1]*b[2] - a[2]*b[1], 
-			     a[2]*b[0] - a[0]*b[2],
-			     a[0]*b[1] - a[1]*b[0], 
-			     1.0);//.normalize();
-      // transform into NDC
-      n = (T * n).normalize();
-
-      //auto test_n = makeVector3<float>(n[0],n[1],n[2]);
-      //test_n = test_n.normalize();
-      //std::cerr << test_n << std::endl;
-
-      // check if n_z is positive
-      if(n[2] > 0) { 
-      //if(test_n[2] < 0) { 
-	// add triangle to "show" list (which will replace current poly list)
-	culled_polys.push_back(poly);
-	culled_norms.push_back(norm);
-      } else {
-	std::cerr << "found backface!\n";
-	//std::cerr << n[2] << std::endl;
-      }
-    }
-
-    // now replace old lists with culled ones
-    poly_list = culled_polys; 
-    poly_normal_list = culled_norms; 
   }
 
   void render(std::shared_ptr<Canvas> c,
