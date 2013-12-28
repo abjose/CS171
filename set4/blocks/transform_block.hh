@@ -9,18 +9,18 @@ class TransformBlock {
 public:
   //private:
   //Matrix<float,4,1> transform;
-  Matrix<float,3,1> rotation;
+  Matrix<float,4,1> rotation;
   Matrix<float,3,1> translation;
-  Matrix<float,4,4> scale;
+  Matrix<float,3,1> scale;
 
   //public:
   // default constructor
   TransformBlock() {
     // init matrices to be identity in case they're never set
-    transform.make_identity();
-    rotation.make_identity();
-    translation.make_identity();
-    scale.make_identity();
+    //transform.make_identity();
+    //rotation.make_identity();
+    //translation.make_identity();
+    //scale.make_identity();
   }
 
   void set_rotation(float x, float y, float z, float theta) {
@@ -35,12 +35,12 @@ public:
   void set_scale(float a, float b, float c) {
     scale = makeVector3<float>(a,b,c);
   }
-  Matrix<float,4,4> get_rotation() {
-    return rotation;
-  }
-  Matrix<float,4,4> get_scale() {
-    return scale;
-  }
+  //Matrix<float,4,4> get_rotation() {
+  //  return rotation;
+  //}
+  //Matrix<float,4,4> get_scale() {
+  //  return scale;
+  //}
 
   /*
   void combine_transform(std::shared_ptr<TransformBlock> t2) {

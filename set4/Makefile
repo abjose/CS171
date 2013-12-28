@@ -1,6 +1,4 @@
-# Makefile for cs171 HW 0
-# Just type "make" to compile; if it works right, you should have an
-# executable called hw0.
+# Makefile for cs171 HW 4
 
 CXX		= g++
 # add -g for debugging info
@@ -8,8 +6,8 @@ CXXFLAGS	= -std=c++0x -g #-Wall
 
 LDFLAGS	= -L/usr/X11R6/lib -lglut -lGL -lGLU -lXi -lXmu
 
-SRCS	= shaded.cpp shaded.hh
-OBJS	= parser.tab.o lexer.yy.o shaded.o #$(SRCS:.cpp=.o)
+SRCS	= shaded.cpp
+OBJS	= parser.tab.o lexer.yy.o $(SRCS:.cpp=.o)
 PROG	= shaded
 
 all:	$(OBJS)

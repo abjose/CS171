@@ -27,8 +27,8 @@ private:
 public:
   // default constructor
   SeparatorBlock() {
-    transform = std::shared_ptr<TransformBlock>(new TransformBlock);
-    transform_sans_trans = std::shared_ptr<TransformBlock>(new TransformBlock);
+    //transform = std::shared_ptr<TransformBlock>(new TransformBlock);
+    //transform_sans_trans = std::shared_ptr<TransformBlock>(new TransformBlock);
   }
 
   void add_transform(std::shared_ptr<TransformBlock> t) {
@@ -89,6 +89,7 @@ public:
   }
 
 
+  /*
   void verts_object_to_world() {
     auto final_transform = transform->get_final_transform();
     std::vector<Matrix<float,3,1> > final_vertices;
@@ -159,6 +160,7 @@ public:
     }
     normal_list = final_normals;
   }
+  */
 
   void render(std::shared_ptr<Canvas> c,
 	      std::vector<std::shared_ptr<LightBlock> > lights, 
@@ -197,10 +199,13 @@ public:
   }
 
   void display() {
-    std::cout << "SHOWING SEPERATOR'S TRANSFORM\n";
-    transform->display();
-    std::cout << "SHOWING SEPERATOR'S TRANSFORM (no translations)\n";
-    transform_sans_trans->display();
+    std::cout << "SHOWING SEPERATOR'S TRANSFORMS\n";
+    for (auto& t : transforms)
+      t->display();
+    //std::cout << "SHOWING SEPERATOR'S TRANSFORM\n";
+    //transform->display();
+    //std::cout << "SHOWING SEPERATOR'S TRANSFORM (no translations)\n";
+    //transform_sans_trans->display();
     std::cout << "SHOWING SEPERATOR'S MATERIAL\n";
     material->display();
     std::cout << "SHOWING SEPERATOR'S VERTICES\n";
