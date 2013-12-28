@@ -1,6 +1,10 @@
 #ifndef __SCENE_BLOCK_H_GUARD__
 #define __SCENE_BLOCK_H_GUARD__
 
+#include "GL/gl.h"
+#include "GL/glu.h"
+#include "GL/glut.h"
+
 #include <vector>
 #include <memory>
 #include "../matrix/matrix.hh"
@@ -10,7 +14,8 @@
 #include "separator_block.hh"
 
 class SceneBlock {
-private:
+public:
+  //private:
   int shading;
   std::shared_ptr<CameraBlock> camera;
   std::vector<std::shared_ptr<LightBlock> > lights;
@@ -27,16 +32,25 @@ public:
     sep_list.push_back(s);
   }
 
-  void render(std::shared_ptr<Canvas> c, int shading_type) {
+  //void render(std::shared_ptr<Canvas> c, int shading_type) {
+  void render() {
     //Matrix<float,4,4> p_proj = camera->get_perspective_projection();
     //Matrix<float,4,4> inv_cam = camera->get_inverse_transform();
+    
     for(auto &sep: sep_list) {
-      // could just push and pop matrices at the beginning and end?
-      //sep->cull_backfaces(p_proj, inv_cam);
-      //sep->verts_object_to_world();
+      glPushMatrix();
+      sep->verts_object_to_world();
       //sep->norms_object_to_world();
 
-      sep->render(c, lights, camera, shading_type);
+      //sep->render(c, lights, camera, shading_type);
+      sep->render();
+      // TODO: update function calls to not use tons of arguments
+      // TODO: if normals don't seem right, just...push and pop stuff
+      //       so can do normals correctly. Maybe worth just modifying
+      //       verts_object_to_world();??
+      
+      // reset transform for next seperator
+      glPopMatrix();
     }
   }
   

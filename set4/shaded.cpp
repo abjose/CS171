@@ -2,6 +2,8 @@
 #include "shaded.hh"
 //#include "matrix/canvas.hh"
 
+static std::shared_ptr<SceneBlock> scene;
+
 /** GLUT callback functions **/
 
 /*
@@ -15,8 +17,41 @@ void redraw()
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  gluSphere(quad, 2.0, 256, 256);
-  gluCylinder(quad, 3.0, 2.0, 3.0, 256, 256);
+  //gluSphere(quad, 2.0, 256, 256);
+  //gluCylinder(quad, 3.0, 2.0, 3.0, 256, 256);
+
+  glMatrixMode(GL_MODELVIEW); // might not need
+  glLoadIdentity();  // might...not need?
+  glPushMatrix();
+  //glTranslate3f(1, 0, 0);
+  //glPushMatrix();
+  //glRotate(120, 1, 0, 0);
+  // render some stuff
+  //glPopMatrix();
+  //glPushMatrix();
+  //glRotate(120, 0, 1, 0);
+  //glPopMatrix();
+
+
+  scene->render();
+
+  /*
+  for each frame:
+    // NOTE!!: these out push/pops should be moved when incorporating 
+    //         user input!
+    push
+
+    // user mouse translate and rotation -- more details later
+    
+    for each object:
+      push
+      transform(s)
+      //draw the polygons
+      pop
+    pop
+  */
+  
+  glPopMatrix();
 
   glutSwapBuffers();
 }
@@ -88,6 +123,9 @@ void initLights() {
   glEnable(GL_LIGHTING);
 }
 
+
+// add initLights() ?
+
 /**
  * Sets the OpenGL material state.  This is remembered so we only need to
  * do this once.  If you want to use different materials, you'd need to do this
@@ -127,11 +165,27 @@ void initGL()
   // Look up these functions to see what they're doing.
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  glFrustum(-0.5, 0.5, -0.5, 0.5, 1, 10);
+  glFrustum(scene->camera->left,
+	    scene->camera->right,
+	    scene->camera->bottom,
+	    scene->camera->top,
+	    scene->camera->near,
+	    scene->camera->far);
+  //glFrustum(-0.5, 0.5, -0.5, 0.5, 1, 10);
   // NOTE: THE REST OF EVERYTHING WILL BE IN MODELVIEW
   glMatrixMode(GL_MODELVIEW);
+
+  // do camera stuff here I guess?
+
   glLoadIdentity();
-  gluLookAt(5, 5, 5, 0, 0, 0, 1, 0, 0);
+  //gluLookAt(5, 5, 5, 
+  //	    0, 0, 0, 
+  //	    1, 0, 0);
+  gluLookAt(5,//scene->camera->position[0], 
+	    5,//scene->camera->position[1], 
+	    5,//scene->camera->position[2],
+	    0, 0, 0, // NEED TO INCLUDE WITH ROTATION STUFF!!
+	    1, 0, 0);
 
   // set light parameters
   initLights();
@@ -140,8 +194,8 @@ void initGL()
   initMaterial();
 
   // initialize the "quadric" used by GLU to render high-level objects.
-  quad = gluNewQuadric();
-  gluQuadricOrientation(quad, GLU_OUTSIDE);
+  //quad = gluNewQuadric();
+  //gluQuadricOrientation(quad, GLU_OUTSIDE);
 }
 
 /**
@@ -175,7 +229,8 @@ int main(int argc, char* argv[])
     pop
   */
 
-
+  // From old code
+  scene = parse(std::cin);
   
   // OpenGL will take out any arguments intended for its use here.
   // Useful ones are -display and -gldebug.
@@ -193,18 +248,9 @@ int main(int argc, char* argv[])
     
   initGL();
 
-
-  // From old code
-  std::shared_ptr<SceneBlock> scene;
-  scene = parse(std::cin);
-
-  // render to the canvas
+  // render the parsed scene
   scene->display();
   //scene->render(c, mode);
-
-  // spit the ppm to std output
-  //std::cout << c->to_ppm() << std::endl;
-
 
   // set up GLUT callbacks.
   glutDisplayFunc(redraw);

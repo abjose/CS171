@@ -8,9 +8,9 @@
 class CameraBlock{
 public:
   //private:
-  //Matrix<float,3,1> position;
-  Matrix<float,3,1> view_translation;
-  Matrix<float,4,1> view_rotation;
+  // previously used view_translation and view_rotation
+  Matrix<float,3,1> position;
+  Matrix<float,4,1> rotation;
 
 public:
   // public because laziness
@@ -19,25 +19,25 @@ public:
 
   // default constructor
   CameraBlock() {
-    //view_translation.make_identity();
-    //view_rotation.make_identity();
+    //position.make_identity();
+    //rotation.make_identity();
   }
 
   void set_position(float x, float y, float z) {
-    //view_translation = translation_matrix(x,y,z);
-    view_translation = makeVector3<float>(x,y,z);
+    //position = translation_matrix(x,y,z);
+    position = makeVector3<float>(x,y,z);
     // not sure this is right...
     //position = makeVector3<float>(x,y,z);
   }
   void set_orientation(float x, float y, float z, float theta) {
     float PI  = 3.14159265;
     float deg = (theta * 180) / PI;
-    view_rotation = makeVector4<float>(x,y,z,deg);
+    rotation = makeVector4<float>(x,y,z,deg);
   }
 
   /*
   Matrix<float,4,4> get_inverse_transform() {
-    Matrix<float,4,4> tr = view_translation * view_rotation;
+    Matrix<float,4,4> tr = position * rotation;
     tr.inverse();
     return tr;
   }
@@ -57,10 +57,10 @@ public:
   */
 
   void display() {
-    std::cout << "SHOWING CAMERA'S VIEW TRANSLATION\n";
-    view_translation.display();
-    std::cout << "SHOWING CAMERA'S VIEW ROTATION\n";
-    view_rotation.display();
+    std::cout << "SHOWING CAMERA'S POSITION\n";
+    position.display();
+    std::cout << "SHOWING CAMERA'S ROTATION\n";
+    rotation.display();
     //std::cout << "SHOWING CAMERA'S INVERSE TRANSFORM\n";
     //get_inverse_transform().display();
     //std::cout << "SHOWING CAMERA'S PERSPECTIVE PROJECTION\n";
