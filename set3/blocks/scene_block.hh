@@ -31,9 +31,10 @@ public:
     Matrix<float,4,4> p_proj = camera->get_perspective_projection();
     Matrix<float,4,4> inv_cam = camera->get_inverse_transform();
     for(auto &sep: sep_list) {
-      sep->cull_backfaces(p_proj, inv_cam);
+      //sep->cull_backfaces(p_proj, inv_cam);
       sep->verts_object_to_world();
       sep->norms_object_to_world();
+      sep->cull_backfaces_dot(p_proj, inv_cam, camera->position);
 
       sep->render(c, lights, camera, shading_type);
     }

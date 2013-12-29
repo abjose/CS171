@@ -131,12 +131,17 @@ public:
     final_transform_sans_trans = final_transform_sans_trans.transpose();
 
     for (auto &it: normal_list) {
-      auto n = makeVector4<float>(it[0], it[1], it[2], 1.0);
-      n = (final_transform_sans_trans * n).normalize();
-      final_normals.push_back(makeVector3<float>(n[0],n[1],n[2]));
+      //auto n = makeVector4<float>(it[0], it[1], it[2], 1.0);
+      auto n = makeVector4<float>(it[0], it[1], it[2], 0.);
+      //n = (final_transform_sans_trans * n).normalize();
+      n = final_transform_sans_trans * n;
+      //final_normals.push_back(makeVector3<float>(n[0],n[1],n[2]));
+      final_normals.push_back(makeVector3<float>(n[0],n[1],n[2]).normalize());
     }
     normal_list = final_normals;
   }
+
+  // TODO: IF END UP USING THESE, NEED TO FIX W TO 0 LIKE ABOVE!
   //need?
   void norms_world_to_camera(Matrix<float,4,4> inv_cam) {
     std::vector<Matrix<float,3,1> > final_normals;
@@ -184,23 +189,66 @@ public:
       n = makeVector4<float>(a[1]*b[2] - a[2]*b[1], 
 			     a[2]*b[0] - a[0]*b[2],
 			     a[0]*b[1] - a[1]*b[0], 
-			     1.0);//.normalize();
+			     //1.0);
+			     0.0);
       // transform into NDC
-      n = (T * n).normalize();
-
-      //auto test_n = makeVector3<float>(n[0],n[1],n[2]);
-      //test_n = test_n.normalize();
-      //std::cerr << test_n << std::endl;
+      n = (T * n);
+      auto test = makeVector3<float>(n[0],n[1],n[2]).normalize();
 
       // check if n_z is positive
-      if(n[2] > 0) { 
-      //if(test_n[2] < 0) { 
+      //if(n[2] > 0) { 
+      if(test[2] >= 0) { 
 	// add triangle to "show" list (which will replace current poly list)
 	culled_polys.push_back(poly);
 	culled_norms.push_back(norm);
       } else {
-	std::cerr << "found backface!\n";
+	std::cerr << "found backface: ";
+	for (auto& bla : poly)
+	    std::cerr << bla << ", ";
+	std::cerr << std::endl;
 	//std::cerr << n[2] << std::endl;
+      }
+    }
+
+    // now replace old lists with culled ones
+    poly_list = culled_polys; 
+    poly_normal_list = culled_norms; 
+  }
+
+  void cull_backfaces_dot(Matrix<float,4,4> persp_proj,
+			  Matrix<float,4,4> inv_cam,
+			  Matrix<float,3,1> cam_pos) {
+    
+    // use dot product of surface normal (can just take any??)
+    // and camera-to-poly vector 
+   
+    assert(poly_list.size() == poly_normal_list.size());
+    std::vector<std::vector<int> > culled_polys;     
+    std::vector<std::vector<int> > culled_norms; 
+    Matrix<float,3,1> v0,v1,v2, avg_v;
+    for (int i=0; i < poly_list.size(); i++) {
+      auto poly = poly_list[i];
+      auto norm = poly_normal_list[i];
+      v0 = vertex_list[poly[0]];
+      v1 = vertex_list[poly[1]];
+      v2 = vertex_list[poly[2]];
+      avg_v = (v0+v1+v2) / 3.0;
+
+      // reverse this if not working...
+      auto cam_to_surf = (avg_v - cam_pos).normalize(); 
+      auto surf_norm = normal_list[norm[0]].normalize(); // just choose one
+      auto dot = surf_norm.dot(cam_to_surf);      
+      
+      // check if dot is positive
+      if(dot >= 0) { 
+	// add triangle to "show" list (which will replace current poly list)
+	culled_polys.push_back(poly);
+	culled_norms.push_back(norm);
+      } else {
+	std::cerr << "found backface: ";
+	for (auto& bla : poly)
+	    std::cerr << bla << ", ";
+	std::cerr << std::endl;
       }
     }
 
