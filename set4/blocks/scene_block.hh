@@ -38,6 +38,10 @@ public:
     //Matrix<float,4,4> inv_cam = camera->get_inverse_transform();
     
     for(auto &sep: sep_list) {
+      // TODO: awk...need to transform normals by different things...
+      // so...maybe just call in sep's render func? and push and pop
+      // as necessary?
+
       glPushMatrix();
       //sep->verts_object_to_world();
       //sep->norms_object_to_world();

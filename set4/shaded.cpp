@@ -17,7 +17,6 @@ void redraw()
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glMatrixMode(GL_MODELVIEW); // might not need
   //glLoadIdentity();  // might...not need?
   //glPushMatrix();
 
@@ -178,6 +177,8 @@ void initGL()
 	    5,//scene->camera->position[2],
 	    0, 0, 0, // NEED TO INCLUDE WITH ROTATION STUFF!!
 	    1, 0, 0);
+  // could just use a glRotation thing with inv. camera stuff?
+  // ....same for translation I guess...
 
   // set light parameters
   initLights();

@@ -52,7 +52,7 @@ public:
   void add_poly_index(int vertex) {
     if (vertex == -1) {
       if (temp_poly.size() > 3) {
-	// tringulate non-triangle polygon
+	// triangulate non-triangle polygon
 	for(int i=2; i < temp_poly.size(); i++) {
 	  std::vector<int> tri(3,0);// (vs, vs + sizeof(vs)/sizeof(int));
 	  tri[0] = temp_poly[0];
@@ -171,9 +171,24 @@ public:
     // should have already pushed
     for (auto& t : transforms) {
       // TODO: might be backwards! but is supposed to be a stack...
+      // also, will you have to push and pop each time? hmm..
+      // i.e. push isn't a "save state", you actually have to do it a lot
       glTranslatef(t->translation[0],
 		   t->translation[1],
 		   t->translation[2]);
+      glRotatef(t->rotation[3],
+		t->rotation[0],
+		t->rotation[1],
+		t->rotation[2]);
+      glScalef(t->scale[0],
+	       t->scale[1],
+	       t->scale[2]);
+    }
+  }
+
+  void norms_object_to_world() {
+    for (auto& t : transforms) {
+      // note - change this if change verts version
       glRotatef(t->rotation[3],
 		t->rotation[0],
 		t->rotation[1],
@@ -198,6 +213,8 @@ public:
     GLfloat vertices[n_floats];
     GLfloat normals[n_floats];
 
+    // TODO: considering these arrays are always the same, should just
+    // calculate them once?
     // for each polygon (should all be triangles)
     for (int i=0; i < poly_list.size(); i++) {
       auto poly = poly_list[i];
@@ -215,6 +232,7 @@ public:
     }
       
     // do you need to enable/disable every time?
+    //verts_object_to_world();
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, vertices);
