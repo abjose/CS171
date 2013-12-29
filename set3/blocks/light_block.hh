@@ -2,6 +2,7 @@
 #define __LIGHT_BLOCK_H_GUARD__
 
 #include "../matrix/matrix.hh"
+#include "../matrix/transform.hh"
 
 class LightBlock{
 public:

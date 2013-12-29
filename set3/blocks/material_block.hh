@@ -2,6 +2,7 @@
 #define __MATERIAL_BLOCK_H_GUARD__
 
 #include "../matrix/matrix.hh"
+#include "../matrix/transform.hh"
 
 class MaterialBlock{
 public:
