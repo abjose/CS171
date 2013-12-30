@@ -32,20 +32,13 @@ public:
     sep_list.push_back(s);
   }
 
-  //void render(std::shared_ptr<Canvas> c, int shading_type) {
-  void render() {
-    //Matrix<float,4,4> p_proj = camera->get_perspective_projection();
-    //Matrix<float,4,4> inv_cam = camera->get_inverse_transform();
-    
+  void render() {    
     for(auto &sep: sep_list) {
       sep->init_material();
 
       glPushMatrix();
-
       sep->object_to_world();
       sep->render();
-
-      // reset transform for next separator
       glPopMatrix();
     }
   }
