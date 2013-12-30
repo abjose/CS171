@@ -60,6 +60,7 @@ public:
 	  tri[2] = temp_poly[i];
 	  poly_list.push_back(tri);
 	}
+	temp_poly.clear();
       } else {
 	// should experiment with this -- see if all this copying is necessary
 	// can technically get rid of this if above works
@@ -81,6 +82,7 @@ public:
 	  tri[2] = temp_poly_normal[i];
 	  poly_normal_list.push_back(tri);
 	}
+	temp_poly_normal.clear();
       } else {
 	// should experiment with this -- see if all this copying is necessary
 	std::vector<int> new_poly_normal = temp_poly_normal;
@@ -167,7 +169,7 @@ public:
   */
 
 
-  void verts_object_to_world() {
+  void object_to_world() {
     // should have already pushed
     for (auto& t : transforms) {
       // TODO: might be backwards! but is supposed to be a stack...
@@ -185,20 +187,6 @@ public:
 	       t->scale[2]);
     }
   }
-
-  void norms_object_to_world() {
-    for (auto& t : transforms) {
-      // note - change this if change verts version
-      glRotatef(t->rotation[3],
-		t->rotation[0],
-		t->rotation[1],
-		t->rotation[2]);
-      glScalef(t->scale[0],
-	       t->scale[1],
-	       t->scale[2]);
-    }
-  }
-
 
   //  void render(std::shared_ptr<Canvas> c,
   //	      std::vector<std::shared_ptr<LightBlock> > lights, 

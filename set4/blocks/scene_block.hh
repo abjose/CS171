@@ -43,8 +43,7 @@ public:
       // as necessary?
 
       glPushMatrix();
-      //sep->verts_object_to_world();
-      //sep->norms_object_to_world();
+      //sep->object_to_world();
 
       // TODO: try copying something you know works here instead
       sep->render();
