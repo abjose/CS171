@@ -5,8 +5,6 @@
 // TODO: lighting seems to be on...the opposite of the right side?
 //       does anything need to be done to lighting to put into world coords?
 // TODO: change vertex variables to 'v' instead of 't'?
-// TODO: IMPLEMENT BACKFACE CULLING, NORMAL TRIANGLING...
-//       THENNNN WORK ON LIGHTING PROBLEMS
 // Pretty weird that flat shading seems to work well (for lighting...) 
 // but not the others...makes me think normals are screwed up.
 
@@ -19,11 +17,13 @@ Matrix<float,3,1> light_func(Matrix<float,3,1> n, Matrix<float,3,1> v,
   // let v = point in space (x,y,z)
   // let lights = [light0, light1, ... ]
   // let camerapos = (x,y,z)
+
+  n = n.normalize(); // omg how many times are you going to normalize
   
   Matrix<float,3,1> scolor = material->specular; // (r,g,b)
   Matrix<float,3,1> dcolor = material->diffuse;  // (r,g,b)
   Matrix<float,3,1> acolor = material->ambient;  // (r,g,b)
-  float shiny =  material->shininess;     // (a scalar, an exponent >= 0)
+  float shiny = material->shininess;     // (a scalar, an exponent >= 0)
     
   // start off the diffuse and specular at pitch black
   Matrix<float,3,1> diffuse  = makeVector3<float>(0,0,0);
@@ -40,30 +40,23 @@ Matrix<float,3,1> light_func(Matrix<float,3,1> n, Matrix<float,3,1> v,
     Matrix<float,3,1> lc = light->color;
     
     // first calculate the addition this light makes to the diffuse part
-    //Matrix<float,3,1> ddiffuse = zero_clip(lc * (n . unit(lx - v)));
+    // ddiffuse = zero_clip(lc * (n . unit(lx - v)));
     Matrix<float,3,1> ddiffuse = (lc * (n.dot((v-lx).normalize()))).zero_clip();
     // accumulate that
     diffuse += ddiffuse;
-    //std::cout << "diffuse:\n" << ddiffuse << std::endl;
     
     // calculate the specular exponent
     //k = zero_clip(n . unit(unit(camerapos - v) + unit(lx - v)));
     float k = n.dot(((camerapos - v).normalize() +
 		     (lx - v).normalize()).normalize());
     if (k < 0) k = 0;
-    //std::cout << "k: " << k << std::endl; 
-    //std::cout << "v: " << v << std::endl;
-    //std::cout << "pow: " << pow(k,shiny) << std::endl;
-    //std::cout << "\n\n\n";
+
     // calculate the addition to the specular highlight
     // k^shiny is a scalar, lc is (r,g,b)
     Matrix<float,3,1> dspecular = (lc * pow(k,shiny)).zero_clip();
     // accumulate that
     specular += dspecular;
-    //std::cout << "specular:\n" << dspecular << std::endl;
   }
-  
-  //std::cout << specular << std::endl;
 
   // after working on all the lights, clamp the diffuse value to 1
   diffuse = diffuse.one_clip();
@@ -87,7 +80,6 @@ void draw_pixels_with_constant_color(std::shared_ptr<Canvas> c,
 void draw_pixels(std::shared_ptr<Canvas> c) {
   // iterate through pixels_to_draw vector
   for (auto& it : pixels_to_draw) {
-    //std::cout << it[2] << ", " << it[3] << ", " << it[4] << std::endl;
     c->set_pixel(it[0],it[1], makeVector3<float>(it[2],it[3],it[4]));
   }
 }

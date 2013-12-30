@@ -54,10 +54,6 @@ public:
 	  tri[0] = temp_poly[0];
 	  tri[1] = temp_poly[i-1];
 	  tri[2] = temp_poly[i];
-	  std::cerr << "final triangle: ";
-	  for (auto& it : tri)
-	    std::cerr << it << ", ";
-	  std::cerr << std::endl;
 	  poly_list.push_back(tri);
 	}
 	temp_poly.clear();
