@@ -94,6 +94,8 @@ void keyfunc(GLubyte key, GLint x, GLint y)
  * and the light will be used during all renders.
  */
 void initLights() {
+  // NOTE THAT THERE ARE MULTIPLE LIGHTS!!
+  
   GLfloat amb[] = { 1.0, 1.0, 1.0, 1.0 };
   GLfloat diff[]= { 1.0f, 1.0f, 1.0f, 1.0f };
   GLfloat spec[]= { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -162,33 +164,27 @@ void initGL()
 	    scene->camera->top,
 	    scene->camera->near,
 	    scene->camera->far);
-  //glFrustum(-0.5, 0.5, -0.5, 0.5, 1, 10);
+
   // NOTE: THE REST OF EVERYTHING WILL BE IN MODELVIEW
   glMatrixMode(GL_MODELVIEW);
 
-  // do camera stuff here I guess?
-
   glLoadIdentity();
-  //gluLookAt(5, 5, 5, 
-  //	    0, 0, 0, 
-  //	    1, 0, 0);
-  gluLookAt(5,//scene->camera->position[0], 
-	    5,//scene->camera->position[1], 
-	    5,//scene->camera->position[2],
-	    0, 0, 0, // NEED TO INCLUDE WITH ROTATION STUFF!!
-	    1, 0, 0);
-  // could just use a glRotation thing with inv. camera stuff?
-  // ....same for translation I guess...
+
+  // camera rotate -theta
+  glRotatef(-1*scene->camera->rotation[3],
+	    scene->camera->rotation[0],
+	    scene->camera->rotation[1],
+	    scene->camera->rotation[2]);
+  // camera -translate
+  glTranslatef(-1*scene->camera->position[0], 
+ 	         -1*scene->camera->position[1], 
+  	         -1*scene->camera->position[2]);
 
   // set light parameters
   initLights();
 
   // set material parameters
-  initMaterial();
-
-  // initialize the "quadric" used by GLU to render high-level objects.
-  quad = gluNewQuadric();
-  gluQuadricOrientation(quad, GLU_OUTSIDE);
+  //initMaterial();
 }
 
 /**

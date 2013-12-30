@@ -94,81 +94,6 @@ public:
     }
   }
 
-
-  /*
-  void verts_object_to_world() {
-    auto final_transform = transform->get_final_transform();
-    std::vector<Matrix<float,3,1> > final_vertices;
-    for (auto &it: vertex_list) {
-      //std::cout << "In verts_object_to_world...converting...\n";
-      // need to homogenize...each time?
-      auto v = makeVector4<float>(it[0], it[1], it[2], 1.0);
-      v = (final_transform * v).homogenize();
-      final_vertices.push_back(makeVector3<float>(v[0],v[1],v[2]));
-    }    
-    vertex_list = final_vertices;
-  }
-  void verts_world_to_camera(Matrix<float,4,4> inv_cam) {
-    std::vector<Matrix<float,3,1> > final_vertices;
-    for (auto &it: vertex_list) {
-      // need to homogenize...each time?
-      auto v = makeVector4<float>(it[0], it[1], it[2], 1.0);
-      v = (inv_cam * v).homogenize();
-      final_vertices.push_back(makeVector3<float>(v[0],v[1],v[2]));
-    }    
-    vertex_list = final_vertices;
-  }
-  void verts_world_to_NDC(Matrix<float,4,4> persp_proj) {
-    std::vector<Matrix<float,3,1> > final_vertices;
-    for (auto &it: vertex_list) {
-      // need to homogenize...each time?
-      auto v = makeVector4<float>(it[0], it[1], it[2], 1.0);
-      v = (persp_proj * v).homogenize();
-      final_vertices.push_back(makeVector3<float>(v[0],v[1],v[2]));
-    }    
-    vertex_list = final_vertices;
-  }
-
-
-  void norms_object_to_world() {
-    std::vector<Matrix<float,3,1> > final_normals;
-    Matrix<float,4,4> final_transform_sans_trans = 
-      transform_sans_trans->get_final_transform();
-    final_transform_sans_trans.inverse();
-    final_transform_sans_trans = final_transform_sans_trans.transpose();
-
-    for (auto &it: normal_list) {
-      auto n = makeVector4<float>(it[0], it[1], it[2], 1.0);
-      n = (final_transform_sans_trans * n).normalize();
-      final_normals.push_back(makeVector3<float>(n[0],n[1],n[2]));
-    }
-    normal_list = final_normals;
-  }
-  //need?
-  void norms_world_to_camera(Matrix<float,4,4> inv_cam) {
-    std::vector<Matrix<float,3,1> > final_normals;
-    for (auto &it: normal_list) {
-      auto n = makeVector4<float>(it[0], it[1], it[2], 1.0);
-      n = (inv_cam * n);//.normalize();
-      final_normals.push_back(makeVector3<float>(n[0],n[1],n[2]).normalize());
-      // TODO: pretty weird that when you normalize here, doesn't seem to
-      //       'last' to lighting stuff (because different when normalize there)
-    }
-    normal_list = final_normals;
-  }
-  //need?
-  void norms_world_to_NDC(Matrix<float,4,4> persp_proj) {
-    std::vector<Matrix<float,3,1> > final_normals;
-    for (auto &it: normal_list) {
-      auto n = makeVector4<float>(it[0], it[1], it[2], 1.0);
-      n = (persp_proj * n).normalize();
-      final_normals.push_back(makeVector3<float>(n[0],n[1],n[2]));
-    }
-    normal_list = final_normals;
-  }
-  */
-
-
   void object_to_world() {
     // should have already pushed
     for (auto& t : transforms) {
@@ -188,10 +113,26 @@ public:
     }
   }
 
-  //  void render(std::shared_ptr<Canvas> c,
-  //	      std::vector<std::shared_ptr<LightBlock> > lights, 
-  //	      std::shared_ptr<CameraBlock> camera,
-  //	      int shading_type) {
+  void init_material() {
+    GLfloat emit[] = {0.0, 0.0, 0.0, 1.0}; // wat
+    GLfloat  amb[] = {material->ambient[0],
+		      material->ambient[1],
+		      material->ambient[2]};
+    GLfloat  diff[] = {material->diffuse[0],
+		       material->diffuse[1],
+		       material->diffuse[2]};
+    GLfloat  spec[] = {material->specular[0],
+		       material->specular[1],
+		       material->specular[2]};
+    GLfloat shiny = material->shininess;
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT, amb);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, diff);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, spec);
+    glMaterialfv(GL_FRONT, GL_EMISSION, emit);
+    glMaterialfv(GL_FRONT, GL_SHININESS, &shiny);
+  }
+
   void render() {
     assert(poly_list.size() == poly_normal_list.size());
 
@@ -220,7 +161,6 @@ public:
     }
       
     // do you need to enable/disable every time?
-    //verts_object_to_world();
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, vertices);

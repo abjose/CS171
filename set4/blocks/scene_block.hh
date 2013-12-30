@@ -38,23 +38,14 @@ public:
     //Matrix<float,4,4> inv_cam = camera->get_inverse_transform();
     
     for(auto &sep: sep_list) {
-      // TODO: awk...need to transform normals by different things...
-      // so...maybe just call in sep's render func? and push and pop
-      // as necessary?
+      sep->init_material();
 
       glPushMatrix();
-      //sep->object_to_world();
 
-      // TODO: try copying something you know works here instead
+      sep->object_to_world();
       sep->render();
 
-
-      // TODO: update function calls to not use tons of arguments
-      // TODO: if normals don't seem right, just...push and pop stuff
-      //       so can do normals correctly. Maybe worth just modifying
-      //       verts_object_to_world();??
-      
-      // reset transform for next seperator
+      // reset transform for next separator
       glPopMatrix();
     }
   }
