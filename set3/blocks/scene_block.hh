@@ -34,8 +34,7 @@ public:
       //sep->cull_backfaces(p_proj, inv_cam);
       sep->verts_object_to_world();
       sep->norms_object_to_world();
-      sep->cull_backfaces_dot(p_proj, inv_cam, camera->position);
-
+      //sep->cull_backfaces_dot(camera->position);
       sep->render(c, lights, camera, shading_type);
     }
   }

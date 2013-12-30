@@ -14,7 +14,16 @@ int main(int argc, char *argv[]) {
   
   // TODO: convert things from using .display() to << notation
   // TODO: change canvas to take args in same order as initDraw?
-  // TODO: convert Canvas back to non-template because always using rgb...
+  // TODO: why do lights consistently seem to be on the wrong side?
+  // TODO: why isn't backface culling not working? possibly putting vertices
+  //       in wrong order somewhere?
+  // TODO: Also possible clipping just isn't working...didn't write anything
+  //       specifically for it...
+
+  // TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+  // ALEX! When transforming surface normals, DON'T have W be 1 - have it be 0 
+  // and then completely ignore it (i.e. don't normalize...)
+  // http://stackoverflow.com/questions/10596548/correctly-transforming-a-surface-normal
 
   // call initDraw for use of raster later
   initDraw(xMin, xMax, yMin, yMax, xres, yres);

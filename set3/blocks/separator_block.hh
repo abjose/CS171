@@ -54,13 +54,19 @@ public:
 	  tri[0] = temp_poly[0];
 	  tri[1] = temp_poly[i-1];
 	  tri[2] = temp_poly[i];
+	  std::cerr << "final triangle: ";
+	  for (auto& it : tri)
+	    std::cerr << it << ", ";
+	  std::cerr << std::endl;
 	  poly_list.push_back(tri);
 	}
+	temp_poly.clear();
       } else {
 	// should experiment with this -- see if all this copying is necessary
 	// can technically get rid of this if above works
-	std::vector<int> new_poly = temp_poly;
-	poly_list.push_back(new_poly);
+	//std::vector<int> new_poly = temp_poly;
+	//poly_list.push_back(new_poly);
+	poly_list.push_back(temp_poly);
 	temp_poly.clear();
       }
     } else {
@@ -77,6 +83,7 @@ public:
 	  tri[2] = temp_poly_normal[i];
 	  poly_normal_list.push_back(tri);
 	}
+	temp_poly_normal.clear();
       } else {
 	// should experiment with this -- see if all this copying is necessary
 	std::vector<int> new_poly_normal = temp_poly_normal;
@@ -165,8 +172,20 @@ public:
     normal_list = final_normals;
   }
 
+
+  // TRY TO FIX PROBLEM WITH RENDERING BIG THINGS!!!
+  // NORMAL THING DOESN'T SEEM TO WORK FOR FOURCUBES!
+  //  ACTUALLY FIRST SEE WHICH ONES ARE STILL BROKEN
+  // ALSO LIGHTING...
+  // LOOK AT backfaces for lion...some seem kinda fucked up
+  // for example, one seemed to repeat the 2nd one twice?
+  // also...does it have the 1st one too often?
+
   void cull_backfaces(Matrix<float,4,4> persp_proj,
 		      Matrix<float,4,4> inv_cam) {
+    // TODO: not working! Fact that dot one works and this doesn't might hint
+    //       about ordering problems...
+
     // polygons should all be triangles
     // note: this will be backwards if polygons aren't ccw - try reversing
     // if nothing shows
@@ -215,13 +234,9 @@ public:
     poly_normal_list = culled_norms; 
   }
 
-  void cull_backfaces_dot(Matrix<float,4,4> persp_proj,
-			  Matrix<float,4,4> inv_cam,
-			  Matrix<float,3,1> cam_pos) {
-    
+  void cull_backfaces_dot(Matrix<float,3,1> cam_pos) {
     // use dot product of surface normal (can just take any??)
     // and camera-to-poly vector 
-   
     assert(poly_list.size() == poly_normal_list.size());
     std::vector<std::vector<int> > culled_polys;     
     std::vector<std::vector<int> > culled_norms; 
@@ -234,9 +249,12 @@ public:
       v2 = vertex_list[poly[2]];
       avg_v = (v0+v1+v2) / 3.0;
 
-      // reverse this if not working...
-      auto cam_to_surf = (avg_v - cam_pos).normalize(); 
+      // TODO: SHOULD BOTH OF THESE REALLY WORK?
+      //auto cam_to_surf = (avg_v - cam_pos).normalize(); 
+      auto cam_to_surf = (cam_pos - avg_v).normalize(); 
       auto surf_norm = normal_list[norm[0]].normalize(); // just choose one
+      // TODO: also try calculating surf_norm by getting cross product of face
+      //       vertices...might help figure out why other one doesn't work
       auto dot = surf_norm.dot(cam_to_surf);      
       
       // check if dot is positive
