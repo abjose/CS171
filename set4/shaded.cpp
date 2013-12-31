@@ -1,8 +1,16 @@
+
 #include <iostream>
 #include "shaded.hh"
-//#include "matrix/canvas.hh"
+//#include "uistate.h"
+#include "ui.hh"
+
 
 static std::shared_ptr<SceneBlock> scene;
+//static UIState *ui;
+static UI *ui;
+
+// The current window size.
+int windowWidth = 800, windowHeight = 600;
 
 /** GLUT callback functions **/
 
@@ -17,12 +25,18 @@ void redraw()
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+  //glTranslatef(0.01,0,0);
+
+  glPushMatrix();
+
+  // apply camera transform?
+  //ui->ApplyViewingTransformation();
+  ui->applyViewingTransformation();
+  glTranslatef(ui->final_x, -1*ui->final_y, ui->final_z);
+
   //glLoadIdentity();  // might...not need?
   //glPushMatrix();
 
-  //gluSphere(quad, 2.0, 256, 256);
-  //gluCylinder(quad, 3.0, 2.0, 3.0, 256, 256);
-  
   scene->render();
 
   /*
@@ -41,7 +55,7 @@ void redraw()
     pop
   */
   
-  //glPopMatrix();
+  glPopMatrix();
 
   glutSwapBuffers();
 }
@@ -51,16 +65,14 @@ void redraw()
  * All we do here is change the OpenGL viewport so it will always draw in the
  * largest square that can fit in our window..
  */
+
 void resize(GLint w, GLint h)
 {
-  if (h == 0)
-    h = 1;
+  if (h == 0) h = 1;
 
   // ensure that we are always square (even if whole window not used)
-  if (w > h)
-    w = h;
-  else
-    h = w;
+  if (w > h) w = h;
+  else       h = w;
 
   // Reset the current viewport and perspective transformation
   glViewport(0, 0, w, h);
@@ -68,6 +80,7 @@ void resize(GLint w, GLint h)
   // Tell GLUT to call redraw()
   glutPostRedisplay();
 }
+
 
 /*
  * GLUT calls this function when any key is pressed while our window has
@@ -125,37 +138,17 @@ void initLights() {
   glEnable(GL_LIGHTING);
 }
 
-
-// add initLights() ?
-
-/**
- * Sets the OpenGL material state.  This is remembered so we only need to
- * do this once.  If you want to use different materials, you'd need to do this
- * before every different one you wanted to use.
- */
-// void initMaterial() {
-//   // TODO: need to change this for each separator...can just move this code?
-//   GLfloat emit[] = {0.0, 0.0, 0.0, 1.0};
-//   GLfloat  amb[] = {0.0, 0.0, 0.0, 1.0};
-//   GLfloat diff[] = {0.0, 0.0, 1.0, 1.0};
-//   GLfloat spec[] = {1.0, 1.0, 1.0, 1.0};
-//   GLfloat shiny = 20.0f;
-
-//   glMaterialfv(GL_FRONT, GL_AMBIENT, amb);
-//   glMaterialfv(GL_FRONT, GL_DIFFUSE, diff);
-//   glMaterialfv(GL_FRONT, GL_SPECULAR, spec);
-//   glMaterialfv(GL_FRONT, GL_EMISSION, emit);
-//   glMaterialfv(GL_FRONT, GL_SHININESS, &shiny);
-// }
-
 /**
  * Set up OpenGL state.  This does everything so when we draw we only need to
  * actually draw the sphere, and OpenGL remembers all of our other settings.
  */
 void initGL()
 {
-  // Tell openGL to use gauraud shading:
-  glShadeModel(GL_SMOOTH);
+  glShadeModel(GL_SMOOTH); // gouraud
+  //glShadeModel(GL_FLAT);   // flat
+  //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE ); // wireframe
+  // TODO: SHOULD TURN OFF LIGHTING AND STUFF FOR THIS ONE!!
+  
     
   // Enable back-face culling:
   glEnable(GL_CULL_FACE);
@@ -197,6 +190,101 @@ void initGL()
   //initMaterial();
 }
 
+
+
+
+
+
+//--------------------------------------------------------------------------
+// Handles reshaping of the program window
+//--------------------------------------------------------------------------
+//void reshape(const int width, const int height)
+/*
+void resize(const int width, const int height)
+{
+    windowWidth = width;
+    windowHeight = height;
+    
+    if( width <= 0 || height <= 0 ) return;
+    
+    ui->WindowX() = width;
+    ui->WindowY() = height;
+    
+    ui->Aspect() = float( width ) / height;
+    ui->SetupViewport();
+    ui->SetupViewingFrustum();
+}
+*/
+
+//--------------------------------------------------------------------------
+// Handles motion of the mouse when a button is being held
+//--------------------------------------------------------------------------
+void motion(const int x, const int y)
+{
+  // Just pass it on to the ui controller.
+  //ui->MotionFunction(x, y);
+  ui->motionFunction(x, y);
+}
+
+//--------------------------------------------------------------------------
+// Handles mouse clicks and releases
+//--------------------------------------------------------------------------
+void mouse(const int button, const int state, const int x, const int y)
+{
+  // Just pass it on to the ui controller.
+  //ui->MouseFunction(button, state, x, y);
+  ui->mouseFunction(button, state, x, y);
+}
+
+//--------------------------------------------------------------------------
+// Initializes the UI
+//--------------------------------------------------------------------------
+void initUI()
+{
+  /*
+glFrustum(scene->camera->left,
+	    scene->camera->right,
+	    scene->camera->bottom,
+	    scene->camera->top,
+	    scene->camera->near,
+	    scene->camera->far);
+
+  // NOTE: THE REST OF EVERYTHING WILL BE IN MODELVIEW
+  glMatrixMode(GL_MODELVIEW);
+
+  glLoadIdentity();
+
+  // camera rotate -theta
+  glRotatef(-1*scene->camera->rotation[3],
+	    scene->camera->rotation[0],
+	    scene->camera->rotation[1],
+	    scene->camera->rotation[2]);
+  // camera -translate
+  glTranslatef(-1*scene->camera->position[0], 
+ 	         -1*scene->camera->position[1], 
+  	         -1*scene->camera->position[2]);
+
+
+*/
+
+  ui = new UI();
+  //ui = new UIState;
+  /*
+  ui->Trans() = Vector3(scene->camera->position[0],
+			scene->camera->position[1],
+			scene->camera->position[2]);
+  ui->Radius() = 2;
+  ui->Near() = scene->camera->near;;
+  ui->Far() = scene->camera->far;
+  */
+  //reshape(windowWidth, windowHeight);
+  resize(windowWidth, windowHeight);
+  //checkGLErrors("End of uiInit");
+}
+
+
+
+
 /**
  * Main entrance point.
  * Sets up some stuff then passes control to glutMainLoop() which never
@@ -204,6 +292,21 @@ void initGL()
  */
 int main(int argc, char* argv[])
 {
+
+  /*
+
+    UI TODO:
+    - set up keyboard stuff to maintain key state in UI class
+    - add stuff for properly translating camera, etc. to UI class
+    - add stuff to update camera transformation
+    - move transformation stuff to redraw (think already is)
+    - make zoom (shift+drag middle mouse)
+    - make translate (middle mouse button)
+    - make rotation (don't do arcball? unless code easy to copy)
+    -- yeahhh, maybe don't do arcball...especially with quaternions...
+
+   */
+
 
   // REFERENCE CODE OUTLINE (for transformations)
   /*
@@ -228,6 +331,8 @@ int main(int argc, char* argv[])
     pop
   */
 
+  // TODO: OH NO LOOKS LIKE ONE FACE ISN'T BEING RENDERED IN FOURCUBES
+
   // From old code
   scene = parse(std::cin);
   
@@ -246,15 +351,20 @@ int main(int argc, char* argv[])
   glutCreateWindow("CS171 HW4");
     
   initGL();
-
-  // render the parsed scene
-  //scene->display();
-  //scene->render(c, mode);
+  initUI();
 
   // set up GLUT callbacks.
   glutDisplayFunc(redraw);
   glutReshapeFunc(resize);
   glutKeyboardFunc(keyfunc);
+  //glutIdleFunc(glutPostRedisplay);
+
+  //glutDisplayFunc(display);
+  //glutIdleFunc(glutPostRedisplay);
+  //glutKeyboardFunc(keyboard);
+  //glutReshapeFunc(reshape);
+  glutMouseFunc(mouse);
+  glutMotionFunc(motion);
 
   // From here on, GLUT has control,
   glutMainLoop();

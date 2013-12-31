@@ -134,6 +134,10 @@ public:
   }
 
   void render() {
+    // TODO: not all faces are being rendered...the problem might be here?
+    // could just try switching to the indexed version...
+    // TODO: implement user input and then maybe can tell what's going on 
+
     assert(poly_list.size() == poly_normal_list.size());
 
     // init vertex/normal arrays
@@ -141,6 +145,9 @@ public:
     int n_floats = 3*n_verts;  // 3 floats per vertex
     GLfloat vertices[n_floats];
     GLfloat normals[n_floats];
+
+    // TODO: WHY DOES CUBE2 SEEM TO BE RENDERING TWICE???? SIZE IS PRINTED TWICE...
+    // maybe because being redrawn?
 
     // TODO: considering these arrays are always the same, should just
     // calculate them once?
@@ -159,12 +166,24 @@ public:
 	//vertices[9*i+3*v+2] = vertex_list[poly[v]][2];
       }
     }
+
+    /*
+    int count = 0;
+    for(auto& it : vertices) {
+      if (count%3 == 0)
+	std::cerr << std::endl;
+      std::cerr << it << ", ";
+      count++;
+    }
+    std::cerr << "\nsize: " << count << std::endl;
+    */
       
     // do you need to enable/disable every time?
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, vertices);
     glNormalPointer(GL_FLOAT, 0, normals);
+    //glDrawArrays(GL_TRIANGLES, 0, n_verts);
     glDrawArrays(GL_TRIANGLES, 0, n_verts);
     // deactivate vertex arrays after drawing
     glDisableClientState(GL_VERTEX_ARRAY);
