@@ -59,12 +59,13 @@ def Q(u, k):
 
 def a(i,k,j, t_new):
     # j should be the index of the knot just to the left of the new one
-    if 1 <= i <= j-k: return 1
-    if j+1 <= i <= n: return 0
+    if 1 <= i <= j-k: return 1.
+    if j+1 <= i <= n: return 0.
     if j-k+1 <= i <= j:
         return (t_new - t[i]) / (t[i+k] - t[i])
     
 def insert_knot(t_new, k):
+    global p,t #ick
     # insert s.t. t_prev < t_new <= t_next
     # find indices of surrounding knots
     t_next = bisect.bisect_left(t, t_new)
@@ -73,19 +74,18 @@ def insert_knot(t_new, k):
     t_prev = t_next-1;
 
     # insert knot...sure this is supposed to happen before getting a's?
-    np.insert(t, t_next, t_new)
+    t = np.insert(t, t_next, t_new)
 
     # find new control points
-    # insert new control point in relevant range
+    # insert new control point in relevant range...should be last?
     j = t_prev
-    np.insert(p, j-k+1, np.array([0.,0.,0.])) # value shouldn't matter
+    p = np.insert(p, j, [0.,0.,0.], axis=0) # value shouldn't matter
     for i in range(j-k+1,j+1):
         a_i  = a(i,k,t_prev, t_new)
-        p[i] = (1-a_i)*p[i-1] + a_i*p[i]
+        print a_i
+        p[i] = (1.-a_i)*p[i-1] + a_i*p[i]
 
 if __name__=='__main__':
-    print 'meow'
-
     # probably make something to 'sample' Q for lots of points...
     degree = 3
     k = degree + 1
@@ -93,4 +93,9 @@ if __name__=='__main__':
     #for i in np.arange(0.,1.,0.01):
     #    print Q(float(i),k)
 
+    print p
+    print t
     insert_knot(0.4,k)
+    print p
+    print t
+
