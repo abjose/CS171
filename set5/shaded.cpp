@@ -1,11 +1,10 @@
 
 #include <iostream>
 #include "shaded.hh"
-//#include "uistate.h"
-#include "ui.hh"
+#include "nurbs/spline.hh"
+#include "UI/ui.hh"
 
 
-static std::shared_ptr<SceneBlock> scene;
 //static UIState *ui;
 static UI *ui;
 
@@ -31,13 +30,13 @@ void redraw()
 
   // apply camera transform?
   //ui->ApplyViewingTransformation();
-  ui->applyViewingTransformation();
-  glTranslatef(ui->final_x, -1*ui->final_y, ui->final_z);
+  //ui->applyViewingTransformation();
+  //glTranslatef(ui->final_x, -1*ui->final_y, ui->final_z);
 
   //glLoadIdentity();  // might...not need?
   //glPushMatrix();
 
-  scene->render();
+  //scene->render();
 
   // TODO: put object transformations in here???
   // and just like...everything?!!!
@@ -116,25 +115,25 @@ void initLights() {
   int light_consts[] = {GL_LIGHT0, GL_LIGHT1, GL_LIGHT2, GL_LIGHT3, GL_LIGHT4,
 			GL_LIGHT5, GL_LIGHT6, GL_LIGHT7};
 
-  for (int i=0; i<scene->lights.size(); i++) {  
-    auto l   = scene->lights[i];
-    int  l_c = light_consts[i];
+  // for (int i=0; i<scene->lights.size(); i++) {  
+  //   auto l   = scene->lights[i];
+  //   int  l_c = light_consts[i];
 
-    GLfloat amb[] = { 0.0, 0.0, 0.0, 1.0 };
-    GLfloat spec[] = {l->color[0], l->color[1], l->color[2], 1.0f};
-    //GLfloat diff[] = {l->color[0], l->color[1], l->color[2], 1.0f};
-    GLfloat diff[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    GLfloat lightpos[] = { l->location[0],l->location[1],l->location[2], 1.0f };
-    //GLfloat shiny = 4.0f; 
+  //   GLfloat amb[] = { 0.0, 0.0, 0.0, 1.0 };
+  //   GLfloat spec[] = {l->color[0], l->color[1], l->color[2], 1.0f};
+  //   //GLfloat diff[] = {l->color[0], l->color[1], l->color[2], 1.0f};
+  //   GLfloat diff[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  //   GLfloat lightpos[] = { l->location[0],l->location[1],l->location[2], 1.0f };
+  //   //GLfloat shiny = 4.0f; 
 
-    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, amb);
-    glLightfv(l_c, GL_AMBIENT, amb);
-    glLightfv(l_c, GL_DIFFUSE, diff);
-    glLightfv(l_c, GL_SPECULAR, spec);
-    glLightfv(l_c, GL_POSITION, lightpos);
-    //glLightf(l_c, GL_SHININESS, shiny);
-    glEnable(l_c);
-  }
+  //   glLightModelfv(GL_LIGHT_MODEL_AMBIENT, amb);
+  //   glLightfv(l_c, GL_AMBIENT, amb);
+  //   glLightfv(l_c, GL_DIFFUSE, diff);
+  //   glLightfv(l_c, GL_SPECULAR, spec);
+  //   glLightfv(l_c, GL_POSITION, lightpos);
+  //   //glLightf(l_c, GL_SHININESS, shiny);
+  //   glEnable(l_c);
+  //}
 
   // Turn on lighting.  You can turn it off with a similar call to
   // glDisable().
@@ -164,12 +163,12 @@ void initGL()
   // Look up these functions to see what they're doing.
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  glFrustum(scene->camera->left,
-	    scene->camera->right,
-	    scene->camera->bottom,
-	    scene->camera->top,
-	    scene->camera->near,
-	    scene->camera->far);
+  // glFrustum(scene->camera->left,
+  // 	    scene->camera->right,
+  // 	    scene->camera->bottom,
+  // 	    scene->camera->top,
+  // 	    scene->camera->near,
+  // 	    scene->camera->far);
 
   // NOTE: THE REST OF EVERYTHING WILL BE IN MODELVIEW
   glMatrixMode(GL_MODELVIEW);
@@ -177,14 +176,14 @@ void initGL()
   glLoadIdentity();
 
   // camera rotate -theta
-  glRotatef(-1*scene->camera->rotation[3],
-	    scene->camera->rotation[0],
-	    scene->camera->rotation[1],
-	    scene->camera->rotation[2]);
+  // glRotatef(-1*scene->camera->rotation[3],
+  // 	    scene->camera->rotation[0],
+  // 	    scene->camera->rotation[1],
+  // 	    scene->camera->rotation[2]);
   // camera -translate
-  glTranslatef(-1*scene->camera->position[0], 
- 	         -1*scene->camera->position[1], 
-  	         -1*scene->camera->position[2]);
+  // glTranslatef(-1*scene->camera->position[0], 
+  // 	         -1*scene->camera->position[1], 
+  // 	         -1*scene->camera->position[2]);
 
   // set light parameters
   initLights();
@@ -226,7 +225,7 @@ void motion(const int x, const int y)
 {
   // Just pass it on to the ui controller.
   //ui->MotionFunction(x, y);
-  ui->motionFunction(x, y);
+  //ui->motionFunction(x, y);
 }
 
 //--------------------------------------------------------------------------
@@ -236,7 +235,7 @@ void mouse(const int button, const int state, const int x, const int y)
 {
   // Just pass it on to the ui controller.
   //ui->MouseFunction(button, state, x, y);
-  ui->mouseFunction(button, state, x, y);
+  //ui->mouseFunction(button, state, x, y);
 }
 
 //--------------------------------------------------------------------------
@@ -270,7 +269,7 @@ glFrustum(scene->camera->left,
 
 */
 
-  ui = new UI();
+  //ui = new UI();
   //ui = new UIState;
   /*
   ui->Trans() = Vector3(scene->camera->position[0],
@@ -336,9 +335,8 @@ int main(int argc, char* argv[])
 
   // TODO: OH NO LOOKS LIKE ONE FACE ISN'T BEING RENDERED IN FOURCUBES
 
-  // From old code
-  scene = parse(std::cin);
-  
+
+  /*
   // OpenGL will take out any arguments intended for its use here.
   // Useful ones are -display and -gldebug.
   glutInit(&argc, argv);
@@ -374,6 +372,15 @@ int main(int argc, char* argv[])
 
   // so we should never get to this point.
   return 1;
+
+  */
+
+
+  // just test out spline stuff for now
+
+
+
+  return 0;
 }
 
 

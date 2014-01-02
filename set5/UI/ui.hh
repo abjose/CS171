@@ -5,7 +5,7 @@
 #include "GL/glu.h"
 #include "GL/glut.h"
 
-#include "matrix/transform.hh"
+#include "../matrix/transform.hh"
 
 class UI {
 private:

@@ -60,7 +60,7 @@ def Q(u, k):
 def a(i,k,j, t_new):
     # j should be the index of the knot just to the left of the new one
     if 1 <= i <= j-k: return 1.
-    if j+1 <= i <= n: return 0.
+    if j+1 <= i <= n: return 0. # where is it getting n from?
     if j-k+1 <= i <= j:
         return (t_new - t[i]) / (t[i+k] - t[i])
     
@@ -78,6 +78,7 @@ def insert_knot(t_new, k):
 
     # find new control points
     # insert new control point in relevant range...should be last?
+    # NOTE: THIS IS WRONG
     j = t_prev
     p = np.insert(p, j, [0.,0.,0.], axis=0) # value shouldn't matter
     for i in range(j-k+1,j+1):

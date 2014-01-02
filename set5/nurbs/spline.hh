@@ -10,7 +10,7 @@
 class Spline {
 private:
   // control point - stores x,y,w
-  typdef Matrix<float,3,1> CtrlPt;
+  typedef Matrix<float,3,1> CtrlPt;
   // order
   int k;
   // number of segments in the spline vector
@@ -19,12 +19,24 @@ private:
   std::vector<float> t;
   // control point vector
   std::vector<CtrlPt> p;
-  // N_t ???
+  // N_t --- unordered map for doing dynamic programming later
+
+  // math-y things
+  float  B_i(int i, float u);
+  float  N(int i, int k_, float u);
+  //float N_dynamic(i, k_, u);
+  CtrlPt Q(float u);
+  float  a(int i, int j, float t_new);
+
+  // knot manipulation
+  void  insert_knot(float t_new);
+  float get_knot_from_pt(int x, int y);
+  int   find_knot_index(float u);
+
+public:
   // vector for holding points to draw...should make an array for OpenGL
   std::vector<Matrix<float,2,1> > spline;
 
-
-public:
   Spline(int degree, int resolution) {
     k   = degree+1;
     res = resolution;
@@ -42,11 +54,12 @@ public:
   }
   ~Spline() {}
 
+  // public knot manipulation
+  void insert_knot(int x, int y);
 
-
-  // will probably need some function for getting U from (x,y)
-
-
+  // spline-generation
+  void make_spline();
+  void scale_spline(int xmin, int xmax, int ymin, int ymax);
 };
 
 

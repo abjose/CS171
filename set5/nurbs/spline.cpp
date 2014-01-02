@@ -1,6 +1,8 @@
 
 #include <iostream>
 
+#include "spline.hh"
+
 float Spline::B_i(int i, float u) {
   switch(i) {
   case 0: return pow(1-u, 3) / 6;
@@ -10,37 +12,38 @@ float Spline::B_i(int i, float u) {
   }
 }
 
-float Spline::N(int i, float u) {
+float Spline::N(int i, int k_, float u) {
   // do with dynamic programming instead!
-  if (k==1) {
+  if (k_==1) {
     if (t[i] <= u && u <= t[i+1])
       return 1;
     return 0;
   }
   float l = 0; float r = 0;
-  l_d = t[i+k-1] - t[i];
-  r_d = t[i+k] - t[i+1];
+  float l_d = t[i+k_-1] - t[i];
+  float r_d = t[i+k_] - t[i+1];
   if (l_d != 0)
-    l = (u-t[i])*N(i,k-1,u) / l_d;
+    l = (u-t[i])*N(i,k_-1,u) / l_d;
   if (r_d != 0)
-    r = (t[i+k]-u)*N(i+1,k-1,u) / r_d;
+    r = (t[i+k_]-u)*N(i+1,k_-1,u) / r_d;
   return l+r;
 }
 
-//float N_dynamic(i, u) {}
+//float N_dynamic(i, k_, u) {}
 
-CtrlPt Spline::Q(float u) {
+Spline::CtrlPt Spline::Q(float u) {
   // NOTE: where is U vs u = U-i? If things don't look right should verify...
-  CtrlPt sum = makeVector3<float>(0,0,0);
+  Spline::CtrlPt sum = makeVector3<float>(0,0,0);
   for (int i=0; i<k; i++)
-    sum += p[i] * N(i, u);
+    sum += p[i] * N(i, k, u);
   return sum;
 }
 
 float Spline::a(int i, int j, float t_new) {
   // j should be the index of the knot just to the left of the new one
   if (1 <= i && i <= j-k) return 1;
-  if (j+1 <= i && i <= n) return 0;
+  if (j+1 <= i && i <= p.size()) return 0; // SURE THIS SHOULD BE p.size?
+                                           // it's supposed to be n = # ctrl pts
   if (j-k+1 <= i && i <= j) return (t_new - t[i]) / (t[i+k] - t[i]);
   std::cout << "Something weird happend in spline::a\n";
   return -1;
@@ -72,19 +75,15 @@ void Spline::insert_knot(float t_new) {
   t.insert(t.begin()+t_next, t_new);
 
   // find new control points
-  // insert new control point in relevant range...should be last?
-  // (3) Fill in the new control point list so that the control 
-  //     point values are affected only by old control point 
-  //     values (but NEW knot values).
   int j = t_prev;
   // create new control point list
-  std::vector<CtrlPt> new_p;
+  std::vector<Spline::CtrlPt> p_new;
   // really have to reassign everything?
   float a_i;
   p_new.push_back(p[0]); // p'_0 = p_0
   for (int i=1; i<p.size(); i++) {
     a_i = a(i, t_prev, t_new);
-    p_new.push_back((1.-a_i)*p[i-1] + a_i*p[i]);
+    p_new.push_back(p[i-1]*(1.-a_i) + p[i]*a_i);
   }
   p_new.push_back(p.back()); // p'_n+1 = p_n
   p = p_new;
@@ -116,7 +115,7 @@ float Spline::get_knot_from_pt(int x, int y) {
   return best_i / spline.size();
 }
 
-void Spine::insert_knot(int x, int y) {
+void Spline::insert_knot(int x, int y) {
   insert_knot(get_knot_from_pt(x,y));
 }
 
@@ -124,10 +123,15 @@ void Spine::insert_knot(int x, int y) {
 // TODO: NEED TO SCALE FINAL POINTS!!!!
 void Spline::make_spline() {
   float du = 1. / res;
-  CtrlPt pt;
+  Spline::CtrlPt pt;
   spline.clear();
   for (float u=0; u<=1.0; u+=du) {
     pt = Q(u).homogenize(); // necessary to homogenize?
     spline.push_back(makeVector2<float>(pt[0], pt[1]));
   }
+}
+
+void Spline::scale_spline(int xmin, int xmax, int ymin, int ymax) {
+  // sure you want to do this here?
+
 }
