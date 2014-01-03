@@ -220,7 +220,7 @@ public:
   }
   Matrix &operator-=(const Matrix &m2) {		
     for (int i=0; i < size(); i++) 
-      ref(i) += m2[i];
+      ref(i) -= m2[i];
     return *this;
   }
   const Matrix operator-(const Matrix m2) const {

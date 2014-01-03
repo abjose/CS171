@@ -7,7 +7,7 @@ CXXFLAGS	= -std=c++0x -g #-Wall
 LDFLAGS	= -L/usr/X11R6/lib -lglut -lGL -lGLU -lXi -lXmu
 
 #SRCS	= shaded.cpp
-SRCS	= ui.cpp shaded.cpp
+SRCS	= UI/ui.cpp shaded.cpp
 OBJS	= parser.tab.o lexer.yy.o $(SRCS:.cpp=.o)
 PROG	= shaded
 
@@ -24,4 +24,4 @@ lexer.yy.cpp: parsing/lexer.lex
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 clean:
-	rm -f *.o $(PROG) parser.tab.cpp parser.tab.hpp lexer.yy.cpp
+	rm -f *.o UI/*.o $(PROG) parser.tab.cpp parser.tab.hpp lexer.yy.cpp

@@ -2,7 +2,7 @@
 #include <iostream>
 #include "shaded.hh"
 //#include "uistate.h"
-#include "ui.hh"
+#include "UI/ui.hh"
 
 
 static std::shared_ptr<SceneBlock> scene;
@@ -32,12 +32,20 @@ void redraw()
   // apply camera transform?
   //ui->ApplyViewingTransformation();
   ui->applyViewingTransformation();
-  glTranslatef(ui->final_x, -1*ui->final_y, ui->final_z);
+  glTranslatef(ui->final_tx, -1*ui->final_ty, ui->final_tz);
+  //glRotatef(ui->final_rd, ui->final_rx, -1*ui->final_ry, ui->final_rz);
+  glTranslatef(3,0,0);
+  glRotatef(ui->final_rd, ui->final_rx,ui->final_ry,0);
+  glTranslatef(-3,0,0);
 
   //glLoadIdentity();  // might...not need?
   //glPushMatrix();
 
+  // TODO: so...put this stuff here explicitly?
   scene->render();
+
+  // TODO: put object transformations in here???
+  // and just like...everything?!!!
 
   /*
   for each frame:
@@ -302,9 +310,8 @@ int main(int argc, char* argv[])
     - move transformation stuff to redraw (think already is)
     - make zoom (shift+drag middle mouse)
     - make translate (middle mouse button)
-    - make rotation (don't do arcball? unless code easy to copy)
-    -- yeahhh, maybe don't do arcball...especially with quaternions...
-
+    - make rotation 
+    - is frustrum and stuff right?
    */
 
 
