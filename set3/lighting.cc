@@ -114,7 +114,6 @@ void flat_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
 		  std::shared_ptr<MaterialBlock> material, 
 		  std::vector<std::shared_ptr<LightBlock> > lights,
 		  std::shared_ptr<CameraBlock> camera, 
-		  std::shared_ptr<TransformBlock> transform,
 		  std::shared_ptr<Canvas> c) {
   //std::cout << "merp - in flat_shading\n";
   // Compute the averge location and average normal of each of the 3 
@@ -167,7 +166,6 @@ void gouraud_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
 		     std::shared_ptr<MaterialBlock> material, 
 		     std::vector<std::shared_ptr<LightBlock> > lights,
 		     std::shared_ptr<CameraBlock> camera, 
-		     std::shared_ptr<TransformBlock> transform,
 		     std::shared_ptr<Canvas> c) {
   // Call the lighting function on each of the 3 vertices and their 
   // corresponding normals, to get a unique color for each.
@@ -216,7 +214,6 @@ void phong_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
 		   std::shared_ptr<MaterialBlock> material, 
 		   std::vector<std::shared_ptr<LightBlock> > lights,
 		   std::shared_ptr<CameraBlock> camera, 
-		   std::shared_ptr<TransformBlock> transform,
 		   std::shared_ptr<Canvas> c) {
   // Convert your 3 vertex locations to NDC.
   Matrix<float,4,4> T = camera->get_perspective_projection() * 

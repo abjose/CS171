@@ -46,7 +46,6 @@ void flat_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
 		  std::shared_ptr<MaterialBlock> material, 
 		  std::vector<std::shared_ptr<LightBlock> > lights,
 		  std::shared_ptr<CameraBlock> camera, 
-		  std::shared_ptr<TransformBlock> transform,
 		  std::shared_ptr<Canvas> c);
 
 void gouraud_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
@@ -55,7 +54,6 @@ void gouraud_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
 		     std::shared_ptr<MaterialBlock> material, 
 		     std::vector<std::shared_ptr<LightBlock> > lights,
 		     std::shared_ptr<CameraBlock> camera, 
-		     std::shared_ptr<TransformBlock> transform,
 		     std::shared_ptr<Canvas> c);
 void gouraud_shading();
 
@@ -66,7 +64,6 @@ void phong_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
 		   std::shared_ptr<MaterialBlock> material, 
 		   std::vector<std::shared_ptr<LightBlock> > lights,
 		   std::shared_ptr<CameraBlock> camera, 
-		   std::shared_ptr<TransformBlock> transform,
 		   std::shared_ptr<Canvas> c);
 
 #endif // __LIGHTING_H_GUARD__

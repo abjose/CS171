@@ -186,10 +186,9 @@ public:
     // note: this will be backwards if polygons aren't ccw - try reversing
     // if nothing shows
     assert(poly_list.size() == poly_normal_list.size());
+    int backface_count = 0;
     std::vector<std::vector<int> > culled_polys;     
     std::vector<std::vector<int> > culled_norms; 
-    Matrix<float,4,4> T = persp_proj * inv_cam * 
-      transform_sans_trans->get_final_transform();
     Matrix<float,3,1> v0,v1,v2, a,b;
     Matrix<float,4,1> n;
     for (int i=0; i < poly_list.size(); i++) {
@@ -200,14 +199,14 @@ public:
       v2 = vertex_list[poly[2]];
       
       // get cross product -- TODO: move into matrix class?
+      // TODO: in set5 magnitude or subtraction or something didn't
+      // seem to work as expected...might be worth checking...
       a = (v1-v0).normalize(); b = (v2-v1).normalize();
       n = makeVector4<float>(a[1]*b[2] - a[2]*b[1], 
 			     a[2]*b[0] - a[0]*b[2],
 			     a[0]*b[1] - a[1]*b[0], 
 			     //1.0);
 			     0.0);
-      // transform into NDC
-      n = (T * n);
       auto test = makeVector3<float>(n[0],n[1],n[2]).normalize();
 
       // check if n_z is positive
@@ -217,6 +216,7 @@ public:
 	culled_polys.push_back(poly);
 	culled_norms.push_back(norm);
       } else {
+	backface_count++;
 	std::cerr << "found backface: ";
 	for (auto& bla : poly)
 	    std::cerr << bla << ", ";
@@ -224,7 +224,7 @@ public:
 	//std::cerr << n[2] << std::endl;
       }
     }
-
+    std::cerr << "# backfaces: " << backface_count << std::endl;
     // now replace old lists with culled ones
     poly_list = culled_polys; 
     poly_normal_list = culled_norms; 
@@ -234,6 +234,7 @@ public:
     // use dot product of surface normal (can just take any??)
     // and camera-to-poly vector 
     assert(poly_list.size() == poly_normal_list.size());
+    int backface_count = 0;
     std::vector<std::vector<int> > culled_polys;     
     std::vector<std::vector<int> > culled_norms; 
     Matrix<float,3,1> v0,v1,v2, avg_v;
@@ -245,8 +246,6 @@ public:
       v2 = vertex_list[poly[2]];
       avg_v = (v0+v1+v2) / 3.0;
 
-      // TODO: SHOULD BOTH OF THESE REALLY WORK?
-      //auto cam_to_surf = (avg_v - cam_pos).normalize(); 
       auto cam_to_surf = (cam_pos - avg_v).normalize(); 
       auto surf_norm = normal_list[norm[0]].normalize(); // just choose one
       // TODO: also try calculating surf_norm by getting cross product of face
@@ -259,13 +258,14 @@ public:
 	culled_polys.push_back(poly);
 	culled_norms.push_back(norm);
       } else {
+	backface_count++;
 	std::cerr << "found backface: ";
 	for (auto& bla : poly)
 	    std::cerr << bla << ", ";
 	std::cerr << std::endl;
       }
     }
-
+    std::cerr << "# backfaces: " << backface_count << std::endl;
     // now replace old lists with culled ones
     poly_list = culled_polys; 
     poly_normal_list = culled_norms; 
@@ -287,19 +287,19 @@ public:
 	flat_shading(vertex_list[poly[0]], normal_list[norm[0]],
 		     vertex_list[poly[1]], normal_list[norm[1]],
 		     vertex_list[poly[2]], normal_list[norm[2]],
-		     material, lights, camera, transform, c);
+		     material, lights, camera, c);
 	break;
       case 1: // gouraud shading
 	gouraud_shading(vertex_list[poly[0]], normal_list[norm[0]],
 			vertex_list[poly[1]], normal_list[norm[1]],
 			vertex_list[poly[2]], normal_list[norm[2]],
-			material, lights, camera, transform, c);
+			material, lights, camera, c);
 	break;
       case 2: // phong shading
 	phong_shading(vertex_list[poly[0]], normal_list[norm[0]],
 		      vertex_list[poly[1]], normal_list[norm[1]],
 		      vertex_list[poly[2]], normal_list[norm[2]],
-		      material, lights, camera, transform, c);
+		      material, lights, camera, c);
 	break;
       }
     }
