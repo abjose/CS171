@@ -6,54 +6,42 @@
 #include "GL/glut.h"
 
 #include "../matrix/transform.hh"
+#include "../nurbs/spline.hh"
 
 class UI {
 private:
-  // UI state stuff
-  // mouse position
-  int mx = 0;
-  int my = 0;
 
-  // TRANSLATION
-  // state variables - set to 0 if off, 1 if on
-  int is_translate = 0;
-  int is_zoom = 0;
-  // constants for translate and zoom normals
-  float TC = 0.001;
-  float ZC = 0.001;
-  // x,y at which translation was started
-  int init_tx = 0;
-  int init_ty = 0;
-  // y at which zoom was started
-  int init_zy = 0;
-  // amount to translate in PIXELS...worry about overflow?
-  int translate_x = 0;
-  int translate_y = 0;
-  int translate_z = 0;
+  // window -> world cord stuff
+  float xmin, xmax, ymin, ymax;
+  int xdim, ydim;
 
-  // ROTATION
+  // spline
+  Spline* s;
 
+  // click state
+  bool lclick = false;
+  bool rclick = false;
+  // drag state
+  bool dragging = false;
+  int drag_pt = -1;
 
-  // transform functions
-  void startZoom();
-  void endZoom();
-  void startTranslation();
-  void endTranslation();
-
+  float getWorldX(int x);
+  float getWorldY(int y);
 
 public:
-  float final_x;
-  float final_y;
-  float final_z;
 
-  UI() {};
+  UI(float xMin, float xMax, float yMin, float yMax, int xDim, int yDim,
+     Spline* S) {
+    xmin = xMin; xmax = xMax;
+    ymin = yMin; ymax = yMax;
+    xdim = xDim; ydim = yDim;
+    s = S;
+  };
   ~UI() {};
 
   void motionFunction(const int x, const int y);
   void mouseFunction(int button, int state, int x, int y);
   void keyFunction(GLubyte key, GLint x, GLint y);
-  void applyViewingTransformation();
-
 };
 
 

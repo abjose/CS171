@@ -6,7 +6,7 @@ CXXFLAGS	= -std=c++0x -g #-Wall
 
 LDFLAGS	= -L/usr/X11R6/lib -lglut -lGL -lGLU -lXi -lXmu
 
-SRCS	= nurbs/spline.cpp shaded.cpp
+SRCS	= nurbs/spline.cpp UI/ui.cpp shaded.cpp
 OBJS	= $(SRCS:.cpp=.o)
 PROG	= shaded
 
@@ -17,4 +17,4 @@ all:	$(OBJS)
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 clean:
-	rm -f *.o $(PROG)
+	rm -f *.o nurbs/*.o UI/*.o $(PROG)

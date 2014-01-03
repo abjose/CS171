@@ -17,8 +17,7 @@ private:
   int res;
   // knot vector - should be nondecreasing, size n+k+1 where n = |p|
   std::vector<float> t;
-  // control point vector
-  std::vector<CtrlPt> p;
+  
   // N_t --- unordered map for doing dynamic programming later
 
   // math-y things
@@ -30,12 +29,14 @@ private:
 
   // knot manipulation
   void  insert_knot(float t_new);
-  float get_knot_from_pt(int x, int y);
+  float get_knot_from_pt(float x, float y);
   int   find_knot_index(float u);
 
 public:
-  // vector for holding points to draw...should make an array for OpenGL
+  // vector for holding points to draw
   std::vector<Matrix<float,2,1> > spline;
+  // control point vector
+  std::vector<CtrlPt> p;
 
   Spline(int degree, int resolution) {
     k   = degree+1;
@@ -50,16 +51,26 @@ public:
       p.push_back(makeVector3<float>( 1, 1,w));
       // populate knot vector
       t = std::vector<float> {0,0,0,0,1,1,1,1};
+      // make initial spline
+      make_spline();
     }
   }
   ~Spline() {}
 
   // public knot manipulation
-  void insert_knot(int x, int y);
+  void insert_knot(float x, float y);
+
+  // control point manipulation
+  int get_ctrl_pt(float x, float y);
+  void set_ctrl_pt(int index, float x, float y);
 
   // spline-generation
   void make_spline();
-  void scale_spline(int xmin, int xmax, int ymin, int ymax);
+
+  // output
+  void display_knots();
+  void display_pts();
+  void display();
 };
 
 

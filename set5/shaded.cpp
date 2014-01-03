@@ -7,6 +7,8 @@
 
 //static UIState *ui;
 static UI *ui;
+// spline
+static Spline *s;
 
 // The current window size.
 int windowWidth = 800, windowHeight = 600;
@@ -224,8 +226,7 @@ void resize(const int width, const int height)
 void motion(const int x, const int y)
 {
   // Just pass it on to the ui controller.
-  //ui->MotionFunction(x, y);
-  //ui->motionFunction(x, y);
+  ui->motionFunction(x, y);
 }
 
 //--------------------------------------------------------------------------
@@ -234,8 +235,7 @@ void motion(const int x, const int y)
 void mouse(const int button, const int state, const int x, const int y)
 {
   // Just pass it on to the ui controller.
-  //ui->MouseFunction(button, state, x, y);
-  //ui->mouseFunction(button, state, x, y);
+  ui->mouseFunction(button, state, x, y);
 }
 
 //--------------------------------------------------------------------------
@@ -284,6 +284,45 @@ glFrustum(scene->camera->left,
   //checkGLErrors("End of uiInit");
 }
 
+void display()
+{
+  // recalc stuff
+  s->make_spline();
+
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glOrtho(-2, 2, -2, 2, -1, 1);
+
+  glMatrixMode( GL_MODELVIEW );
+  glLoadIdentity();
+
+  glColor3ub( 255, 255, 255 );
+
+  // draw spline
+  glBegin(GL_LINE_STRIP);
+  for (auto& pt : s->spline)
+    glVertex2f(pt[0], pt[1]);
+  glEnd();
+
+  // draw control point connections
+  glBegin(GL_LINE_STRIP);
+  for (auto& pt : s->p)
+    glVertex2f(pt[0], pt[1]);
+  glEnd();
+
+  // draw control points
+  glPointSize(10.0);
+  glEnable(GL_POINT_SMOOTH);
+  //glEnable(GL_BLEND);
+  glBegin(GL_POINTS);
+  for (auto& p : s->p)
+    glVertex2f(p[0], p[1]);
+  glEnd();
+
+  glutSwapBuffers();
+}
 
 
 
@@ -377,10 +416,30 @@ int main(int argc, char* argv[])
 
 
   // just test out spline stuff for now
+  s = new Spline(3, 1000);
+  ui = new UI(-2,2, -2,2, 600,600, s); // make sure to change args...
+
+  //s->insert_knot(0,0);
+
+  s->make_spline();
+
+  s->display();
+
+  //std::cout << std::endl;
+  //for (auto& p : s->spline)
+  //  std::cout << p[0] << ", " << p[1] << std::endl;
 
 
+  glutInit(&argc, argv);
+  glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE );
+  glutInitWindowSize( 600, 600 );
+  glutCreateWindow( "GLUT" );
+  glutDisplayFunc( display );
+  glutMouseFunc(mouse);
+  glutMotionFunc(motion);
+  glutMainLoop();
 
-  return 0;
+  return 1;
 }
 
 

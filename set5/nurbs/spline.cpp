@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <cmath>
 
 #include "spline.hh"
 
@@ -45,7 +46,7 @@ float Spline::a(int i, int j, float t_new) {
   if (j+1 <= i && i <= p.size()) return 0; // SURE THIS SHOULD BE p.size?
                                            // it's supposed to be n = # ctrl pts
   if (j-k+1 <= i && i <= j) return (t_new - t[i]) / (t[i+k] - t[i]);
-  std::cout << "Something weird happend in spline::a\n";
+  std::cout << "Something weird happened in spline::a\n";
   return -1;
 }
 
@@ -98,9 +99,9 @@ void Spline::insert_knot(float t_new) {
 // need to add something that goes from x,y click to U value, then inserts
 // knot
 // so basically a version of insert_knot that takes x,y
-float Spline::get_knot_from_pt(int x, int y) {
+float Spline::get_knot_from_pt(float x, float y) {
   // TODO: could speed this up a lot
-  // TODO: NEED TO SCALE PTS
+  // TODO: could decide not to insert a new know if click too far away?
   auto click = makeVector2<float>(x,y);
   float best_d = 999999999.;
   int best_i = 0;
@@ -112,15 +113,16 @@ float Spline::get_knot_from_pt(int x, int y) {
       best_i = i;
     }
   }
-  return best_i / spline.size();
+  //std::cout << "u: " << (float) best_i / spline.size() << std::endl;
+  return (float) best_i / spline.size();
 }
 
-void Spline::insert_knot(int x, int y) {
+void Spline::insert_knot(float x, float y) {
   insert_knot(get_knot_from_pt(x,y));
 }
 
 // populate spline vector with points according to resolution
-// TODO: NEED TO SCALE FINAL POINTS!!!!
+// TODO: NEED TO SCALE FINAL POINTS!!!! Lols, no you don't!
 void Spline::make_spline() {
   float du = 1. / res;
   Spline::CtrlPt pt;
@@ -129,9 +131,67 @@ void Spline::make_spline() {
     pt = Q(u).homogenize(); // necessary to homogenize?
     spline.push_back(makeVector2<float>(pt[0], pt[1]));
   }
+  pt = Q(.99999).homogenize(); // necessary to homogenize?
+  spline.push_back(makeVector2<float>(pt[0], pt[1]));
 }
 
-void Spline::scale_spline(int xmin, int xmax, int ymin, int ymax) {
-  // sure you want to do this here?
+/*******************************/
+/* Helper functions for the UI */
+/*******************************/
 
+int Spline::get_ctrl_pt(float x, float y) {
+  // see if a control pt was clicked, return its index if so
+  // TODO: definitely make this faster
+  // TODO: this is pretty much the same code as get_knot_from_pt...
+  // TODO: MAGNITUDE NOT WORKING?!?!?!?
+  std::cout << "Clicked: " << x << ", " << y << std::endl;
+  auto click = makeVector2<float>(x,y);
+  float best_d = 999999999.;
+  float best_i = -1;
+  float d;
+  for (int i=0; i<p.size(); i++) {
+    d = sqrt(pow(p[i][0]-x,2) + pow(p[i][1]-y,2));
+    //d = (click-makeVector2<float>(p[i][0],p[i][1])).magnitude();
+    std::cout << "Pt: " << p[i][0] << ", " << p[i][1];
+    std::cout << " -- d: " << d << std::endl;
+    if (d < best_d) {
+      best_d = d;
+      best_i = i;
+    }
+  }
+  // TODO: return failure if too far away (also take 'distance' as an arg)
+  std::cout << "Closest: " << p[best_i][0] << ", " << p[best_i][1] << std::endl;
+  return best_i;
+}
+
+void Spline::set_ctrl_pt(int index, float x, float y) {
+  // update the ctrl pt at index to pt x,y
+  p[index] = makeVector3<float>(x,y,1); // does weight even matter?
+}
+
+
+
+/*********************/
+/* Display functions */
+/*********************/
+
+// have some output functions...
+void Spline::display_knots() {
+  std::cout << "Knots: ";
+  for (auto& knot : t) {
+    std::cout << knot << ", ";
+  }
+  std::cout << std::endl;
+}
+
+void Spline::display_pts() {
+  std::cout << "Control points:\n";
+  for (auto& ctrl : p) {
+    std::cout << ctrl[0] << ", " << ctrl[1] << ", " << ctrl[2] << std::endl;
+  }
+}
+
+void Spline::display() {
+  display_knots();
+  display_pts();
 }
