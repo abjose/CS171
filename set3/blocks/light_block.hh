@@ -11,6 +11,10 @@ public:
   Matrix<float,3,1> color;    // r g b
 
   //public:
+  LightBlock() {
+    location = makeVector3<float>(0,0,1);
+    color = makeVector3<float>(1,1,1);
+  }
 
   void set_location(float x, float y, float z) {
     location = makeVector3<float>(x,y,z);
