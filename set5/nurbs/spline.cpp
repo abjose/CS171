@@ -150,17 +150,17 @@ int Spline::get_ctrl_pt(float x, float y) {
   float best_i = -1;
   float d;
   for (int i=0; i<p.size(); i++) {
-    d = sqrt(pow(p[i][0]-x,2) + pow(p[i][1]-y,2));
-    //d = (click-makeVector2<float>(p[i][0],p[i][1])).magnitude();
-    std::cout << "Pt: " << p[i][0] << ", " << p[i][1];
-    std::cout << " -- d: " << d << std::endl;
+    //d = sqrt(pow(p[i][0]-x,2) + pow(p[i][1]-y,2));
+    d = (click-makeVector2<float>(p[i][0],p[i][1])).magnitude();
+    //std::cout << "Pt: " << p[i][0] << ", " << p[i][1];
+    //std::cout << " -- d: " << d << std::endl;
     if (d < best_d) {
       best_d = d;
       best_i = i;
     }
   }
   // TODO: return failure if too far away (also take 'distance' as an arg)
-  std::cout << "Closest: " << p[best_i][0] << ", " << p[best_i][1] << std::endl;
+  //std::cout << "Closest: " << p[best_i][0] << ", " << p[best_i][1] << std::endl;
   return best_i;
 }
 
