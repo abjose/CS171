@@ -31,17 +31,18 @@ void UI::mouseFunction(int button, int state, int x, int y) {
     break;
   case GLUT_RIGHT_BUTTON:
     if(state == GLUT_DOWN) {
-      rclick = true;
+      //rclick = true;
+      s->insert_knot(getWorldX(x), -getWorldY(y));
     }
     else if(state == GLUT_UP) {
-      rclick = false;
+      //rclick = false;
     }
     break;
   default:
     break;
   }
 
-  //glutPostRedisplay();
+  glutPostRedisplay();
 }
 
 float UI::getWorldX(int x) {

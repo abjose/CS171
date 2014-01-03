@@ -425,6 +425,8 @@ int main(int argc, char* argv[])
 
   s->display();
 
+  // TODO: ui doesn't work if resize screen - don't hard-pass dims!
+
   //std::cout << std::endl;
   //for (auto& p : s->spline)
   //  std::cout << p[0] << ", " << p[1] << std::endl;

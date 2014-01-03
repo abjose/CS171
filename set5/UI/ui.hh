@@ -20,7 +20,7 @@ private:
 
   // click state
   bool lclick = false;
-  bool rclick = false;
+  //bool rclick = false;
   // drag state
   bool dragging = false;
   int drag_pt = -1;

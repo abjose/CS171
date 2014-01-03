@@ -35,7 +35,7 @@ float Spline::N(int i, int k_, float u) {
 Spline::CtrlPt Spline::Q(float u) {
   // NOTE: where is U vs u = U-i? If things don't look right should verify...
   Spline::CtrlPt sum = makeVector3<float>(0,0,0);
-  for (int i=0; i<k; i++)
+  for (int i=0; i<p.size(); i++)
     sum += p[i] * N(i, k, u);
   return sum;
 }
