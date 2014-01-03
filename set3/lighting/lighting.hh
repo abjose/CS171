@@ -6,14 +6,14 @@
 #include <memory>
 #include <map>
 #include <utility>
-#include "raster/raster.h"
-#include "blocks/light_block.hh"
-#include "blocks/material_block.hh"
-#include "blocks/transform_block.hh"
-#include "blocks/camera_block.hh"
-#include "matrix/matrix.hh"
-#include "matrix/canvas.hh"
-#include "matrix/transform.hh"
+#include "../raster/raster.h"
+#include "../blocks/light_block.hh"
+#include "../blocks/material_block.hh"
+#include "../blocks/transform_block.hh"
+#include "../blocks/camera_block.hh"
+#include "../matrix/matrix.hh"
+#include "../matrix/canvas.hh"
+#include "../matrix/transform.hh"
 
 // TODO: move this to a sensible directory
 // TODO: add z-buff stuff...presumable to draw_pixels funcs

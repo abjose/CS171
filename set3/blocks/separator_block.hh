@@ -6,7 +6,7 @@
 #include "../matrix/matrix.hh"
 #include "../matrix/transform.hh"
 #include "../matrix/canvas.hh"
-#include "../lighting.hh"
+#include "../lighting/lighting.hh"
 #include "transform_block.hh"
 #include "material_block.hh"
 #include "light_block.hh"
