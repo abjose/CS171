@@ -41,7 +41,7 @@ Matrix<float,3,1> light_func(Matrix<float,3,1> n, Matrix<float,3,1> v,
     
     // first calculate the addition this light makes to the diffuse part
     // ddiffuse = zero_clip(lc * (n . unit(lx - v)));
-    Matrix<float,3,1> ddiffuse = (lc * (n.dot((v-lx).normalize()))).zero_clip();
+    Matrix<float,3,1> ddiffuse = (lc * (n.dot((lx-v).normalize()))).zero_clip();
     // accumulate that
     diffuse += ddiffuse;
     
