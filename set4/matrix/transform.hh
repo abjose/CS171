@@ -59,6 +59,14 @@ Matrix<T,4,4> rotation_matrix(T x, T y, T z, T theta) {
 }
   
 
+template<typename T>
+Matrix<T,2,1> makeVector2(T e1, T e2) {
+  Matrix<T,2,1> m;
+  T a[] = {e1,e2};
+  m.copy(a);
+  return m;
+}
+
 // Convenience function to construct a 3x1 vector out of 3 arguments
 template<typename T>
 Matrix<T,3,1> makeVector3(T e1, T e2, T e3) {

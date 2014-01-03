@@ -147,11 +147,12 @@ public:
   }
 
   Matrix homogenize() const {
-    // Kinda gross. Assumes x,y,z,w.
+    // Kinda gross.
     assert(R==1 || C==1);
-    assert(size() == 4);
+    //assert(size() == 4);
     Matrix<T,R,C> m2 = *this;
-    T w = ref(3);
+    //T w = ref(3);
+    T w = ref(size()-1);
     return m2 / w;
   }
 
@@ -251,7 +252,7 @@ public:
   }
   Matrix &operator-=(const Matrix &m2) {		
     for (int i=0; i < size(); i++) 
-      ref(i) += m2[i];
+      ref(i) -= m2[i];
     return *this;
   }
   const Matrix operator-(const Matrix m2) const {

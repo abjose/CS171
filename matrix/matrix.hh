@@ -8,6 +8,7 @@
 
 
 #include <cassert>
+#include <cmath>
 #include <vector>
 #include <iostream>
 
@@ -111,13 +112,24 @@ public:
     }
   }
 
+  friend std::ostream &operator<<(std::ostream &os, const Matrix &m) {  
+    os << R << "x" << C << " matrix:\n";
+    for (int r=0; r<R; r++) {
+      for (int c=0; c<C; c++)
+	os << m(r,c) << " ";
+      os << std::endl;
+    }
+    return os;
+  }
+
+
   //------------------------------------------
   // math-y things
   //------------------------------------------
 
   // TODO: add an is_vector test?
 
-  T dot(const Matrix<T,R,1> &other) {
+  T dot(const Matrix<T,R,1> &other) const {
     assert(R==1 || C==1);
     T d = 0;
     for (int i=0; i < size(); i++)
@@ -125,6 +137,7 @@ public:
     return d;
   }
 
+  // TODO: hmm, should this always be a float?
   T magnitude() const {
     assert(R==1 || C==1);
     T mag = 0;
@@ -133,32 +146,52 @@ public:
     return sqrt(mag);
   }
 
-  void homogenize() {
-    // Kinda gross. Assumes x,y,z,w.
+  Matrix homogenize() const {
+    // Kinda gross.
     assert(R==1 || C==1);
-    assert(size() == 4);
-    T w = ref(3);
-    *this /= w;
+    //assert(size() == 4);
+    Matrix<T,R,C> m2 = *this;
+    //T w = ref(3);
+    T w = ref(size()-1);
+    return m2 / w;
   }
 
-  Matrix normalize() {
+  Matrix normalize() const {
     //void normalize() {
+    Matrix<T,R,C> m2 = *this;
     T mag = magnitude();
-    assert(mag != 0);
-    *this /= mag;
-    return *this;
+    //assert(mag != 0);
+    // should just make 0 vector if magnitude is 0?
+    if (mag == 0) //abs(mag) < 0.000001)
+      return m2; //m2.clear(0);
+    //else
+    //m2 /= mag;
+    return m2 / mag;
   }
 
   // return tranpose as new matrix
-  Matrix transpose() {
+  Matrix<T,C,R> transpose() const {
     Matrix<T,C,R> res;
     for (int row=0; row<R; row++)
 	for (int col=0; col<C; col++)
 	    res.ref(col,row) = ref(row,col);
     return res;
   }
-  
 
+  Matrix zero_clip() const {
+    Matrix<T,R,C> m2 = *this;
+    for (int i=0; i < size(); i++)
+      if (m2[i] < 0) m2[i] = 0;
+    return m2;
+  }
+
+  Matrix one_clip() const {
+    Matrix<T,R,C> m2 = *this;
+    for (int i=0; i < size(); i++)
+      if (m2[i] > 1) m2[i] = 1;
+    return m2;
+  }  
+  
   void set_diagonal(const Matrix<T,R,1> &diag) {
     // don't reallly have to assert square...
     assert(R==C);
@@ -172,7 +205,6 @@ public:
     clear(0);
     for (int i=0; i < R; i++) 
       ref(i,i) = 1;
-
   }
 
 
@@ -220,7 +252,7 @@ public:
   }
   Matrix &operator-=(const Matrix &m2) {		
     for (int i=0; i < size(); i++) 
-      ref(i) += m2[i];
+      ref(i) -= m2[i];
     return *this;
   }
   const Matrix operator-(const Matrix m2) const {
@@ -236,10 +268,10 @@ public:
     Matrix<T,R,C2> res;
     for (int r=0; r<R; r++)
       for (int c=0; c<C2; c++) {
-	T dot = 0;
+	T d = 0;
 	for (int i=0; i<C; i++)
-	  dot += ref(r,i) * m2(i,c);
-	res(r,c) = dot;
+	  d += ref(r,i) * m2(i,c);
+	res(r,c) = d;
       }
     return res;
   }
