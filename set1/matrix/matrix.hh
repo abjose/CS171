@@ -6,7 +6,7 @@
 #ifndef __MINMATRIX_H_GUARD__
 #define __MINMATRIX_H_GUARD__
 
-
+#include <cmath>
 #include <cassert>
 #include <vector>
 #include <iostream>
@@ -116,6 +116,13 @@ public:
   //------------------------------------------
 
   // TODO: add an is_vector test?
+
+  bool operator==(const Matrix<T,R,C> &other) const {
+    for (int i=0; i<size(); i++)
+      if (ref(i) != other[i])
+	return false;
+    return true;
+  }
 
   T dot(const Matrix<T,R,1> &other) {
     assert(R==1 || C==1);
@@ -242,14 +249,6 @@ public:
 	res(r,c) = dot;
       }
     return res;
-  }
-
-  void apply_transform_stack(const std::vector<Matrix<T,4,4> > ts) {
-    assert(R==4 && C==1); // awk
-    for (auto rit = ts.rbegin(); rit != ts.rend(); ++rit) {
-      //(*rit).display();
-      *this = (*rit) * (*this);
-    }
   }
 
   // 4x4 matrix inversion....gag. Stolen from: 
