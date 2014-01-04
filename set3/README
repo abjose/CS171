@@ -20,7 +20,7 @@ shaded n xRes yRes < iv-file | display -
 All the iv files are kept in /data.
 
 Actual example, for future reference:
-./shaded 0 800 800 < data/sphere.iv | display -
+./shaded 0 800 800 -eyelight < data/sphere.iv | display -
 
 
 EXTRA CREDIT DONE:
