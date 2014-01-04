@@ -101,19 +101,16 @@ translateline: TRANSLAT triple {
   if(debug) std::cout << "Got translation: " << in[2] << ' ' << in[1] 
 		      << ' ' << in[0] << std::endl;
   transform->set_translation(in[2],in[1],in[0]);
-  //transform->display();
 }
 scaleline: SFACTOR triple {
   if(debug) std::cout << "Got scale: " << ' ' << in[2] << ' ' 
 		      << in[1] << ' ' << in[0] << std::endl;
   transform->set_scale(in[2],in[1],in[0]);
-  //transform->display();
 }
 rotline: ROT quad {
   if(debug) std::cout << "Got rotation: " << ' ' << in[2] << ' ' 
 		      << in[1] << ' ' << in[0] << std::endl;
   transform->set_rotation(in[3],in[2],in[1],in[0]);
-  //transform->display();
 }
 
 ifslines: ifsline | ifsline ifslines
@@ -164,9 +161,6 @@ std::unique_ptr<SceneBlock> parse_test(std::istream &datafile) {
        std::cerr << "Parse failed!" << std::endl;
        exit(1);
    }
-
-   // see if everything's there
-   //scene->display();
 
    delete lexer;
    return std::move(scene);
