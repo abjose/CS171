@@ -92,7 +92,6 @@ public:
     auto final_transform = transform->get_final_transform();
     std::vector<Matrix<float,3,1> > final_vertices;
     for (auto &it: vertex_list) {
-      //std::cout << "In verts_object_to_world...converting...\n";
       // need to homogenize...each time?
       auto v = makeVector4<float>(it[0], it[1], it[2], 1.0);
       v = (final_transform * v).homogenize();
@@ -100,27 +99,6 @@ public:
     }    
     vertex_list = final_vertices;
   }
-  void verts_world_to_camera(Matrix<float,4,4> inv_cam) {
-    std::vector<Matrix<float,3,1> > final_vertices;
-    for (auto &it: vertex_list) {
-      // need to homogenize...each time?
-      auto v = makeVector4<float>(it[0], it[1], it[2], 1.0);
-      v = (inv_cam * v).homogenize();
-      final_vertices.push_back(makeVector3<float>(v[0],v[1],v[2]));
-    }    
-    vertex_list = final_vertices;
-  }
-  void verts_world_to_NDC(Matrix<float,4,4> persp_proj) {
-    std::vector<Matrix<float,3,1> > final_vertices;
-    for (auto &it: vertex_list) {
-      // need to homogenize...each time?
-      auto v = makeVector4<float>(it[0], it[1], it[2], 1.0);
-      v = (persp_proj * v).homogenize();
-      final_vertices.push_back(makeVector3<float>(v[0],v[1],v[2]));
-    }    
-    vertex_list = final_vertices;
-  }
-
 
   void norms_object_to_world() {
     std::vector<Matrix<float,3,1> > final_normals;
@@ -130,11 +108,8 @@ public:
     final_transform_sans_trans = final_transform_sans_trans.transpose();
 
     for (auto &it: normal_list) {
-      //auto n = makeVector4<float>(it[0], it[1], it[2], 1.0);
       auto n = makeVector4<float>(it[0], it[1], it[2], 0.);
-      //n = (final_transform_sans_trans * n).normalize();
       n = final_transform_sans_trans * n;
-      //final_normals.push_back(makeVector3<float>(n[0],n[1],n[2]));
       final_normals.push_back(makeVector3<float>(n[0],n[1],n[2]).normalize());
     }
     normal_list = final_normals;

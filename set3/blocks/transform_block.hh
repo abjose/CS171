@@ -39,7 +39,6 @@ public:
   }
   void combine_transform(std::shared_ptr<TransformBlock> t2) {
     transform = transform * t2->translation * t2->rotation * t2->scale;
-    //std::cout << "TESTTT:\n" <<  transform << std::endl;
   }
   void combine_transform_sans_trans(std::shared_ptr<TransformBlock> t2) {
     transform = transform * t2->rotation * t2->scale;

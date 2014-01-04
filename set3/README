@@ -4,14 +4,15 @@ To compile:
 An executable 'shaded' should appear
 
 To run, type:
-./shaded n xRes yRes < iv-file
+./shaded n xRes yRes [-eyelight] < iv-file
 
 Where n determines what shading mode to use:
 0 = Flat
 1 = Gouraud
 2 = Phong
-
 and xRes, yRes are the x and y resolutions of the final image.
+An optional fourth parameter '-eyelight' can be added to create a bright green
+light at the location of the camera.
 
 To display the output, try something like:
 shaded n xRes yRes < iv-file | display -
@@ -20,3 +21,7 @@ All the iv files are kept in /data.
 
 Actual example, for future reference:
 ./shaded 0 800 800 < data/sphere.iv | display -
+
+
+EXTRA CREDIT DONE:
+-eyelight

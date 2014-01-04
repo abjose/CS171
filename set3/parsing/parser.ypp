@@ -217,9 +217,6 @@ std::shared_ptr<SceneBlock> parse(std::istream &datafile) {
        exit(1);
    }
 
-   // see if everything's there
-   //scene->display();
-
    delete lexer;
    return scene;
 }

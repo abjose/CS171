@@ -10,7 +10,8 @@
 #include "separator_block.hh"
 
 class SceneBlock {
-private:
+public:
+  //private:
   int shading;
   std::shared_ptr<CameraBlock> camera;
   std::vector<std::shared_ptr<LightBlock> > lights;
