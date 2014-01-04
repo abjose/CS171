@@ -1,9 +1,18 @@
-To compile:
-- cd to this directory
-- type 'make'
-An executable 'hw0' should appear
+This is code for set 1 of CS171.
 
-To run:
-type './hw0' in the terminal
+Note: in general, if the set requires pasting output into a README, it's in the
+README within the relevant directory rathe than this one.
 
-A blue sphere should appear in a new window.
+matrix/   contains the code for PART 0 (tests in README there)
+polyline/ contains the code for PART 1 (see README there for more information)
+draw2d/   contains the code for PART 2 (see README there)
+
+
+
+
+
+
+
+
+
+
