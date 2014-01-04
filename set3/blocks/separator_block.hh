@@ -58,10 +58,6 @@ public:
 	}
 	temp_poly.clear();
       } else {
-	// should experiment with this -- see if all this copying is necessary
-	// can technically get rid of this if above works
-	//std::vector<int> new_poly = temp_poly;
-	//poly_list.push_back(new_poly);
 	poly_list.push_back(temp_poly);
 	temp_poly.clear();
       }
@@ -144,49 +140,12 @@ public:
     normal_list = final_normals;
   }
 
-  // TODO: IF END UP USING THESE, NEED TO FIX W TO 0 LIKE ABOVE!
-  //need?
-  void norms_world_to_camera(Matrix<float,4,4> inv_cam) {
-    std::vector<Matrix<float,3,1> > final_normals;
-    for (auto &it: normal_list) {
-      auto n = makeVector4<float>(it[0], it[1], it[2], 1.0);
-      n = (inv_cam * n);//.normalize();
-      final_normals.push_back(makeVector3<float>(n[0],n[1],n[2]).normalize());
-      // TODO: pretty weird that when you normalize here, doesn't seem to
-      //       'last' to lighting stuff (because different when normalize there)
-    }
-    normal_list = final_normals;
-  }
-  //need?
-  void norms_world_to_NDC(Matrix<float,4,4> persp_proj) {
-    std::vector<Matrix<float,3,1> > final_normals;
-    for (auto &it: normal_list) {
-      auto n = makeVector4<float>(it[0], it[1], it[2], 1.0);
-      n = (persp_proj * n).normalize();
-      final_normals.push_back(makeVector3<float>(n[0],n[1],n[2]));
-    }
-    normal_list = final_normals;
-  }
-
-
-  // TRY TO FIX PROBLEM WITH RENDERING BIG THINGS!!!
-  // NORMAL THING DOESN'T SEEM TO WORK FOR FOURCUBES!
-  //  ACTUALLY FIRST SEE WHICH ONES ARE STILL BROKEN
-  // ALSO LIGHTING...
-  // LOOK AT backfaces for lion...some seem kinda fucked up
-  // for example, one seemed to repeat the 2nd one twice?
-  // also...does it have the 1st one too often?
-
   void cull_backfaces(Matrix<float,4,4> persp_proj,
 		      Matrix<float,4,4> inv_cam) {
-    // TODO: not working! Fact that dot one works and this doesn't might hint
-    //       about ordering problems...
-
     // polygons should all be triangles
     // note: this will be backwards if polygons aren't ccw - try reversing
     // if nothing shows
     assert(poly_list.size() == poly_normal_list.size());
-    int backface_count = 0;
     std::vector<std::vector<int> > culled_polys;     
     std::vector<std::vector<int> > culled_norms; 
     Matrix<float,3,1> v0,v1,v2, a,b;
@@ -198,33 +157,26 @@ public:
       v1 = vertex_list[poly[1]];
       v2 = vertex_list[poly[2]];
       
-      // get cross product -- TODO: move into matrix class?
-      // TODO: in set5 magnitude or subtraction or something didn't
-      // seem to work as expected...might be worth checking...
+      // get cross product
       a = (v1-v0).normalize(); b = (v2-v1).normalize();
       n = makeVector4<float>(a[1]*b[2] - a[2]*b[1], 
 			     a[2]*b[0] - a[0]*b[2],
 			     a[0]*b[1] - a[1]*b[0], 
-			     //1.0);
 			     0.0);
       auto test = makeVector3<float>(n[0],n[1],n[2]).normalize();
 
       // check if n_z is positive
-      //if(n[2] > 0) { 
       if(test[2] >= 0) { 
 	// add triangle to "show" list (which will replace current poly list)
 	culled_polys.push_back(poly);
 	culled_norms.push_back(norm);
       } else {
-	backface_count++;
 	std::cerr << "found backface: ";
 	for (auto& bla : poly)
 	    std::cerr << bla << ", ";
 	std::cerr << std::endl;
-	//std::cerr << n[2] << std::endl;
       }
     }
-    std::cerr << "# backfaces: " << backface_count << std::endl;
     // now replace old lists with culled ones
     poly_list = culled_polys; 
     poly_normal_list = culled_norms; 
@@ -234,7 +186,6 @@ public:
     // use dot product of surface normal (can just take any??)
     // and camera-to-poly vector 
     assert(poly_list.size() == poly_normal_list.size());
-    int backface_count = 0;
     std::vector<std::vector<int> > culled_polys;     
     std::vector<std::vector<int> > culled_norms; 
     Matrix<float,3,1> v0,v1,v2, avg_v;
@@ -258,14 +209,12 @@ public:
 	culled_polys.push_back(poly);
 	culled_norms.push_back(norm);
       } else {
-	backface_count++;
 	std::cerr << "found backface: ";
 	for (auto& bla : poly)
 	    std::cerr << bla << ", ";
 	std::cerr << std::endl;
       }
     }
-    std::cerr << "# backfaces: " << backface_count << std::endl;
     // now replace old lists with culled ones
     poly_list = culled_polys; 
     poly_normal_list = culled_norms; 

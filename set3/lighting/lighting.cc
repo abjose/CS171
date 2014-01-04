@@ -1,13 +1,9 @@
 
+#include <math.h>
+
 #include "lighting.hh"
-
-// TODO: move this to a sensible directory
-// TODO: lighting seems to be on...the opposite of the right side?
-//       does anything need to be done to lighting to put into world coords?
-// TODO: change vertex variables to 'v' instead of 't'?
-// Pretty weird that flat shading seems to work well (for lighting...) 
-// but not the others...makes me think normals are screwed up.
-
+#include "../raster/raster.h"
+#include "../matrix/transform.hh"
 
 Matrix<float,3,1> light_func(Matrix<float,3,1> n, Matrix<float,3,1> v,
 			     std::shared_ptr<MaterialBlock> material, 
@@ -28,31 +24,26 @@ Matrix<float,3,1> light_func(Matrix<float,3,1> n, Matrix<float,3,1> v,
   // start off the diffuse and specular at pitch black
   Matrix<float,3,1> diffuse  = makeVector3<float>(0,0,0);
   Matrix<float,3,1> specular = makeVector3<float>(0,0,0);
+
   // copy the ambient color (for the eyelight extra credit code, you can change 
   // it here to rely on distance from the camera)
   Matrix<float,3,1> ambient = acolor;
 
   for (auto& light : lights) {
     // get the light position and color from the light
-    // let lx = light position (x,y,z)
-    // let lc = light color (r,g,b)
     Matrix<float,3,1> lx = light->location;
     Matrix<float,3,1> lc = light->color;
     
     // first calculate the addition this light makes to the diffuse part
-    // ddiffuse = zero_clip(lc * (n . unit(lx - v)));
     Matrix<float,3,1> ddiffuse = (lc * (n.dot((lx-v).normalize()))).zero_clip();
     // accumulate that
     diffuse += ddiffuse;
     
     // calculate the specular exponent
-    //k = zero_clip(n . unit(unit(camerapos - v) + unit(lx - v)));
-    float k = n.dot(((camerapos - v).normalize() +
-		     (lx - v).normalize()).normalize());
-    if (k < 0) k = 0;
+    float k = n.dot(((camerapos-v).normalize()+(lx-v).normalize()).normalize());
+    if (k < 0) k = 0;  // clip
 
     // calculate the addition to the specular highlight
-    // k^shiny is a scalar, lc is (r,g,b)
     Matrix<float,3,1> dspecular = (lc * pow(k,shiny)).zero_clip();
     // accumulate that
     specular += dspecular;
@@ -62,10 +53,11 @@ Matrix<float,3,1> light_func(Matrix<float,3,1> n, Matrix<float,3,1> v,
   diffuse = diffuse.one_clip();
   // note that diffuse, dcolor,specular and scolor are all (r,g,b).
   // * here represents component-wise multiplication
-  //rgb = one_clip(ambient + diffuse*dcolor + specular*scolor)
   diffuse[0]  *= dcolor[0]; diffuse[1]  *= dcolor[1]; diffuse[2]  *= dcolor[2];
   specular[0] *= scolor[0]; specular[1] *= scolor[1]; specular[2] *= scolor[2];
   Matrix<float,3,1> rgb = (ambient + diffuse + specular).one_clip();
+
+  // return the color
   return rgb;
 }
 
@@ -90,7 +82,6 @@ void draw_pixels(std::shared_ptr<Canvas> c,
 		 std::shared_ptr<CameraBlock> camera) {
   // iterate through pixels_to_draw vector
   for (auto& it : pixels_to_draw) {
-    // it = {x,y, x0,y0,z0, nx,ny,nz}
     // x0 y0 z0 are in world space
     auto v = makeVector3<float>(it[2],it[3],it[4]);
     auto n = makeVector3<float>(it[5],it[6],it[7]).normalize();
@@ -115,7 +106,6 @@ void flat_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
 		  std::vector<std::shared_ptr<LightBlock> > lights,
 		  std::shared_ptr<CameraBlock> camera, 
 		  std::shared_ptr<Canvas> c) {
-  //std::cout << "merp - in flat_shading\n";
   // Compute the averge location and average normal of each of the 3 
   // vertices. Remember to normalize your normals.
   auto avg_loc  = (t0 + t1 + t2) / 3;
@@ -148,7 +138,6 @@ void flat_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
   // the face, and give each vertex the same RGB calculated in step 2.
   draw_pixels_with_constant_color(c, color);
 }
-
 
 void draw_gouraud(int x, int y, float *data) {
   // should move this z-buff stuff into its own function when you know it works
@@ -193,7 +182,6 @@ void gouraud_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
   // Then, draw each of these pixels with their corresponding interpolated color
   draw_pixels(c);
 }
-
 
 void draw_phong(int x, int y, float *data) {
   // should move this z-buff stuff into its own function when you know it works

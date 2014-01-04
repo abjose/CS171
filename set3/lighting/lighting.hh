@@ -2,28 +2,17 @@
 #define __LIGHTING_H_GUARD__
 
 #include <vector>
-#include <math.h>
 #include <memory>
 #include <map>
 #include <utility>
-#include "../raster/raster.h"
 #include "../blocks/light_block.hh"
 #include "../blocks/material_block.hh"
-#include "../blocks/transform_block.hh"
 #include "../blocks/camera_block.hh"
-#include "../matrix/matrix.hh"
 #include "../matrix/canvas.hh"
-#include "../matrix/transform.hh"
 
-// TODO: move this to a sensible directory
-// TODO: add z-buff stuff...presumable to draw_pixels funcs
-// TODO: move some of these imports to the cc file
-
-// this right?
 // vector of float arrays for drawing pixels onto the canvas
 static std::vector<float*> pixels_to_draw;
 static std::map<std::pair<int,int>,float> z_buff;
-// set defaults large?
 
 Matrix<float,3,1> light_func(Matrix<float,3,1> n, Matrix<float,3,1> v,
 			     std::shared_ptr<MaterialBlock> material, 

@@ -19,17 +19,12 @@ bool debug = false;
 //bool debug = true;
 // vector for storing input numbers
 std::deque<float> in;
-// shared_ptr to a CameraBlock
+// shared_ptr for various things to be read 
 std::shared_ptr<CameraBlock> camera(new CameraBlock());
-// shared_ptr to a LightBlock
 std::shared_ptr<LightBlock> light(new LightBlock());
-// shared_ptr to a TransformBlock
 std::shared_ptr<TransformBlock> transform(new TransformBlock());
-// shared_ptr to a MaterialBlock
 std::shared_ptr<MaterialBlock> material(new MaterialBlock());
-// shared_ptr to a SeperatorBock
 std::shared_ptr<SeparatorBlock> separator(new SeparatorBlock());
-// shared_ptr to a SceneBlock
 std::shared_ptr<SceneBlock> scene(new SceneBlock());
 %}
 
@@ -126,7 +121,6 @@ normalline: NORMAL open VECTOR sqopen triples sqclose close {
 transformline: TRANSFORM open translines close {
   separator->add_transform(transform);
   // re-init transform
-  //transform = std::make_shared<TransformBlock>();
   transform = std::shared_ptr<TransformBlock>(new TransformBlock());
 }
 translines: transline | transline translines
@@ -135,19 +129,16 @@ translateline: TRANSLAT triple {
   if(debug) std::cout << "Got translation: " << in[2] << ' ' << in[1] 
 		      << ' ' << in[0] << std::endl;
   transform->set_translation(in[2],in[1],in[0]);
-  //transform->display();
 }
 scaleline: SFACTOR triple {
   if(debug) std::cout << "Got scale: " << ' ' << in[2] << ' ' 
 		      << in[1] << ' ' << in[0] << std::endl;
   transform->set_scale(in[2],in[1],in[0]);
-  //transform->display();
 }
 rotline: ROT quad {
   if(debug) std::cout << "Got rotation: " << ' ' << in[2] << ' ' 
 		      << in[1] << ' ' << in[0] << std::endl;
   transform->set_rotation(in[3],in[2],in[1],in[0]);
-  //transform->display();
 }
 
 ifslines: ifsline | ifsline ifslines
