@@ -6,10 +6,9 @@ CXXFLAGS	= -std=c++0x -g #-Wall
 
 LDFLAGS	= -L/usr/X11R6/lib -lglut -lGL -lGLU -lXi -lXmu
 
-#SRCS	= shaded.cpp
-SRCS	= UI/ui.cpp shaded.cpp
+SRCS	= UI/ui.cpp oglRenderer.cpp
 OBJS	= parser.tab.o lexer.yy.o $(SRCS:.cpp=.o)
-PROG	= shaded
+PROG	= oglRenderer
 
 all:	$(OBJS)
 	$(CXX) -o $(PROG) $(OBJS) $(LDFLAGS) $(CXXFLAGS)

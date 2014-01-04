@@ -1,6 +1,6 @@
 
 #include <iostream>
-#include "shaded.hh"
+#include "oglRenderer.hh"
 //#include "uistate.h"
 #include "UI/ui.hh"
 
@@ -34,9 +34,9 @@ void redraw()
   ui->applyViewingTransformation();
   glTranslatef(ui->final_tx, -1*ui->final_ty, ui->final_tz);
   //glRotatef(ui->final_rd, ui->final_rx, -1*ui->final_ry, ui->final_rz);
-  glTranslatef(3,0,0);
+  //glTranslatef(3,0,0);
   glRotatef(ui->final_rd, ui->final_rx,ui->final_ry,0);
-  glTranslatef(-3,0,0);
+  //glTranslatef(-3,0,0);
 
   //glLoadIdentity();  // might...not need?
   //glPushMatrix();
