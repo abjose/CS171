@@ -26,9 +26,6 @@ public:
   ~SeparatorBlock() {}
 
   void add_transform(std::unique_ptr<TransformBlock> t) {
-    //transform = std::move(t);
-    //std::cout << "ADDING TRANSFORM IN SEPLIST\n";
-    //transform->display();
     transform->combine_transform(std::move(t));
   }
   void add_vertex(float x, float y, float z) {
@@ -67,19 +64,12 @@ public:
   void render(Canvas &c) {
     // render vertices onto the canvas appropriately
     for(auto &poly: poly_list) {
-    //  std::cout << "On polygon: ";
-    //  for(auto &vertex: poly) {
-    //    std::cout << vertex << ", ";
-    //  }
-    //  std::cout << std::endl;
-      
       // set initial vert to final vertex so lines close polygon
       int prev_vert = poly[poly.size()-1];
       for(auto &curr_vert: poly) {
 	Matrix<float,4,1> p0 = final_vertices[curr_vert];
 	Matrix<float,4,1> p1 = final_vertices[prev_vert];
 	c.scale_draw_line(p0[0], p0[1], p1[0], p1[1]);
-	//std::cout << "Drawing a line: (" << p0[0] << ", " << p0[2] << ") to (" << p1[0] << ", " << p1[1] << ")\n";
 	prev_vert = curr_vert; // heh heh heh
       }
     }

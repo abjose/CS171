@@ -31,7 +31,6 @@ public:
     scale = scale_matrix(a,b,c);
   }
   void combine_transform(std::unique_ptr<TransformBlock> t2) {
-    // kinda gross
     // do TRS each time
     transform = transform * t2->translation * t2->rotation * t2->scale;
   }

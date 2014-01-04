@@ -9,15 +9,17 @@ int main(int argc, char *argv[]) {
 
   // make a new canvas and scene for the parser
   Canvas c(-1, -1, 1, 1, xres, yres);
-  //Canvas c(-5, -5, 5, 5, xres, yres);
   std::unique_ptr<SceneBlock> scene;
   scene = parse_test(std::cin);
 
-  // render to the canvas
+  // uncomment to display contents of scene
+  // (should also comment PPM stuff below)
   //scene->display();
+
+  // render to the canvas
   scene->render(c);
 
-  // spit the ppm to std output
+  // spit the PPM to std output
   std::cout << c.to_ppm() << std::endl;
   
   return 0;
