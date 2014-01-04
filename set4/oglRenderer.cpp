@@ -4,9 +4,7 @@
 //#include "uistate.h"
 #include "UI/ui.hh"
 
-
 static std::shared_ptr<SceneBlock> scene;
-//static UIState *ui;
 static UI *ui;
 
 // The current window size.
@@ -68,28 +66,6 @@ void redraw()
   glutSwapBuffers();
 }
 
-/**
- * GLUT calls this function when the window is resized.
- * All we do here is change the OpenGL viewport so it will always draw in the
- * largest square that can fit in our window..
- */
-
-void resize(GLint w, GLint h)
-{
-  if (h == 0) h = 1;
-
-  // ensure that we are always square (even if whole window not used)
-  if (w > h) w = h;
-  else       h = w;
-
-  // Reset the current viewport and perspective transformation
-  glViewport(0, 0, w, h);
-
-  // Tell GLUT to call redraw()
-  glutPostRedisplay();
-}
-
-
 /*
  * GLUT calls this function when any key is pressed while our window has
  * focus.  Here, we just quit if any appropriate key is pressed.  You can
@@ -150,13 +126,21 @@ void initLights() {
  * Set up OpenGL state.  This does everything so when we draw we only need to
  * actually draw the sphere, and OpenGL remembers all of our other settings.
  */
-void initGL()
+void initGL(int mode)
 {
-  glShadeModel(GL_SMOOTH); // gouraud
-  //glShadeModel(GL_FLAT);   // flat
-  //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE ); // wireframe
-  // TODO: SHOULD TURN OFF LIGHTING AND STUFF FOR THIS ONE!!
-  
+  switch(mode) {
+  case 0: // wireframe
+    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    break;
+  case 1: // flat
+    glShadeModel(GL_FLAT);   // flat 
+    break;
+  case 2: // gouraud
+    glShadeModel(GL_SMOOTH); // gouraud
+    break;
+  default:
+    break;
+  }  
     
   // Enable back-face culling:
   glEnable(GL_CULL_FACE);
@@ -176,7 +160,7 @@ void initGL()
 	    scene->camera->near,
 	    scene->camera->far);
 
-  // NOTE: THE REST OF EVERYTHING WILL BE IN MODELVIEW
+  // from now on, everything should be in modelview
   glMatrixMode(GL_MODELVIEW);
 
   glLoadIdentity();
@@ -191,38 +175,29 @@ void initGL()
  	         -1*scene->camera->position[1], 
   	         -1*scene->camera->position[2]);
 
-  // set light parameters
-  initLights();
-
-  // set material parameters
-  //initMaterial();
+  // set light parameters if not doing wireframe
+  if (mode != 0)
+    initLights();
 }
-
-
-
-
-
 
 //--------------------------------------------------------------------------
 // Handles reshaping of the program window
 //--------------------------------------------------------------------------
-//void reshape(const int width, const int height)
-/*
-void resize(const int width, const int height)
+void resize(GLint w, GLint h)
 {
-    windowWidth = width;
-    windowHeight = height;
-    
-    if( width <= 0 || height <= 0 ) return;
-    
-    ui->WindowX() = width;
-    ui->WindowY() = height;
-    
-    ui->Aspect() = float( width ) / height;
-    ui->SetupViewport();
-    ui->SetupViewingFrustum();
+  if (h == 0) h = 1;
+
+  // ensure that we are always square (even if whole window not used)
+  if (w > h) w = h;
+  else       h = w;
+
+  // Reset the current viewport and perspective transformation
+  glViewport(0, 0, w, h);
+
+  // Tell GLUT to call redraw()
+  glutPostRedisplay();
 }
-*/
+
 
 //--------------------------------------------------------------------------
 // Handles motion of the mouse when a button is being held
@@ -230,7 +205,6 @@ void resize(const int width, const int height)
 void motion(const int x, const int y)
 {
   // Just pass it on to the ui controller.
-  //ui->MotionFunction(x, y);
   ui->motionFunction(x, y);
 }
 
@@ -240,7 +214,6 @@ void motion(const int x, const int y)
 void mouse(const int button, const int state, const int x, const int y)
 {
   // Just pass it on to the ui controller.
-  //ui->MouseFunction(button, state, x, y);
   ui->mouseFunction(button, state, x, y);
 }
 
@@ -249,43 +222,7 @@ void mouse(const int button, const int state, const int x, const int y)
 //--------------------------------------------------------------------------
 void initUI()
 {
-  /*
-glFrustum(scene->camera->left,
-	    scene->camera->right,
-	    scene->camera->bottom,
-	    scene->camera->top,
-	    scene->camera->near,
-	    scene->camera->far);
-
-  // NOTE: THE REST OF EVERYTHING WILL BE IN MODELVIEW
-  glMatrixMode(GL_MODELVIEW);
-
-  glLoadIdentity();
-
-  // camera rotate -theta
-  glRotatef(-1*scene->camera->rotation[3],
-	    scene->camera->rotation[0],
-	    scene->camera->rotation[1],
-	    scene->camera->rotation[2]);
-  // camera -translate
-  glTranslatef(-1*scene->camera->position[0], 
- 	         -1*scene->camera->position[1], 
-  	         -1*scene->camera->position[2]);
-
-
-*/
-
   ui = new UI();
-  //ui = new UIState;
-  /*
-  ui->Trans() = Vector3(scene->camera->position[0],
-			scene->camera->position[1],
-			scene->camera->position[2]);
-  ui->Radius() = 2;
-  ui->Near() = scene->camera->near;;
-  ui->Far() = scene->camera->far;
-  */
-  //reshape(windowWidth, windowHeight);
   resize(windowWidth, windowHeight);
   //checkGLErrors("End of uiInit");
 }
@@ -301,44 +238,17 @@ glFrustum(scene->camera->left,
 int main(int argc, char* argv[])
 {
 
-  /*
+  // read cmd line args
+  int mode;
+  mode = std::stoi(argv[1]);
+  windowWidth = std::stoi(argv[2]); windowHeight = std::stoi(argv[3]);
 
-    UI TODO:
-    - set up keyboard stuff to maintain key state in UI class
-    - add stuff for properly translating camera, etc. to UI class
-    - add stuff to update camera transformation
-    - move transformation stuff to redraw (think already is)
-    - make zoom (shift+drag middle mouse)
-    - make translate (middle mouse button)
-    - make rotation 
-    - is frustrum and stuff right?
+  /*
+    TODO
+    - run all tests!
+    - Looks like normals are wrong for sphere!!! or something...
+    - also lion2 looks kinda fucked up
    */
-
-
-  // REFERENCE CODE OUTLINE (for transformations)
-  /*
-  // perspective and camera are setup only once in the beginning of program
-  PROJECTION
-  Frustum
-  
-  MODELVIEW
-  camera rotate -theta
-  camera -translate
-  
-  for each frame:
-    push
-
-    // user mouse translate and rotation -- more details later
-    
-    for each object:
-      push
-      transform(s)
-      //draw the polygons
-      pop
-    pop
-  */
-
-  // TODO: OH NO LOOKS LIKE ONE FACE ISN'T BEING RENDERED IN FOURCUBES
 
   // From old code
   scene = parse(std::cin);
@@ -352,24 +262,18 @@ int main(int argc, char* argv[])
   // These options aren't really necessary but are here for examples.
   glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 
-  glutInitWindowSize(800, 800);
+  glutInitWindowSize(windowWidth, windowHeight);
   glutInitWindowPosition(300, 100);
 
   glutCreateWindow("CS171 HW4");
     
-  initGL();
+  initGL(mode);
   initUI();
 
   // set up GLUT callbacks.
   glutDisplayFunc(redraw);
   glutReshapeFunc(resize);
   glutKeyboardFunc(keyfunc);
-  //glutIdleFunc(glutPostRedisplay);
-
-  //glutDisplayFunc(display);
-  //glutIdleFunc(glutPostRedisplay);
-  //glutKeyboardFunc(keyboard);
-  //glutReshapeFunc(reshape);
   glutMouseFunc(mouse);
   glutMotionFunc(motion);
 
@@ -379,8 +283,3 @@ int main(int argc, char* argv[])
   // so we should never get to this point.
   return 1;
 }
-
-
-
-
-
