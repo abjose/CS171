@@ -1,0 +1,40 @@
+
+To compile:
+- change to this directory
+- type 'make'
+An executable 'parse_transform' should appear
+
+To run:
+- type './parse_transform < filename'
+Where 'filename' is the name of a transformation file as specified in the set.
+Sample transformation files are in data/.
+
+For example, typing:
+'./parse_transform < data/transform2.tf'
+Yields output:
+
+PARSING!
+  Translation!: 3, 2, 1
+  Rotation!: 1, 2, 3, 2
+  Scale!: 2, 3, 4
+
+VECTOR BEFORE TRANSFORMS:
+4x1 matrix:
+1 
+2 
+3 
+4 
+
+FINAL TRANSFORMATION:
+4x4 matrix:
+-0.629987 -1.58026 3.158 3 
+1.86273 -0.0346005 1.4556 2 
+-0.36516 2.54982 1.97693 1 
+0 0 0 1 
+
+VECTOR AFTER TRANSFORMS:
+4x1 matrix:
+17.6835 
+14.1603 
+14.6653 
+4 

@@ -6,15 +6,18 @@
 #include <string>
 #include <list>
 #include <vector>
-#include "polyline.hh"
+#include "parse_transform.hh"
 #include "../matrix/matrix.hh"
 #include "../matrix/transform.hh"
 
 int yyerror(const char *s);
 int yylex();
 
-// note: getting weird errors when using vector of pointers
-static std::vector<Matrix<float,4,4> > transform_stack;
+// make true to print debug messages
+bool debug = true;
+// output 4x4 transform matrix
+static Matrix<float,4,4> final;
+//final.clear(0);
 %}
 
 %union
@@ -43,22 +46,25 @@ translate | rotate | scale;
 translate : 
 TRANSTOK FLOAT FLOAT FLOAT {
   Matrix<float,4,4> m = translation_matrix<float>($2,$3,$4);
-  transform_stack.push_back(m);
-  //std::cout << "  Translation!" << $2 << $3 <<  $4 << std::endl;
+  final = final * m;
+  if(debug) 
+    std::cout << "  Translation!: " << $2 << ", " << $3 << ", " <<  $4 << std::endl;
 };
 
 rotate : 
 ROTTOK FLOAT FLOAT FLOAT FLOAT {
   Matrix<float,4,4> m = rotation_matrix<float>($2,$3,$4,$5);
-  transform_stack.push_back(m);      
-  //std::cout << "  Translation!" << $2 << $3 <<  $4 << $5 << std::endl;
+  final = final * m;
+  if(debug) 
+    std::cout << "  Rotation!: " << $2 << ", " << $3 << ", " <<  $4 << ", " << $5 << std::endl;
 };
 
 scale : 
 SCALETOK FLOAT FLOAT FLOAT {
   Matrix<float,4,4> m = scale_matrix<float>($2,$3,$4);
-  transform_stack.push_back(m);
-  std::cout << "  Scale!" << $2 << $3 <<  $4 << std::endl;
+  final = final * m;
+  if(debug) 
+    std::cout << "  Scale!: " << $2 << ", " << $3  << ", " <<  $4 << std::endl;
 };
 
 %%
@@ -76,9 +82,12 @@ int yylex()
    return lexer->yylex();
 }
 
-std::vector<Matrix<float,4,4> > parse_test(std::istream &datafile) {
+//std::vector<Matrix<float,4,4> > parse_test(std::istream &datafile) {
+Matrix<float,4,4> parse_test(std::istream &datafile) {
    // Construct the lexer.
    lexer = new yyFlexLexer(&datafile);
+   // init matrix
+   final.make_identity();
    // Run the parser.
    if(yyparse())
    {
@@ -87,5 +96,6 @@ std::vector<Matrix<float,4,4> > parse_test(std::istream &datafile) {
    }
 
    delete lexer;
-   return transform_stack;
+   //return transform_stack;
+   return final;
 }
