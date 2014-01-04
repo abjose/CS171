@@ -11,32 +11,18 @@
 int main(int argc, char *argv[]) {
   float xmin, ymin, xmax, ymax;
   int xres, yres;
-
   
   xmin = std::stof(argv[1]); xmax = std::stof(argv[2]); 
   ymin = std::stof(argv[3]); ymax = std::stof(argv[4]); 
   xres = std::stoi(argv[5]); yres = std::stoi(argv[6]); 
-  
-  //std::cout << xmin << xmax << ymin << ymax << xres << yres << std::endl;
 
-  //xmin = 0; xmax = 5;
-  //ymin = 0; ymax = 5;
-  //xres = 50; yres = 50;
-
-
-  Canvas c;//(xmin, ymin, xmax, ymax, xres, yres);
-  //c.clear(0);
-
-  //std::cout << "Running test\n";
-  //c.scale_draw_line(.2, .4, 1.3, 0.3);
-  //c.draw_line(0, 0, 10, 10);
-
+  // store the result of parsing into a Canvas object for drawing
+  Canvas c;
   c = parse_test(std::cin, xmin, ymin, xmax, ymax, xres, yres);
-
+  
+  // write the PPM data to stdout
   std::cout << c.to_ppm() << std::endl;
   
-
-
 
   // draw2d [xmin] [xmax] [ymin] [ymax] [xRes] [yRes]
   // NOTE that the lines can go off the screen, outside the image space.
