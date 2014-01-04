@@ -1,0 +1,160 @@
+This is code for doing Matrix manipulations and PPM Canvas stuff.
+
+You can run some tests of the matrix code by typing 'make', then './tests'.
+It should print some matrix math to stdout, that should match the stuff below.
+
+
+********************
+* Matrix Lib Tests *
+********************
+
+This output should be the same as running the test code in this directory.
+The tests run are:
+0.  Matrix equality
+1a. Matrix*Matrix
+1b. Matrix*Vector
+1c. Matrix*Scalar
+2.  Dot product
+3.  Transpose
+4.  Normalization
+5. Matrix * Matrix inverse
+
+
+Output:
+Running Matrix equality test
+4x4 matrix:
+0 1.4 0 1.3 
+0 1.3 0 1.9 
+0 2.3 0 4.2 
+0 0 0 0 
+4x4 matrix:
+0 1.4 0 1.3 
+0 1.3 0 1.9 
+0 2.3 0 4.2 
+0 0 0 0 
+Equal?: 1
+4x4 matrix:
+0 1.4 0 1.3 
+0 1.3 0 1.9 
+0 2.3 0 4.2 
+0 0 0 0 
+4x4 matrix:
+0 1.4 0 1.4 
+0 1.3 0 1.9 
+0 2.3 0 4.2 
+0 0 0 0 
+Not Equal?: 1
+Test passed!
+
+Running Matrix*Matrix test
+4x4 matrix:
+0 1.4 0 1.3 
+0 1.3 0 1.9 
+0 2.3 0 4.2 
+0 0 0 0 
+4x4 matrix:
+1 0 0 0 
+0 1 0 0 
+0 0 1 0 
+0 0 0 1 
+Multiplying...
+Result:
+4x4 matrix:
+0 1.4 0 1.3 
+0 1.3 0 1.9 
+0 2.3 0 4.2 
+0 0 0 0 
+Test passed!
+
+Running Matrix*Vector test
+4x4 matrix:
+1 0 0 0 
+0 1 0 0 
+0 0 1 0 
+0 0 0 1 
+4x1 matrix:
+1.1 
+2.2 
+3.3 
+4.4 
+Multiplying...
+Result:
+4x1 matrix:
+1.1 
+2.2 
+3.3 
+4.4 
+Test passed!
+
+Running Matrix*Scalar test
+4x4 matrix:
+1 0 0 0 
+0 1 0 0 
+0 0 1 0 
+0 0 0 1 
+Multiplying by 3...
+Result:
+4x4 matrix:
+3 0 0 0 
+0 3 0 0 
+0 0 3 0 
+0 0 0 3 
+Test passed!
+
+Running Dot product test
+4x1 matrix:
+1 
+2 
+3 
+4 
+4x1 matrix:
+2 
+4 
+6 
+8 
+Multiplying...
+Result: 60
+Test passed!
+
+Running Transpose test
+4x4 matrix:
+0 0 0 1 
+0 0 0 0 
+0 0 0 0 
+-1 0 0 0 
+4x4 matrix:
+0 0 0 -1 
+0 0 0 0 
+0 0 0 0 
+1 0 0 0 
+Test passed!
+
+Running Normalization test
+4x1 matrix:
+1 
+2 
+3 
+4 
+Normalizing...
+Result:
+4x1 matrix:
+0.182574 
+0.365148 
+0.547723 
+0.730297 
+Magnitude: 1
+Test passed!
+
+Running Matrix*Matrix Inverse test
+4x4 matrix:
+4 1 9 4 
+1 2 4 3 
+8 3 2 7 
+6 6 6 1 
+Multiplying by inverse...
+Result:
+4x4 matrix:
+1 -1.19209e-07 -2.98023e-08 2.98023e-08 
+-1.49012e-08 1 -1.49012e-08 0 
+-5.96046e-08 -1.19209e-07 1 0 
+-3.35276e-08 -2.98023e-08 -1.49012e-08 1 
