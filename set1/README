@@ -1,7 +1,7 @@
 This is code for set 1 of CS171.
 
 Note: in general, if the set requires pasting output into a README, it's in the
-README within the relevant directory rathe than this one.
+README within the relevant directory rather than this one.
 
 matrix/   contains the code for PART 0 (tests in README there)
 polyline/ contains the code for PART 1 (see README there for more information)
