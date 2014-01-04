@@ -1,9 +1,15 @@
+This is code for set 2 of CS171.
+
 To compile:
-- cd to this directory
+- change to this directory
 - type 'make'
-An executable 'hw0' should appear
+An executable 'wireframe' should appear
 
-To run:
-type './hw0' in the terminal
+To run, type something like:
+'./wireframe xRes yRes < filename | display -'
+The two integers xRes and yRes indicate the size of the image to be made.
+Filename is a .iv file as specified in the set - examples can be found in data/
 
-A blue sphere should appear in a new window.
+For example,
+'./wireframe 400 400 < data/lion2.iv | display -'
+will show the lion2 example in a 400x400 window.
