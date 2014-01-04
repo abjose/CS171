@@ -10,9 +10,20 @@
 #include "matrix.hh"
 
 //------------------------------------------
-// transformations
+// vector-making convenience stuff
 //------------------------------------------
-// NOTE: all of these are for 4x4 matrices
+
+template<typename T>
+Matrix<T,3,1> makeVector(T e1, T e2, T e3) {
+  Matrix<T,3,1> m;
+  T a[] = {e1,e2,e3};
+  m.copy(a);
+  return m;
+}
+
+//------------------------------------------
+// 4x4 transformations
+//------------------------------------------
 
 template<typename T>
 Matrix<T,4,4> translation_matrix(T x, T y, T z) {
@@ -37,9 +48,12 @@ Matrix<T,4,4> scale_matrix(T a, T b, T c) {
 
 template<typename T>
 Matrix<T,4,4> rotation_matrix(T x, T y, T z, T theta) {
-  // TODO: x,y,z needs to be normalized
+  assert(x != 0 || y != 0 || z != 0);
   Matrix<T,4,4> res;
   res.clear(0);
+  // normalize input axis
+  Matrix<T,3,1> n = makeVector<float>(x,y,z).normalize();
+  x = n[0]; y = n[1]; z = n[2];
   T x_2 = x*x;
   T y_2 = y*y;
   T z_2 = z*z;
@@ -58,14 +72,5 @@ Matrix<T,4,4> rotation_matrix(T x, T y, T z, T theta) {
   return res;
 }
   
-
-// Convenience function to construct a 3x1 vector out of 3 arguments
-template<typename T>
-Matrix<T,3,1> makeVector(T e1, T e2, T e3) {
-    Matrix<T,3,1> m;
-    T a[] = {e1,e2,e3};
-    m.copy(a);
-    return m;
-}
 
 #endif // __TRANSFORMS_H_GUARD__

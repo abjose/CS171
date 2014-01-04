@@ -6,7 +6,7 @@
 #ifndef __MINMATRIX_H_GUARD__
 #define __MINMATRIX_H_GUARD__
 
-
+#include <cmath>
 #include <cassert>
 #include <vector>
 #include <iostream>
