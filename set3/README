@@ -1,9 +1,22 @@
 To compile:
-- cd to this directory
+- switch to this directory
 - type 'make'
-An executable 'hw0' should appear
+An executable 'shaded' should appear
 
-To run:
-type './hw0' in the terminal
+To run, type:
+./shaded n xRes yRes < iv-file
 
-A blue sphere should appear in a new window.
+Where n determines what shading mode to use:
+0 = Flat
+1 = Gouraud
+2 = Phong
+
+and xRes, yRes are the x and y resolutions of the final image.
+
+To display the output, try something like:
+shaded n xRes yRes < iv-file | display -
+
+All the iv files are kept in /data.
+
+Actual example, for future reference:
+./shaded 0 800 800 < data/sphere.iv | display -
