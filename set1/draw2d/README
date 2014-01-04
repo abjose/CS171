@@ -1,9 +1,17 @@
 To compile:
-- cd to this directory
+- change to this directory
 - type 'make'
-An executable 'hw0' should appear
+An executable 'draw2d' should appear
 
-To run:
-type './hw0' in the terminal
+To run, type:
+'./draw2d xmin xmax ymin ymax xRes yRes < filename'
+where xmin, xmax, ymin, ymax are max dimensions for the canvas
+xRes and yRes are the dimensions of the final output.
+And filename is a file as specified in the set.
 
-A blue sphere should appear in a new window.
+You can display the output by doing something like:
+'./draw2d xmin xmax ymin ymax xRes yRes < filename | display -'
+
+For example:
+'./draw2d -2 2 -2 2 400 400 < data/binaryclock.2d | display -'
+Should display the binary clock example as a 400x400 image.
