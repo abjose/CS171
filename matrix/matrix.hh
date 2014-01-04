@@ -129,6 +129,13 @@ public:
 
   // TODO: add an is_vector test?
 
+  bool operator==(const Matrix<T,R,C> &other) const {
+    for (int i=0; i<size(); i++)
+      if (ref(i) != other[i])
+	return false;
+    return true;
+  }
+  
   T dot(const Matrix<T,R,1> &other) const {
     assert(R==1 || C==1);
     T d = 0;
