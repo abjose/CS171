@@ -66,10 +66,6 @@ public:
       // make initial spline
       make_spline();
     }
-
-    //set_filename("test");
-    //load();
-
   }
 
   ~Spline() {

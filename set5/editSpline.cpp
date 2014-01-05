@@ -153,7 +153,6 @@ void display() {
  */
 int main(int argc, char* argv[])
 {
-  // just test out spline stuff for now
   s = new Spline(3, 1000);
   ui = new UI(-2,2, -2,2, 600,600, s); // make sure to change args...
 
@@ -164,16 +163,8 @@ int main(int argc, char* argv[])
 
   // TODO: ui doesn't work if resize screen - don't hard-pass dims!
 
-  //std::cout << std::endl;
-  //for (auto& p : s->spline)
-  //  std::cout << p[0] << ", " << p[1] << std::endl;
-
-  // TODO: clean this shit up
-  // also, get rid of CANVAS!! don't really need it here
-
   glutInit(&argc, argv);
   glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE );
-  //glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
   glutInitWindowSize( 600, 600 );
   glutCreateWindow("CS171 HW4");
 
