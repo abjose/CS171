@@ -8,7 +8,6 @@
 #include <vector>
 #include <memory>
 #include "../matrix/matrix.hh"
-#include "../matrix/canvas.hh"
 #include "camera_block.hh"
 #include "light_block.hh"
 #include "separator_block.hh"

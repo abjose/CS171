@@ -9,7 +9,6 @@
 #include <memory>
 #include "../matrix/matrix.hh"
 #include "../matrix/transform.hh"
-#include "../matrix/canvas.hh"
 #include "transform_block.hh"
 #include "material_block.hh"
 #include "light_block.hh"
