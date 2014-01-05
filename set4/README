@@ -18,7 +18,16 @@ Actual example, for future reference:
 ./oglRenderer 0 800 800 < data/sphere.iv
 
 
-EXTRA CREDIT:
+INTERFACE
+===========
+left click + drag to rotate
+center click + drag to translate
+shift + center click + drag to zoom
+'q', 'Q', or esc to quit
+
+
+EXTRA CREDIT
+=============
 Lineset
 Note: Currently, using the Lineset feature (i.e. if the .iv file has
 _any_ LineSet commands in it) switches to a completely different redraw loop.
