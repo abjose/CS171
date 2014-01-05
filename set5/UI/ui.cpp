@@ -41,6 +41,15 @@ void UI::mouseFunction(int button, int state, int x, int y) {
       //rclick = false;
     }
     break;
+  case GLUT_MIDDLE_BUTTON:
+    if(state == GLUT_DOWN) {
+    int i = s->get_ctrl_pt(x,y);
+    if(glutGetModifiers() == GLUT_ACTIVE_SHIFT)
+      s->p[i][2] -= 2; // decrease weight if shift
+    else
+      s->p[i][2] += 2; // else increase weight
+    }
+    break;
   default:
     break;
   }
