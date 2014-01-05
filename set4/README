@@ -16,3 +16,11 @@ All the iv files are kept in /data.
 
 Actual example, for future reference:
 ./oglRenderer 0 800 800 < data/sphere.iv
+
+
+EXTRA CREDIT:
+Lineset
+Note: Currently, using the Lineset feature (i.e. if the .iv file has
+_any_ LineSet commands in it) switches to a completely different redraw loop.
+So, LineSet and normal rendering are mutually exclusive for now.
+.iv files using LineSet can be found in data/ as usual.
