@@ -40,7 +40,67 @@ void redraw()
   //glPushMatrix();
 
   // TODO: so...put this stuff here explicitly?
-  scene->render();
+  //GLfloat emit[], amb[], diff[], spec[], shiny;
+  for (auto& sep : scene->sep_list) {
+    // INITIALIZE MATERIAL FOR THIS SEPARATOR
+    //sep->init_material();
+    GLfloat emit[] = {0.0, 0.0, 0.0, 1.0}; // wat
+    GLfloat amb[] = {sep->material->ambient[0],
+	     sep->material->ambient[1],
+	     sep->material->ambient[2]};
+    GLfloat diff[] = {sep->material->diffuse[0],
+	      sep->material->diffuse[1],
+	      sep->material->diffuse[2]};
+    GLfloat spec[] = {sep->material->specular[0],
+	      sep->material->specular[1],
+	      sep->material->specular[2]};
+    GLfloat shiny = sep->material->shininess;
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT, amb);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, diff);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, spec);
+    glMaterialfv(GL_FRONT, GL_EMISSION, emit);
+    glMaterialfv(GL_FRONT, GL_SHININESS, &shiny);
+
+    // PUSH TRANSFORMATIONS
+    glPushMatrix();
+    
+    // TRANSFORM TO WORLD SPACE
+    //sep->object_to_world();
+    for (auto& t : sep->transforms) {
+      // TODO: might be backwards! but is supposed to be a stack...
+      // also, will you have to push and pop each time? hmm..
+      // i.e. push isn't a "save state", you actually have to do it a lot
+      glTranslatef(t->translation[0],
+		   t->translation[1],
+		   t->translation[2]);
+      glRotatef(t->rotation[3],
+		t->rotation[0],
+		t->rotation[1],
+		t->rotation[2]);
+      glScalef(t->scale[0],
+	       t->scale[1],
+	       t->scale[2]);
+    }
+
+
+    // RENDER
+    sep->render();  // TODO: change name to populate_blah or something
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, sep->vertices);
+    glNormalPointer(GL_FLOAT, 0, sep->normals);
+    glDrawArrays(GL_TRIANGLES, 0, sep->n_verts);
+    // deactivate vertex arrays after drawing
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_NORMAL_ARRAY);
+    
+
+    // POP TRANSFORMATIONS
+    glPopMatrix();
+  }
+
+  //scene->render();
 
   // TODO: put object transformations in here???
   // and just like...everything?!!!
@@ -227,9 +287,6 @@ void initUI()
   //checkGLErrors("End of uiInit");
 }
 
-
-
-
 /**
  * Main entrance point.
  * Sets up some stuff then passes control to glutMainLoop() which never
@@ -246,8 +303,10 @@ int main(int argc, char* argv[])
   /*
     TODO
     - run all tests!
+    - move all transformation/rendering stuff to redraw func!
     - Looks like normals are wrong for sphere!!! or something...
     - also lion2 looks kinda fucked up
+    - when trying to translate lion, gets translated in wrong direction!
    */
 
   // From old code

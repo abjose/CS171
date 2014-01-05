@@ -16,7 +16,8 @@
 #include "camera_block.hh"
 
 class SeparatorBlock {
-private:
+public:
+  //private:
   std::vector<std::shared_ptr<TransformBlock> > transforms;
   //std::shared_ptr<TransformBlock> transform_sans_trans;
   std::shared_ptr<MaterialBlock> material;
@@ -26,6 +27,10 @@ private:
   std::vector<std::vector<int> > poly_normal_list; 
   std::vector<int> temp_poly;
   std::vector<int> temp_poly_normal;
+  // openGL stuff
+  GLfloat *vertices, *normals;
+  int n_verts;
+
 
 
 public:
@@ -94,24 +99,24 @@ public:
     }
   }
 
-  void object_to_world() {
-    // should have already pushed
-    for (auto& t : transforms) {
-      // TODO: might be backwards! but is supposed to be a stack...
-      // also, will you have to push and pop each time? hmm..
-      // i.e. push isn't a "save state", you actually have to do it a lot
-      glTranslatef(t->translation[0],
-		   t->translation[1],
-		   t->translation[2]);
-      glRotatef(t->rotation[3],
-		t->rotation[0],
-		t->rotation[1],
-		t->rotation[2]);
-      glScalef(t->scale[0],
-	       t->scale[1],
-	       t->scale[2]);
-    }
-  }
+  // void object_to_world() {
+  //   // should have already pushed
+  //   for (auto& t : transforms) {
+  //     // TODO: might be backwards! but is supposed to be a stack...
+  //     // also, will you have to push and pop each time? hmm..
+  //     // i.e. push isn't a "save state", you actually have to do it a lot
+  //     glTranslatef(t->translation[0],
+  // 		   t->translation[1],
+  // 		   t->translation[2]);
+  //     glRotatef(t->rotation[3],
+  // 		t->rotation[0],
+  // 		t->rotation[1],
+  // 		t->rotation[2]);
+  //     glScalef(t->scale[0],
+  // 	       t->scale[1],
+  // 	       t->scale[2]);
+  //   }
+  // }
 
   void init_material() {
     GLfloat emit[] = {0.0, 0.0, 0.0, 1.0}; // wat
@@ -141,12 +146,18 @@ public:
     assert(poly_list.size() == poly_normal_list.size());
 
     // init vertex/normal arrays
-    int n_verts = 3*poly_list.size();  // 3 vertices per face
+    //int n_verts = 3*poly_list.size();  // 3 vertices per face
+    n_verts = 3*poly_list.size();  // 3 vertices per face
     int n_floats = 3*n_verts;  // 3 floats per vertex
-    GLfloat vertices[n_floats];
-    GLfloat normals[n_floats];
+    //GLfloat vertices[n_floats];
+    //GLfloat normals[n_floats];
+    //GLfloat TESTV[n_floats];
+    //GLfloat TESTN[n_floats];
 
-    // TODO: WHY DOES CUBE2 SEEM TO BE RENDERING TWICE???? SIZE IS PRINTED TWICE...
+    vertices = new GLfloat[n_floats];//TESTV;
+    normals = new GLfloat[n_floats];//TESTN;
+
+    // TODO: WHY DOES CUBE2 SEEM TO BE RENDERING TWICE???? SIZE IS PRINTED TWICE
     // maybe because being redrawn?
 
     // TODO: considering these arrays are always the same, should just
@@ -155,39 +166,35 @@ public:
     for (int i=0; i < poly_list.size(); i++) {
       auto poly = poly_list[i];
       auto norm = poly_normal_list[i];
+
       for (int v=0; v<3; v++) {
 	for (int f=0; f<3; f++) {
 	  // TODO: get rid of magic numbers like 3
 	  vertices[9*i+3*v+f] = vertex_list[poly[v]][f];
 	  normals[9*i+3*v+f]  = normal_list[norm[v]][f];
 	}
-	//vertices[9*i+3*v+0] = vertex_list[poly[v]][0];
-	//vertices[9*i+3*v+1] = vertex_list[poly[v]][1];
-	//vertices[9*i+3*v+2] = vertex_list[poly[v]][2];
+	
+	// vertices[9*i+3*v+0] = vertex_list[poly[v]][0];
+	// vertices[9*i+3*v+1] = vertex_list[poly[v]][1];
+	// vertices[9*i+3*v+2] = vertex_list[poly[v]][2];
+	
+	// normals[9*i+3*v+0] = normal_list[norm[v]][0];
+	// normals[9*i+3*v+1] = normal_list[norm[v]][1];
+	// normals[9*i+3*v+2] = normal_list[norm[v]][2];
       }
     }
-
-    /*
-    int count = 0;
-    for(auto& it : vertices) {
-      if (count%3 == 0)
-	std::cerr << std::endl;
-      std::cerr << it << ", ";
-      count++;
-    }
-    std::cerr << "\nsize: " << count << std::endl;
-    */
-      
-    // do you need to enable/disable every time?
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_NORMAL_ARRAY);
-    glVertexPointer(3, GL_FLOAT, 0, vertices);
-    glNormalPointer(GL_FLOAT, 0, normals);
-    //glDrawArrays(GL_TRIANGLES, 0, n_verts);
-    glDrawArrays(GL_TRIANGLES, 0, n_verts);
-    // deactivate vertex arrays after drawing
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableClientState(GL_NORMAL_ARRAY);
+    
+    
+    // // do you need to enable/disable every time?
+    // glEnableClientState(GL_VERTEX_ARRAY);
+    // glEnableClientState(GL_NORMAL_ARRAY);
+    // glVertexPointer(3, GL_FLOAT, 0, vertices);
+    // glNormalPointer(GL_FLOAT, 0, normals);
+    // glDrawArrays(GL_TRIANGLES, 0, n_verts);
+    // // deactivate vertex arrays after drawing
+    // glDisableClientState(GL_VERTEX_ARRAY);
+    // glDisableClientState(GL_NORMAL_ARRAY);
+    
   }
 
   void display() {

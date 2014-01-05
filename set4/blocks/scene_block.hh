@@ -32,16 +32,16 @@ public:
     sep_list.push_back(s);
   }
 
-  void render() {    
-    for(auto &sep: sep_list) {
-      sep->init_material();
+  // void render() {    
+  //   for(auto &sep: sep_list) {
+  //     sep->init_material();
 
-      glPushMatrix();
-      sep->object_to_world();
-      sep->render();
-      glPopMatrix();
-    }
-  }
+  //     glPushMatrix();
+  //     sep->object_to_world();
+  //     sep->render();
+  //     glPopMatrix();
+  //   }
+  // }
   
   void display() {
     std::cout << "DISPLAYING SCENE'S CAMERA: \n";
