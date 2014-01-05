@@ -12,7 +12,10 @@
 
 // vector of float arrays for drawing pixels onto the canvas
 static std::vector<float*> pixels_to_draw;
+// zbuffer map
 static std::map<std::pair<int,int>,float> z_buff;
+// camera...for clipping...should probably just go ahead and make this a class..
+static std::shared_ptr<CameraBlock> cam;
 
 Matrix<float,3,1> light_func(Matrix<float,3,1> n, Matrix<float,3,1> v,
 			     std::shared_ptr<MaterialBlock> material, 

@@ -91,11 +91,12 @@ void draw_pixels(std::shared_ptr<Canvas> c,
 }
 
 void draw_flat(int x, int y, float *data) {
-  // should move this z-buff stuff into its own function when you know it works
+  // Z-buffer and clip
   auto xy = std::make_pair(x,y);
   float z = data[2];
-  if(z_buff.count(xy) == 0 || z < z_buff[xy]) {
-    z_buff[xy] = z;
+  if ((z_buff.count(xy) == 0 || z < z_buff[xy]) &&  // z-buffer
+      (-z < cam->near && z > -cam->far)) {          // clipping
+    z_buff[xy] = z;  // update z-buffer
     pixels_to_draw.push_back(new float[2] {(float) x, (float) y});
   } 
 }
@@ -110,6 +111,9 @@ void flat_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
   // vertices. Remember to normalize your normals.
   auto avg_loc  = (t0 + t1 + t2) / 3;
   auto avg_norm = ((n0 + n1 + n2) / 3).normalize();
+
+  // set camera
+  cam = camera;
   
   // Calculate the corresponding color of the average location and normal 
   // with the lighting function.
@@ -126,7 +130,7 @@ void flat_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
   // Call Bill's code with 3 vertices, each with data array = {x, y, z} 
   // (since we're only interpolating across locations)
   vertex verts[3];
-  for (int i = 0; i < 3; i++) verts[i].numData = 3; // just x,y,z
+  for (int i = 0; i<3; i++) verts[i].numData=3; // just x,y,z
   // TODO: pass input stuff as vectors so can just loop?
   verts[0].data = new float[3] {t0_4[0], t0_4[1], t0_4[2]};
   verts[1].data = new float[3] {t1_4[0], t1_4[1], t1_4[2]};
@@ -143,7 +147,8 @@ void draw_gouraud(int x, int y, float *data) {
   // should move this z-buff stuff into its own function when you know it works
   auto xy = std::make_pair(x,y);
   float z = data[2];
-  if(z_buff.count(xy) == 0 || z < z_buff[xy]) {
+  if ((z_buff.count(xy) == 0 || z < z_buff[xy]) &&  // z-buffer
+      (-z < cam->near && z > -cam->far)) {          // clipping
     z_buff[xy] = z;
     pixels_to_draw.push_back(new float[5] 
 			     {(float) x, (float) y, data[3], data[4], data[5]});
@@ -161,6 +166,9 @@ void gouraud_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
   auto c0 = light_func(n0.normalize(), t0, material, lights, camera->position);
   auto c1 = light_func(n1.normalize(), t1, material, lights, camera->position);
   auto c2 = light_func(n2.normalize(), t2, material, lights, camera->position);
+
+  // set camera
+  cam = camera;
 
   // Convert your positions to NDC.
   Matrix<float,4,4> T = camera->get_perspective_projection() * 
@@ -187,7 +195,8 @@ void draw_phong(int x, int y, float *data) {
   // should move this z-buff stuff into its own function when you know it works
   auto xy = std::make_pair(x,y);
   float z = data[2];
-  if(z_buff.count(xy) == 0 || z < z_buff[xy]) {
+  if ((z_buff.count(xy) == 0 || z < z_buff[xy]) &&  // z-buffer
+      (-z < cam->near && z > -cam->far)) {          // clipping
     z_buff[xy] = z;
     pixels_to_draw.push_back(new float[8] 
 			     {(float) x, (float) y, 
@@ -212,6 +221,9 @@ void phong_shading(Matrix<float,3,1> t0, Matrix<float,3,1> n0,
   n0 = n0.normalize();
   n1 = n1.normalize();
   n2 = n2.normalize();
+
+  // set camera
+  cam = camera;
 
   // Call Bill's code with 3 vertices, each with data array = 
   // {x, y, z, nx, ny, nz} (since we're interpolating across both location and 
