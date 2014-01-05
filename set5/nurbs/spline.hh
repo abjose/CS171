@@ -23,9 +23,6 @@ private:
   // filename if specified
   std::string filename;
 
-  
-  // N_t --- unordered map for doing dynamic programming later
-
   // math-y things
   float  B_i(int i, float u);
   float  N(int i, int k_, float u);

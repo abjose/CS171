@@ -14,7 +14,6 @@ float Spline::B_i(int i, float u) {
 }
 
 float Spline::N(int i, int k_, float u) {
-  // do with dynamic programming instead!
   if (k_==1) {
     if (t[i] <= u && u <= t[i+1])
       return 1;
@@ -29,8 +28,6 @@ float Spline::N(int i, int k_, float u) {
     r = (t[i+k_]-u)*N(i+1,k_-1,u) / r_d;
   return l+r;
 }
-
-//float N_dynamic(i, k_, u) {}
 
 Spline::CtrlPt Spline::Q(float u) {
   // NOTE: where is U vs u = U-i? If things don't look right should verify...
@@ -209,7 +206,7 @@ void Spline::remove_ctrl_pt(float x, float y) {
     p.erase(p.begin()+get_ctrl_pt(x,y));
     t.erase(t.begin()+get_knot_index_from_pt(x,y));
   } else 
-    std::cout << "Slow down there, tex. Can't delete too many points...\n";
+    std::cout << "Don't delete too many points...\n";
 }
 
 /*********************/
