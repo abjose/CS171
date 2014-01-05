@@ -24,7 +24,7 @@ public:
   std::vector<Matrix<float,3,1> > vertex_list; 
   std::vector<Matrix<float,3,1> > normal_list; 
   std::vector<std::vector<int> > poly_list; 
-  std::vector<std::vector<int> > poly_normal_list; 
+  std::vector<std::vector<int> > poly_normal_list;
   std::vector<int> temp_poly;
   std::vector<int> temp_poly_normal;
   // openGL stuff

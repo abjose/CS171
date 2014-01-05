@@ -53,6 +53,9 @@ diffuseColor       return DIFFCOLOR;
 specularColor      return SPECCOLOR;
 shininess          return SHININESS;
 
+LineSet            return LINESET;
+numVertices        return NUMVERTS;
+
 #.*$         /* Eat comments   */
 [ \t\r\n]+   /* Eat whitespace */
 

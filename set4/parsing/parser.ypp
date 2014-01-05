@@ -50,6 +50,7 @@ std::shared_ptr<SceneBlock> scene(new SceneBlock);
 %token IFACESET COORDINDEX NORMALINDEX
 %token POINTLIGHT LLOC LCOLOR
 %token MATERIAL AMBCOLOR DIFFCOLOR SPECCOLOR SHININESS
+%token LINESET NUMVERTS
 
 %%
 
@@ -104,6 +105,7 @@ sepitem:  transformline
           | normalline
           | IFACESET open ifslines close 
           | material
+          | linesetline
 
 vertexline: COORD3 open POINT sqopen triples sqclose close {
   // read in triples
@@ -181,6 +183,13 @@ specular: SPECCOLOR triple {
 shininess: SHININESS single {
   material->shininess = in[0];
 }
+
+linesetline: LINESET LBRACE NUMVERTS single RBRACE {
+  std::cout << "GOT LINES!\n" << in[0] << std::endl;
+  scene->is_lines = true;
+  // could also set something in scene if have this
+  // so don't have to do anything too weird
+ }
 
 
 

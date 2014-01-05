@@ -16,12 +16,17 @@
 class SceneBlock {
 public:
   //private:
+  bool is_lines;
   int shading;
   std::shared_ptr<CameraBlock> camera;
   std::vector<std::shared_ptr<LightBlock> > lights;
   std::vector<std::shared_ptr<SeparatorBlock> > sep_list;
 
 public:
+  SceneBlock() {
+    is_lines = false;
+  }
+
   void set_camera(std::shared_ptr<CameraBlock> c) {
     camera = c;
   }
