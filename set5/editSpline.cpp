@@ -1,6 +1,6 @@
 
 #include <iostream>
-#include "shaded.hh"
+#include "editSpline.hh"
 #include "nurbs/spline.hh"
 #include "UI/ui.hh"
 
@@ -298,13 +298,11 @@ void display()
   glMatrixMode( GL_MODELVIEW );
   glLoadIdentity();
 
-  glColor3ub( 255, 255, 255 );
+  glEnable(GL_POINT_SMOOTH);
+  //glEnable(GL_BLEND);
 
-  // draw spline
-  glBegin(GL_LINE_STRIP);
-  for (auto& pt : s->spline)
-    glVertex2f(pt[0], pt[1]);
-  glEnd();
+  glColor3ub( 127, 127, 127 );
+  glLineWidth(1.0);
 
   // draw control point connections
   glBegin(GL_LINE_STRIP);
@@ -313,12 +311,19 @@ void display()
   glEnd();
 
   // draw control points
-  glPointSize(10.0);
-  glEnable(GL_POINT_SMOOTH);
-  //glEnable(GL_BLEND);
+  glPointSize(10.0);;
   glBegin(GL_POINTS);
   for (auto& p : s->p)
     glVertex2f(p[0], p[1]);
+  glEnd();
+
+  glColor3ub( 255, 255, 255 );
+  glLineWidth(3.0);
+
+  // draw spline
+  glBegin(GL_LINE_STRIP);
+  for (auto& pt : s->spline)
+    glVertex2f(pt[0], pt[1]);
   glEnd();
 
   glutSwapBuffers();
@@ -431,6 +436,9 @@ int main(int argc, char* argv[])
   //for (auto& p : s->spline)
   //  std::cout << p[0] << ", " << p[1] << std::endl;
 
+
+  // TODO: clean this shit up
+  // also, get rid of CANVAS!! don't really need it here
 
   glutInit(&argc, argv);
   glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE );
