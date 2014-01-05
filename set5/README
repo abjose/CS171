@@ -1,9 +1,15 @@
 To compile:
-- cd to this directory
+- change to this directory
 - type 'make'
-An executable 'hw0' should appear
+An executable 'editSpline' should appear
 
 To run:
-type './hw0' in the terminal
+type './editSpline [spline-file]' in the terminal
 
-A blue sphere should appear in a new window.
+The optional spline-file parameter can be used to specify a file to read and/or
+save spline data to. If the file does not exist, it will be made.
+
+
+
+Extra credit
+-------------
