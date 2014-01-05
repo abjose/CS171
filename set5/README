@@ -13,7 +13,13 @@ IMPORTANT NOTE: data will only be saved properly if you use the keyboard to quit
 like ctrl-c.
 
 
+INTERFACE
+==========
+'t' to toggle control points/lines
+'q', 'Q', or esc to (optionally save and) quit
+
 Extra credit
--------------
+===============
 - antialiasing
 - save/load
+- control point toggle

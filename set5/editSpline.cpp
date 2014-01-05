@@ -13,6 +13,23 @@ static Spline *s;
 // The current window size.
 int windowWidth = 800, windowHeight = 600;
 
+/** Utility functions **/
+
+/**
+ * Set up OpenGL state.  This does everything so when we draw we only need to
+ * actually draw the sphere, and OpenGL remembers all of our other settings.
+ */
+void initGL()
+{
+  // enable anti-aliasing
+  glEnable(GL_POINT_SMOOTH);
+  glEnable(GL_LINE_SMOOTH);
+  glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
+
 /** GLUT callback functions **/
 
 /**
@@ -36,48 +53,6 @@ void resize(GLint w, GLint h)
   glutPostRedisplay();
 }
 
-
-/*
- * GLUT calls this function when any key is pressed while our window has
- * focus.  Here, we just quit if any appropriate key is pressed.  You can
- * do a lot more cool stuff with this here.
- */
-void keyfunc(GLubyte key, GLint x, GLint y)
-{
-  switch (key) {
-  // escape or q or Q
-  case 27:
-  case 'q':
-  case 'Q':
-    delete s;  // not sure where else to delete...
-    exit(0);
-    break;
-  }
-   
-}
-
-/** Utility functions **/
-
-/**
- * Sets up an OpenGL light.  This only needs to be called once
- * and the light will be used during all renders.
- */
-
-/**
- * Set up OpenGL state.  This does everything so when we draw we only need to
- * actually draw the sphere, and OpenGL remembers all of our other settings.
- */
-void initGL()
-{
-  // enable anti-aliasing
-  glEnable(GL_POINT_SMOOTH);
-  glEnable(GL_LINE_SMOOTH);
-  glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-}
-
-
 //--------------------------------------------------------------------------
 // Handles motion of the mouse when a button is being held
 //--------------------------------------------------------------------------
@@ -95,6 +70,16 @@ void mouse(const int button, const int state, const int x, const int y)
   // Just pass it on to the ui controller.
   ui->mouseFunction(button, state, x, y);
 }
+
+//--------------------------------------------------------------------------
+// Handles keybaord input
+//--------------------------------------------------------------------------
+void keyboard(GLubyte key, GLint x, GLint y)
+{
+  // Just pass it on to the ui controller.
+  ui->keyFunction(key,x,y);
+}
+
 
 void display() {
   glEnable(GL_LINE_SMOOTH);
@@ -115,13 +100,15 @@ void display() {
   glLineWidth(1.0);
 
   // draw control point connections
-  glLineStipple(3,0xAAAA);
-  glEnable(GL_LINE_STIPPLE); 
-  glBegin(GL_LINE_STRIP);
-  for (auto& pt : s->p)
-    glVertex2f(pt[0], pt[1]);
-  glEnd();
-  glDisable(GL_LINE_STIPPLE);
+  if (s->show_pts) {
+    glLineStipple(3,0xAAAA);
+    glEnable(GL_LINE_STIPPLE); 
+    glBegin(GL_LINE_STRIP);
+    for (auto& pt : s->p)
+      glVertex2f(pt[0], pt[1]);
+    glEnd();
+    glDisable(GL_LINE_STIPPLE);
+  }
 
   glColor3ub( 255, 255, 255 );
   glLineWidth(3.0);
@@ -133,13 +120,15 @@ void display() {
   glEnd();
 
 
-  glColor3ub( 127, 127, 127 );
-  // draw control points
-  glPointSize(10.0);
-  glBegin(GL_POINTS);
-  for (auto& p : s->p)
-    glVertex2f(p[0], p[1]);
-  glEnd();
+  if (s->show_pts) {
+    glColor3ub( 127, 127, 127 );
+    // draw control points
+    glPointSize(10.0);
+    glBegin(GL_POINTS);
+    for (auto& p : s->p)
+      glVertex2f(p[0], p[1]);
+    glEnd();
+  }
 
   glutSwapBuffers();
 }
@@ -173,7 +162,7 @@ int main(int argc, char* argv[])
   glutDisplayFunc(display);
   glutMouseFunc(mouse);
   glutMotionFunc(motion);
-  glutKeyboardFunc(keyfunc);
+  glutKeyboardFunc(keyboard);
   glutMainLoop();
 
   return 1;

@@ -162,7 +162,9 @@ void Spline::set_ctrl_pt(int index, float x, float y) {
   p[index] = makeVector3<float>(x,y,p[index][2]); // does weight even matter?
 }
 
-
+void Spline::toggle_ctrl_pts() {
+  show_pts = !show_pts;
+}
 
 /*********************/
 /* Display functions *

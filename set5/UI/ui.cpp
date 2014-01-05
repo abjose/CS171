@@ -11,6 +11,9 @@ void UI::motionFunction(const int x, const int y) {
 }
 
 void UI::mouseFunction(int button, int state, int x, int y) {
+  // disable interface if not showing points
+  if(!s->show_pts) return;
+
   switch(button) {
   case GLUT_LEFT_BUTTON:
     if(state == GLUT_DOWN) {
@@ -52,14 +55,19 @@ float UI::getWorldY(int y) {
 
 void UI::keyFunction(GLubyte key, GLint x, GLint y) {
   switch (key) {
+  case 't':
+    s->toggle_ctrl_pts();
+    break;
   case 27:
   case 'q':
   case 'Q':
     // escape or q or Q
+    delete s;  // not sure where else to delete...
     exit(0);
     break;
   default:
     break;
   }
-   
+
+  glutPostRedisplay();
 }

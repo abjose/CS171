@@ -49,10 +49,13 @@ public:
   std::vector<Matrix<float,2,1> > spline;
   // control point vector
   std::vector<CtrlPt> p;
+  // should show pts or not?
+  bool show_pts;
 
   Spline(int degree, int resolution) {
     k   = degree+1;
     res = resolution;
+    show_pts = true;
     if (degree == 3) {
       // if degree == 3, assume should populate for demo
       // populate control point vector with initial values
@@ -79,6 +82,7 @@ public:
   // control point manipulation
   int get_ctrl_pt(float x, float y);
   void set_ctrl_pt(int index, float x, float y);
+  void toggle_ctrl_pts();
 
   // spline-generation
   void make_spline();
