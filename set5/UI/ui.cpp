@@ -32,7 +32,10 @@ void UI::mouseFunction(int button, int state, int x, int y) {
   case GLUT_RIGHT_BUTTON:
     if(state == GLUT_DOWN) {
       //rclick = true;
-      s->insert_knot(getWorldX(x), -getWorldY(y));
+      if(glutGetModifiers() == GLUT_ACTIVE_SHIFT)
+	s->remove_ctrl_pt(getWorldX(x), -getWorldY(y));
+      else
+	s->insert_knot(getWorldX(x), -getWorldY(y));
     }
     else if(state == GLUT_UP) {
       //rclick = false;

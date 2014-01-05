@@ -11,7 +11,7 @@ static UI *ui;
 static Spline *s;
 
 // The current window size.
-int windowWidth = 800, windowHeight = 600;
+int windowWidth = 600, windowHeight = 600;
 
 /** Utility functions **/
 
@@ -34,10 +34,7 @@ void initGL()
 
 /**
  * GLUT calls this function when the window is resized.
- * All we do here is change the OpenGL viewport so it will always draw in the
- * largest square that can fit in our window..
  */
-
 void resize(GLint w, GLint h)
 {
   if (h == 0) h = 1;
@@ -96,11 +93,11 @@ void display() {
   glMatrixMode( GL_MODELVIEW );
   glLoadIdentity();
 
-  glColor3ub( 127, 127, 127 );
-  glLineWidth(1.0);
-
   // draw control point connections
   if (s->show_pts) {
+    glColor3ub( 127, 127, 127 );
+    glLineWidth(1.0);
+
     glLineStipple(3,0xAAAA);
     glEnable(GL_LINE_STIPPLE); 
     glBegin(GL_LINE_STRIP);
@@ -133,8 +130,6 @@ void display() {
   glutSwapBuffers();
 }
 
-
-
 /**
  * Main entrance point.
  * Sets up some stuff then passes control to glutMainLoop() which never
@@ -145,7 +140,6 @@ int main(int argc, char* argv[])
   s = new Spline(3, 1000);
   ui = new UI(-2,2, -2,2, 600,600, s); // make sure to change args...
 
-  
   if (argc == 2) {
     s->set_filename(argv[1]);
   }

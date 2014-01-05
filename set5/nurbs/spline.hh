@@ -38,6 +38,7 @@ private:
   // knot manipulation
   void  insert_knot(float t_new);
   float get_knot_from_pt(float x, float y);
+  int get_knot_index_from_pt(float x, float y);
   int   find_knot_index(float u);
 
   // saving
@@ -83,6 +84,7 @@ public:
   int get_ctrl_pt(float x, float y);
   void set_ctrl_pt(int index, float x, float y);
   void toggle_ctrl_pts();
+  void remove_ctrl_pt(float x, float y);
 
   // spline-generation
   void make_spline();

@@ -15,11 +15,15 @@ like ctrl-c.
 
 INTERFACE
 ==========
+left click + drag to move control points around
+right click to insert new control points
+shit + right click to delete the nearest control point (won't delete all)
 't' to toggle control points/lines
 'q', 'Q', or esc to (optionally save and) quit
 
 Extra credit
 ===============
 - antialiasing
-- save/load
+- load/save
 - control point toggle
+- control point deletion

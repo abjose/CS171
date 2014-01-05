@@ -117,6 +117,10 @@ float Spline::get_knot_from_pt(float x, float y) {
   return (float) best_i / spline.size();
 }
 
+int Spline::get_knot_index_from_pt(float x, float y) {
+  return find_knot_index(get_knot_from_pt(x,y));
+}
+
 void Spline::insert_knot(float x, float y) {
   insert_knot(get_knot_from_pt(x,y));
 }
@@ -164,6 +168,14 @@ void Spline::set_ctrl_pt(int index, float x, float y) {
 
 void Spline::toggle_ctrl_pts() {
   show_pts = !show_pts;
+}
+
+void Spline::remove_ctrl_pt(float x, float y) {
+  if (p.size() > 2) {
+    p.erase(p.begin()+get_ctrl_pt(x,y));
+    t.erase(t.begin()+get_knot_index_from_pt(x,y));
+  } else 
+    std::cout << "Slow down there, tex. Can't delete too many points...\n";
 }
 
 /*********************/
