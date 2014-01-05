@@ -7,9 +7,13 @@ To run:
 type './editSpline [spline-file]' in the terminal
 
 The optional spline-file parameter can be used to specify a file to read and/or
-save spline data to. If the file does not exist, it will be made.
-
+save spline data to. If the file does not exist, it will be made. 
+IMPORTANT NOTE: data will only be saved properly if you use the keyboard to quit
+(i.e. escape, 'q', or 'Q') rather than stopping the program some other way
+like ctrl-c.
 
 
 Extra credit
 -------------
+- antialiasing
+- save/load

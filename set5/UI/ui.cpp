@@ -11,9 +11,6 @@ void UI::motionFunction(const int x, const int y) {
 }
 
 void UI::mouseFunction(int button, int state, int x, int y) {
-  //mx = x;
-  //my = y;
-
   switch(button) {
   case GLUT_LEFT_BUTTON:
     if(state == GLUT_DOWN) {

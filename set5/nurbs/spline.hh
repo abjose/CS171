@@ -3,6 +3,9 @@
 
 #include <vector>
 #include <unordered_map>
+#include <iostream>
+#include <fstream>
+#include <string>
 
 #include "../matrix/matrix.hh"
 #include "../matrix/transform.hh"
@@ -11,12 +14,17 @@ class Spline {
 private:
   // control point - stores x,y,w
   typedef Matrix<float,3,1> CtrlPt;
+  // knot vector - should be nondecreasing, size n+k+1 where n = |p|
+  std::vector<float> t;
   // order
   int k;
   // number of segments in the spline vector
   int res;
-  // knot vector - should be nondecreasing, size n+k+1 where n = |p|
-  std::vector<float> t;
+  // bool specifying whether we should write/read from file
+  bool should_save;
+  // filename if specified
+  std::string filename;
+
   
   // N_t --- unordered map for doing dynamic programming later
 
@@ -32,6 +40,10 @@ private:
   float get_knot_from_pt(float x, float y);
   int   find_knot_index(float u);
 
+  // saving
+  void save();
+  void load();
+
 public:
   // vector for holding points to draw
   std::vector<Matrix<float,2,1> > spline;
@@ -45,17 +57,25 @@ public:
       // if degree == 3, assume should populate for demo
       // populate control point vector with initial values
       float w = 1;
-      p.push_back(makeVector3<float>(-1, 1,w));
-      p.push_back(makeVector3<float>(-1,-1,w));
-      p.push_back(makeVector3<float>( 1,-1,w));
-      p.push_back(makeVector3<float>( 1, 1,w));
+      p.push_back(makeVector3<float>(-1, 1,1));
+      p.push_back(makeVector3<float>(-1,-1,1));
+      p.push_back(makeVector3<float>( 1,-1,1));
+      p.push_back(makeVector3<float>( 1, 1,1));
       // populate knot vector
       t = std::vector<float> {0,0,0,0,1,1,1,1};
       // make initial spline
       make_spline();
     }
+
+    //set_filename("test");
+    //load();
+
   }
-  ~Spline() {}
+
+  ~Spline() {
+    // save file if want to
+    if (should_save) save();
+  }
 
   // public knot manipulation
   void insert_knot(float x, float y);
@@ -71,6 +91,9 @@ public:
   void display_knots();
   void display_pts();
   void display();
+
+  // saving
+  void set_filename(std::string fn);
 };
 
 

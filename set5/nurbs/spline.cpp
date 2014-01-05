@@ -122,17 +122,15 @@ void Spline::insert_knot(float x, float y) {
 }
 
 // populate spline vector with points according to resolution
-// TODO: NEED TO SCALE FINAL POINTS!!!! Lols, no you don't!
 void Spline::make_spline() {
-  float du = 1. / res;
+  float du = 1. / (res+1e-6); // a tiny bit more so will get last segment
   Spline::CtrlPt pt;
   spline.clear();
   for (float u=0; u<=1.0; u+=du) {
     pt = Q(u).homogenize(); // necessary to homogenize?
+    //std::cout << pt << std::endl;
     spline.push_back(makeVector2<float>(pt[0], pt[1]));
   }
-  pt = Q(.99999).homogenize(); // necessary to homogenize?
-  spline.push_back(makeVector2<float>(pt[0], pt[1]));
 }
 
 /*******************************/
@@ -143,36 +141,31 @@ int Spline::get_ctrl_pt(float x, float y) {
   // see if a control pt was clicked, return its index if so
   // TODO: definitely make this faster
   // TODO: this is pretty much the same code as get_knot_from_pt...
-  // TODO: MAGNITUDE NOT WORKING?!?!?!?
   std::cout << "Clicked: " << x << ", " << y << std::endl;
   auto click = makeVector2<float>(x,y);
   float best_d = 999999999.;
   float best_i = -1;
   float d;
   for (int i=0; i<p.size(); i++) {
-    //d = sqrt(pow(p[i][0]-x,2) + pow(p[i][1]-y,2));
     d = (click-makeVector2<float>(p[i][0],p[i][1])).magnitude();
-    //std::cout << "Pt: " << p[i][0] << ", " << p[i][1];
-    //std::cout << " -- d: " << d << std::endl;
     if (d < best_d) {
       best_d = d;
       best_i = i;
     }
   }
   // TODO: return failure if too far away (also take 'distance' as an arg)
-  //std::cout << "Closest: " << p[best_i][0] << ", " << p[best_i][1] << std::endl;
   return best_i;
 }
 
 void Spline::set_ctrl_pt(int index, float x, float y) {
   // update the ctrl pt at index to pt x,y
-  p[index] = makeVector3<float>(x,y,1); // does weight even matter?
+  p[index] = makeVector3<float>(x,y,p[index][2]); // does weight even matter?
 }
 
 
 
 /*********************/
-/* Display functions */
+/* Display functions *
 /*********************/
 
 // have some output functions...
@@ -194,4 +187,57 @@ void Spline::display_pts() {
 void Spline::display() {
   display_knots();
   display_pts();
+}
+
+
+/******************/
+/* Saving/Loading *
+/******************/
+
+void Spline::set_filename(std::string fn) {
+  should_save = true;
+  filename = fn;
+  
+  // only load if exists
+  std::ifstream ifile(filename);
+  if(ifile) load();
+}
+
+void Spline::save() {
+  std::cout << "Saving...\n";
+  std::ofstream f(filename);
+  if (f.is_open()) {
+    for (auto& knot : t)
+      f << "knot\n" << knot << std::endl;
+    for (auto& pt : p)
+      f << "point\n" << pt[0] << "\n" << pt[1] << "\n" << pt[2] << "\n"; 
+    f.close();
+  }
+  else std::cout << "Unable to open file";
+}
+
+void Spline::load() {
+  std::string line;
+  std::ifstream f(filename);
+  float f1, f2, f3;
+  if (f.is_open()) {
+    t.clear();
+    p.clear();
+    while (std::getline(f, line)) {
+      if (line == "knot") {
+	std::getline(f, line);
+	t.push_back(std::stof(line));
+      } else if (line == "point") {
+	std::getline(f, line);
+	f1 = std::stof(line);
+	std::getline(f, line);
+	f2 = std::stof(line);
+	std::getline(f, line);
+	f3 = std::stof(line);
+	p.push_back(makeVector3(f1,f2,f3));
+      }
+    }
+    f.close();
+  }
+  else std::cout << "Unable to open file"; 
 }
