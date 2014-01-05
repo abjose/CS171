@@ -68,52 +68,12 @@ void keyfunc(GLubyte key, GLint x, GLint y)
  */
 void initGL()
 {
-  glShadeModel(GL_SMOOTH); // gouraud
-  //glShadeModel(GL_FLAT);   // flat
-  //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE ); // wireframe
-  // TODO: SHOULD TURN OFF LIGHTING AND STUFF FOR THIS ONE!!
-  
-    
-  // Enable back-face culling:
-  glEnable(GL_CULL_FACE);
-  glCullFace(GL_BACK);
-
+  // enable anti-aliasing
+  glEnable(GL_POINT_SMOOTH);
   glEnable(GL_LINE_SMOOTH);
-
-  // Enable depth-buffer test.
-  glEnable(GL_DEPTH_TEST);
-    
-  // Set up projection and modelview matrices ("camera" settings) 
-  // Look up these functions to see what they're doing.
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  // glFrustum(scene->camera->left,
-  // 	    scene->camera->right,
-  // 	    scene->camera->bottom,
-  // 	    scene->camera->top,
-  // 	    scene->camera->near,
-  // 	    scene->camera->far);
-
-  // NOTE: THE REST OF EVERYTHING WILL BE IN MODELVIEW
-  glMatrixMode(GL_MODELVIEW);
-
-  glLoadIdentity();
-
-  // camera rotate -theta
-  // glRotatef(-1*scene->camera->rotation[3],
-  // 	    scene->camera->rotation[0],
-  // 	    scene->camera->rotation[1],
-  // 	    scene->camera->rotation[2]);
-  // camera -translate
-  // glTranslatef(-1*scene->camera->position[0], 
-  // 	         -1*scene->camera->position[1], 
-  // 	         -1*scene->camera->position[2]);
-
-  // set light parameters
-  //initLights();
-
-  // set material parameters
-  //initMaterial();
+  glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 
@@ -135,8 +95,9 @@ void mouse(const int button, const int state, const int x, const int y)
   ui->mouseFunction(button, state, x, y);
 }
 
-void display()
-{
+void display() {
+  glEnable(GL_LINE_SMOOTH);
+
   // recalc stuff
   s->make_spline();
 
@@ -148,9 +109,6 @@ void display()
 
   glMatrixMode( GL_MODELVIEW );
   glLoadIdentity();
-
-  glEnable(GL_POINT_SMOOTH);
-  //glEnable(GL_BLEND);
 
   glColor3ub( 127, 127, 127 );
   glLineWidth(1.0);
@@ -164,13 +122,6 @@ void display()
   glEnd();
   glDisable(GL_LINE_STIPPLE);
 
-  // draw control points
-  glPointSize(10.0);
-  glBegin(GL_POINTS);
-  for (auto& p : s->p)
-    glVertex2f(p[0], p[1]);
-  glEnd();
-
   glColor3ub( 255, 255, 255 );
   glLineWidth(3.0);
 
@@ -178,6 +129,15 @@ void display()
    glBegin(GL_LINE_STRIP);
   for (auto& pt : s->spline)
     glVertex2f(pt[0], pt[1]);
+  glEnd();
+
+
+  glColor3ub( 127, 127, 127 );
+  // draw control points
+  glPointSize(10.0);
+  glBegin(GL_POINTS);
+  for (auto& p : s->p)
+    glVertex2f(p[0], p[1]);
   glEnd();
 
   glutSwapBuffers();
@@ -192,13 +152,6 @@ void display()
  */
 int main(int argc, char* argv[])
 {
-  /*
-  glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
-   
-  initGL();
-  */
-
-
   // just test out spline stuff for now
   s = new Spline(3, 1000);
   ui = new UI(-2,2, -2,2, 600,600, s); // make sure to change args...
@@ -223,6 +176,9 @@ int main(int argc, char* argv[])
   glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE );
   glutInitWindowSize( 600, 600 );
   glutCreateWindow("CS171 HW4");
+
+  initGL();
+
   glutDisplayFunc( display );
   glutMouseFunc(mouse);
   glutMotionFunc(motion);
