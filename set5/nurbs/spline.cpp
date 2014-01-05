@@ -126,20 +126,54 @@ void Spline::insert_knot(float x, float y) {
 }
 
 // populate spline vector with points according to resolution
+// use 'adaptive dt parameterization' to adjust resolution of line
 void Spline::make_spline() {
-  float du = 1. / (res+1e-6); // a tiny bit more so will get last segment
-  Spline::CtrlPt pt;
+  // clear out the spline for repopulating
   spline.clear();
-  for (float u=0; u<=1.0; u+=du) {
-    pt = Q(u).homogenize(); // necessary to homogenize?
-    //std::cout << pt << std::endl;
+
+  // initialize some things
+  Spline::CtrlPt pt, prev;
+  Matrix<float,2,1> pt_d, prev_d;
+  float length = 0, pix_max = 10; // max OK pixel length
+  float dt_temp, dt_init = 0.005;
+  float u = 0;
+  prev = Q(0.).homogenize();
+  prev_d = makeVector2<float>(getPixX(prev[0]), getPixY(prev[1]));
+  // while not done with curve
+  while(u <= 1.0) {
+    dt_temp = dt_init;
+    do {
+      // see if current step is small enough
+      pt = Q(u+dt_temp).homogenize();
+      pt_d = makeVector2<float>(getPixX(pt[0]), getPixY(pt[1]));
+      length = (pt_d-prev_d).magnitude();
+      dt_temp /= 2.;
+      // if not, reduce step size and try again
+      } while (length > pix_max);
+    // if so, add the new point and continue
     spline.push_back(makeVector2<float>(pt[0], pt[1]));
+    u += dt_temp;
+    prev_d = pt_d;
   }
 }
 
 /*******************************/
 /* Helper functions for the UI */
 /*******************************/
+
+float Spline::getPixX(float x) {
+  // TODO: pass dimension to these! assuming 600 for now
+  float xmin = -1;
+  float xmax = 1;
+  float xdim = 600;
+  return ((x-xmin)/(xmax-xmin)) * xdim;
+}
+float Spline::getPixY(float y) {
+  float ymin = -1;
+  float ymax = 1;
+  float ydim = 600;
+  return ((y-ymin)/(ymax-ymin)) * ydim;
+}
 
 int Spline::get_ctrl_pt(float x, float y) {
   // see if a control pt was clicked, return its index if so

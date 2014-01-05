@@ -30,6 +30,8 @@ Notes
   best. It seems to work alright, hopefully this is o.k
 - Honestly not sure if changing the W value is having the intended effect. Seems
   sorta weird, particularly for negative values.
+- For adaptive dt, didn't use length as recommend in set - sort of slow for
+  longer lines. So I just set a fixed pixel threshold.
 
 Extra credit
 ===============
@@ -38,3 +40,4 @@ Extra credit
 - control point toggle
 - control point deletion
 - W values / NURBS (maybe)
+- adaptive delta-t values

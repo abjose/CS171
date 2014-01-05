@@ -137,7 +137,7 @@ void display() {
  */
 int main(int argc, char* argv[])
 {
-  s = new Spline(3, 1000);
+  s = new Spline(3);
   ui = new UI(-2,2, -2,2, 600,600, s); // make sure to change args...
 
   if (argc == 2) {
@@ -145,6 +145,7 @@ int main(int argc, char* argv[])
   }
 
   // TODO: ui doesn't work if resize screen - don't hard-pass dims!
+  // TODO: sometimes removing first and last points seems to break it
 
   glutInit(&argc, argv);
   glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE );

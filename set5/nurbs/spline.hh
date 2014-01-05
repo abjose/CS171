@@ -18,8 +18,6 @@ private:
   std::vector<float> t;
   // order
   int k;
-  // number of segments in the spline vector
-  int res;
   // bool specifying whether we should write/read from file
   bool should_save;
   // filename if specified
@@ -41,6 +39,10 @@ private:
   int get_knot_index_from_pt(float x, float y);
   int   find_knot_index(float u);
 
+  // for adaptive dt
+  float getPixX(float x);
+  float getPixY(float y);
+
   // saving
   void save();
   void load();
@@ -53,9 +55,8 @@ public:
   // should show pts or not?
   bool show_pts;
 
-  Spline(int degree, int resolution) {
+  Spline(int degree) {
     k   = degree+1;
-    res = resolution;
     show_pts = true;
     if (degree == 3) {
       // if degree == 3, assume should populate for demo
