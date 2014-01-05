@@ -67,6 +67,9 @@ float UI::getWorldY(int y) {
 
 void UI::keyFunction(GLubyte key, GLint x, GLint y) {
   switch (key) {
+  case 'd':
+    s->dot_mode = !s->dot_mode;
+    break;
   case 't':
     s->toggle_ctrl_pts();
     break;

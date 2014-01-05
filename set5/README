@@ -22,6 +22,7 @@ INTERFACE
 -middle click to increase the nearest point's weight
 -shift + middle click to decrease the nearest point's weight
 -'t' to toggle control points/lines
+-'d' to toggle 'dot mode'
 -'q', 'Q', or esc to (optionally save and) quit
 
 Notes
@@ -33,6 +34,8 @@ Notes
   sorta weird, particularly for negative values.
 - For adaptive dt, didn't use length as recommend in set - sort of slow for
   longer lines. So I just set a fixed pixel threshold.
+- 'Dot mode' just displays spline segments as dots rather than lines so that
+  you can see the adaptive dt more easily.
 
 Extra credit
 ===============
@@ -41,4 +44,4 @@ Extra credit
 - control point toggle
 - control point deletion
 - W values / NURBS (maybe)
-- adaptive delta-t values
+- adaptive delta-t values (w/ 'dot mode')

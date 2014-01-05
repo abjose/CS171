@@ -51,10 +51,13 @@ public:
   std::vector<CtrlPt> p;
   // should show pts or not?
   bool show_pts;
+  // should show line as dots or not?
+  bool dot_mode;
 
   Spline(int degree) {
     k   = degree+1;
     show_pts = true;
+    dot_mode = false;
     if (degree == 3) {
       // if degree == 3, assume should populate for demo
       // populate control point vector with initial values

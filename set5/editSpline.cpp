@@ -108,10 +108,16 @@ void display() {
   }
 
   glColor3ub( 255, 255, 255 );
-  glLineWidth(3.0);
 
   // draw spline
-   glBegin(GL_LINE_STRIP);
+  if (s->dot_mode) {
+    glPointSize(.5);
+    glBegin(GL_POINTS); // dot mode if desired
+  }
+  else {
+    glLineWidth(3.0);
+    glBegin(GL_LINE_STRIP);
+  }
   for (auto& pt : s->spline)
     glVertex2f(pt[0], pt[1]);
   glEnd();
@@ -146,6 +152,7 @@ int main(int argc, char* argv[])
 
   // TODO: ui doesn't work if resize screen - don't hard-pass dims!
   // TODO: sometimes removing first and last points seems to break it
+  // TODO: add 'dot mode' (use dots instead of lines) so can see adaptive dt
 
   glutInit(&argc, argv);
   glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE );
