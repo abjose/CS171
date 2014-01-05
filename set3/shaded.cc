@@ -12,9 +12,6 @@ int main(int argc, char *argv[]) {
   float xMin = -1; float yMin = -1;
   float xMax =  1; float yMax =  1;
   
-  // TODO: test all examples
-  // TODO: verify clipping works
-
   // call initDraw to initialize raster code for later
   initDraw(xMin, xMax, yMin, yMax, xres, yres);
 
