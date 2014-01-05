@@ -15,13 +15,7 @@ public:
 
   //public:
   // default constructor
-  TransformBlock() {
-    // init matrices to be identity in case they're never set
-    //transform.make_identity();
-    //rotation.make_identity();
-    //translation.make_identity();
-    //scale.make_identity();
-  }
+  TransformBlock() {}
 
   void set_rotation(float x, float y, float z, float theta) {
     // TODO: put PI somewhere else...
@@ -35,25 +29,6 @@ public:
   void set_scale(float a, float b, float c) {
     scale = makeVector3<float>(a,b,c);
   }
-  //Matrix<float,4,4> get_rotation() {
-  //  return rotation;
-  //}
-  //Matrix<float,4,4> get_scale() {
-  //  return scale;
-  //}
-
-  /*
-  void combine_transform(std::shared_ptr<TransformBlock> t2) {
-    transform = transform * t2->translation * t2->rotation * t2->scale;
-    //std::cout << "TESTTT:\n" <<  transform << std::endl;
-  }
-  void combine_transform_sans_trans(std::shared_ptr<TransformBlock> t2) {
-    transform = transform * t2->rotation * t2->scale;
-  }
-  Matrix<float,4,4> get_final_transform() {
-    return transform;
-  }
-  */
 
   void display() {
     std::cout << "ROTATION:\n";

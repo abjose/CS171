@@ -27,35 +27,26 @@ void redraw()
 
   glPushMatrix();
 
-  // apply camera transform?
-  //ui->ApplyViewingTransformation();
+  // APPLY UI TRANSFORMS
   ui->applyViewingTransformation();
   glTranslatef(ui->final_tx, -1*ui->final_ty, ui->final_tz);
-  //glRotatef(ui->final_rd, ui->final_rx, -1*ui->final_ry, ui->final_rz);
-  //glTranslatef(3,0,0);
   glRotatef(ui->final_rd, ui->final_rx,ui->final_ry,0);
-  //glTranslatef(-3,0,0);
 
-  //glLoadIdentity();  // might...not need?
-  //glPushMatrix();
-
-  // TODO: so...put this stuff here explicitly?
-  //GLfloat emit[], amb[], diff[], spec[], shiny;
+  // DO OBJECT STUFF
   for (auto& sep : scene->sep_list) {
     // INITIALIZE MATERIAL FOR THIS SEPARATOR
-    //sep->init_material();
     GLfloat emit[] = {0.0, 0.0, 0.0, 1.0}; // wat
     GLfloat amb[] = {sep->material->ambient[0],
-	     sep->material->ambient[1],
-	     sep->material->ambient[2]};
+		     sep->material->ambient[1],
+		     sep->material->ambient[2]};
     GLfloat diff[] = {sep->material->diffuse[0],
-	      sep->material->diffuse[1],
-	      sep->material->diffuse[2]};
+		      sep->material->diffuse[1],
+		      sep->material->diffuse[2]};
     GLfloat spec[] = {sep->material->specular[0],
-	      sep->material->specular[1],
-	      sep->material->specular[2]};
+		      sep->material->specular[1],
+		      sep->material->specular[2]};
     GLfloat shiny = sep->material->shininess;
-
+    
     glMaterialfv(GL_FRONT, GL_AMBIENT, amb);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, diff);
     glMaterialfv(GL_FRONT, GL_SPECULAR, spec);
@@ -66,11 +57,7 @@ void redraw()
     glPushMatrix();
     
     // TRANSFORM TO WORLD SPACE
-    //sep->object_to_world();
     for (auto& t : sep->transforms) {
-      // TODO: might be backwards! but is supposed to be a stack...
-      // also, will you have to push and pop each time? hmm..
-      // i.e. push isn't a "save state", you actually have to do it a lot
       glTranslatef(t->translation[0],
 		   t->translation[1],
 		   t->translation[2]);
@@ -82,7 +69,6 @@ void redraw()
 	       t->scale[1],
 	       t->scale[2]);
     }
-
 
     // RENDER
     sep->render();  // TODO: change name to populate_blah or something
@@ -99,30 +85,8 @@ void redraw()
     // POP TRANSFORMATIONS
     glPopMatrix();
   }
-
-  //scene->render();
-
-  // TODO: put object transformations in here???
-  // and just like...everything?!!!
-
-  /*
-  for each frame:
-    // NOTE!!: these out push/pops should be moved when incorporating 
-    //         user input!
-    push
-
-    // user mouse translate and rotation -- more details later
-    
-    for each object:
-      push
-      transform(s)
-      //draw the polygons
-      pop
-    pop
-  */
   
   glPopMatrix();
-
   glutSwapBuffers();
 }
 
@@ -148,35 +112,11 @@ void redraw_lines() {
   // TODO: so...put this stuff here explicitly?
   //GLfloat emit[], amb[], diff[], spec[], shiny;
   for (auto& sep : scene->sep_list) {
-    // INITIALIZE MATERIAL FOR THIS SEPARATOR
-    //sep->init_material();
-    // GLfloat emit[] = {0.0, 0.0, 0.0, 1.0}; // wat
-    // GLfloat amb[] = {sep->material->ambient[0],
-    // 	     sep->material->ambient[1],
-    // 	     sep->material->ambient[2]};
-    // GLfloat diff[] = {sep->material->diffuse[0],
-    // 	      sep->material->diffuse[1],
-    // 	      sep->material->diffuse[2]};
-    // GLfloat spec[] = {sep->material->specular[0],
-    // 	      sep->material->specular[1],
-    // 	      sep->material->specular[2]};
-    // GLfloat shiny = sep->material->shininess;
-
-    // glMaterialfv(GL_FRONT, GL_AMBIENT, amb);
-    // glMaterialfv(GL_FRONT, GL_DIFFUSE, diff);
-    // glMaterialfv(GL_FRONT, GL_SPECULAR, spec);
-    // glMaterialfv(GL_FRONT, GL_EMISSION, emit);
-    // glMaterialfv(GL_FRONT, GL_SHININESS, &shiny);
-
     // PUSH TRANSFORMATIONS
     glPushMatrix();
     
     // TRANSFORM TO WORLD SPACE
-    //sep->object_to_world();
     for (auto& t : sep->transforms) {
-      // TODO: might be backwards! but is supposed to be a stack...
-      // also, will you have to push and pop each time? hmm..
-      // i.e. push isn't a "save state", you actually have to do it a lot
       glTranslatef(t->translation[0],
 		   t->translation[1],
 		   t->translation[2]);
@@ -189,58 +129,20 @@ void redraw_lines() {
 	       t->scale[2]);
     }
 
-
-    // RENDER   CHANGE THIS
+    // RENDER 
     glColor3ub( 255,255,255 );
     glLineWidth(1.0);
-    std::cout << "Got here!\n";
     
-    // draw control point connections
     glBegin(GL_LINE_STRIP);
     for (auto& pt : sep->vertex_list)
       glVertex3f(pt[0], pt[1], pt[2]);
     glEnd();
     
-
-
-    // sep->render();  // TODO: change name to populate_blah or something
-    // glEnableClientState(GL_VERTEX_ARRAY);
-    // glEnableClientState(GL_NORMAL_ARRAY);
-    // glVertexPointer(3, GL_FLOAT, 0, sep->vertices);
-    // glNormalPointer(GL_FLOAT, 0, sep->normals);
-    // glDrawArrays(GL_TRIANGLES, 0, sep->n_verts);
-    // // deactivate vertex arrays after drawing
-    // glDisableClientState(GL_VERTEX_ARRAY);
-    // glDisableClientState(GL_NORMAL_ARRAY);
-    
-
     // POP TRANSFORMATIONS
     glPopMatrix();
   }
-
-  //scene->render();
-
-  // TODO: put object transformations in here???
-  // and just like...everything?!!!
-
-  /*
-  for each frame:
-    // NOTE!!: these out push/pops should be moved when incorporating 
-    //         user input!
-    push
-
-    // user mouse translate and rotation -- more details later
-    
-    for each object:
-      push
-      transform(s)
-      //draw the polygons
-      pop
-    pop
-  */
   
   glPopMatrix();
-
   glutSwapBuffers();
 }
 
@@ -271,8 +173,6 @@ void keyfunc(GLubyte key, GLint x, GLint y)
  * and the light will be used during all renders.
  */
 void initLights() {
-  // TODO: Ask connor if these are right? especially spec vs. diff and shiny
-
   // pretty sure can just add to GL_LIGHT0, but probably shouldn't depend on...
   int light_consts[] = {GL_LIGHT0, GL_LIGHT1, GL_LIGHT2, GL_LIGHT3, GL_LIGHT4,
 			GL_LIGHT5, GL_LIGHT6, GL_LIGHT7};
@@ -283,17 +183,14 @@ void initLights() {
 
     GLfloat amb[] = { 0.0, 0.0, 0.0, 1.0 };
     GLfloat spec[] = {l->color[0], l->color[1], l->color[2], 1.0f};
-    //GLfloat diff[] = {l->color[0], l->color[1], l->color[2], 1.0f};
-    GLfloat diff[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    GLfloat diff[] = {l->color[0], l->color[1], l->color[2], 1.0f};
     GLfloat lightpos[] = { l->location[0],l->location[1],l->location[2], 1.0f };
-    //GLfloat shiny = 4.0f; 
 
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, amb);
     glLightfv(l_c, GL_AMBIENT, amb);
     glLightfv(l_c, GL_DIFFUSE, diff);
     glLightfv(l_c, GL_SPECULAR, spec);
     glLightfv(l_c, GL_POSITION, lightpos);
-    //glLightf(l_c, GL_SHININESS, shiny);
     glEnable(l_c);
   }
 
@@ -414,24 +311,13 @@ void initUI()
  */
 int main(int argc, char* argv[])
 {
-
   // read cmd line args
   int mode;
   mode = std::stoi(argv[1]);
   windowWidth = std::stoi(argv[2]); windowHeight = std::stoi(argv[3]);
 
-  /*
-    TODO
-    - run all tests!
-    - move all transformation/rendering stuff to redraw func!
-    - Looks like normals are wrong for sphere!!! or something...
-    - also lion2 looks kinda fucked up
-    - when trying to translate lion, gets translated in wrong direction!
-   */
-
   // From old code
   scene = parse(std::cin);
-  std::cout << "Lines?: " << scene->is_lines << std::endl;
   
   // OpenGL will take out any arguments intended for its use here.
   // Useful ones are -display and -gldebug.
@@ -452,6 +338,7 @@ int main(int argc, char* argv[])
 
   // set up GLUT callbacks.
   if (scene->is_lines)
+    // A bit limiting - modes mutually exclusive. But OK for now, hopefully.
     glutDisplayFunc(redraw_lines);
   else
     glutDisplayFunc(redraw);

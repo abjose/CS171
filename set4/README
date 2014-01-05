@@ -18,6 +18,14 @@ Actual example, for future reference:
 ./oglRenderer 0 800 800 < data/sphere.iv
 
 
+NOTES
+======
+- Currently some weird stuff going on with flat lighting - doesn't seem to
+  be working very well at all. Which is strange because smooth lighting
+  looks alright, and there aren't any differences (aside from the call to
+  gl_enable.
+
+
 INTERFACE
 ===========
 left click + drag to rotate

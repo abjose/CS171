@@ -35,17 +35,6 @@ public:
   void add_separator(std::shared_ptr<SeparatorBlock> s) {
     sep_list.push_back(s);
   }
-
-  // void render() {    
-  //   for(auto &sep: sep_list) {
-  //     sep->init_material();
-
-  //     glPushMatrix();
-  //     sep->object_to_world();
-  //     sep->render();
-  //     glPopMatrix();
-  //   }
-  // }
   
   void display() {
     std::cout << "DISPLAYING SCENE'S CAMERA: \n";

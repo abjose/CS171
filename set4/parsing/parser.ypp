@@ -185,7 +185,7 @@ shininess: SHININESS single {
 }
 
 linesetline: LINESET LBRACE NUMVERTS single RBRACE {
-  std::cout << "GOT LINES!\n" << in[0] << std::endl;
+  std::cout << "Setting to line mode.\n";
   scene->is_lines = true;
   // could also set something in scene if have this
   // so don't have to do anything too weird

@@ -18,7 +18,6 @@ class SeparatorBlock {
 public:
   //private:
   std::vector<std::shared_ptr<TransformBlock> > transforms;
-  //std::shared_ptr<TransformBlock> transform_sans_trans;
   std::shared_ptr<MaterialBlock> material;
   std::vector<Matrix<float,3,1> > vertex_list; 
   std::vector<Matrix<float,3,1> > normal_list; 
@@ -34,15 +33,10 @@ public:
 
 public:
   // default constructor
-  SeparatorBlock() {
-    //transform = std::shared_ptr<TransformBlock>(new TransformBlock);
-    //transform_sans_trans = std::shared_ptr<TransformBlock>(new TransformBlock);
-  }
+  SeparatorBlock() {}
 
   void add_transform(std::shared_ptr<TransformBlock> t) {
     transforms.push_back(t);
-    //transform->combine_transform(t);
-    //transform_sans_trans->combine_transform_sans_trans(t);
   }
   void set_material(std::shared_ptr<MaterialBlock> m) {
     material = m;
@@ -98,25 +92,6 @@ public:
     }
   }
 
-  // void object_to_world() {
-  //   // should have already pushed
-  //   for (auto& t : transforms) {
-  //     // TODO: might be backwards! but is supposed to be a stack...
-  //     // also, will you have to push and pop each time? hmm..
-  //     // i.e. push isn't a "save state", you actually have to do it a lot
-  //     glTranslatef(t->translation[0],
-  // 		   t->translation[1],
-  // 		   t->translation[2]);
-  //     glRotatef(t->rotation[3],
-  // 		t->rotation[0],
-  // 		t->rotation[1],
-  // 		t->rotation[2]);
-  //     glScalef(t->scale[0],
-  // 	       t->scale[1],
-  // 	       t->scale[2]);
-  //   }
-  // }
-
   void init_material() {
     GLfloat emit[] = {0.0, 0.0, 0.0, 1.0}; // wat
     GLfloat  amb[] = {material->ambient[0],
@@ -138,26 +113,14 @@ public:
   }
 
   void render() {
-    // TODO: not all faces are being rendered...the problem might be here?
-    // could just try switching to the indexed version...
-    // TODO: implement user input and then maybe can tell what's going on 
-
     assert(poly_list.size() == poly_normal_list.size());
 
     // init vertex/normal arrays
-    //int n_verts = 3*poly_list.size();  // 3 vertices per face
     n_verts = 3*poly_list.size();  // 3 vertices per face
     int n_floats = 3*n_verts;  // 3 floats per vertex
-    //GLfloat vertices[n_floats];
-    //GLfloat normals[n_floats];
-    //GLfloat TESTV[n_floats];
-    //GLfloat TESTN[n_floats];
 
-    vertices = new GLfloat[n_floats];//TESTV;
-    normals = new GLfloat[n_floats];//TESTN;
-
-    // TODO: WHY DOES CUBE2 SEEM TO BE RENDERING TWICE???? SIZE IS PRINTED TWICE
-    // maybe because being redrawn?
+    vertices = new GLfloat[n_floats];
+    normals = new GLfloat[n_floats];
 
     // TODO: considering these arrays are always the same, should just
     // calculate them once?
@@ -166,44 +129,20 @@ public:
       auto poly = poly_list[i];
       auto norm = poly_normal_list[i];
 
+      // insert vertices and normals into arrays for rendering
       for (int v=0; v<3; v++) {
-	for (int f=0; f<3; f++) {
-	  // TODO: get rid of magic numbers like 3
+	for (int f=0; f<3; f++) {       	  
 	  vertices[9*i+3*v+f] = vertex_list[poly[v]][f];
 	  normals[9*i+3*v+f]  = normal_list[norm[v]][f];
-	}
-	
-	// vertices[9*i+3*v+0] = vertex_list[poly[v]][0];
-	// vertices[9*i+3*v+1] = vertex_list[poly[v]][1];
-	// vertices[9*i+3*v+2] = vertex_list[poly[v]][2];
-	
-	// normals[9*i+3*v+0] = normal_list[norm[v]][0];
-	// normals[9*i+3*v+1] = normal_list[norm[v]][1];
-	// normals[9*i+3*v+2] = normal_list[norm[v]][2];
+	}	
       }
-    }
-    
-    
-    // // do you need to enable/disable every time?
-    // glEnableClientState(GL_VERTEX_ARRAY);
-    // glEnableClientState(GL_NORMAL_ARRAY);
-    // glVertexPointer(3, GL_FLOAT, 0, vertices);
-    // glNormalPointer(GL_FLOAT, 0, normals);
-    // glDrawArrays(GL_TRIANGLES, 0, n_verts);
-    // // deactivate vertex arrays after drawing
-    // glDisableClientState(GL_VERTEX_ARRAY);
-    // glDisableClientState(GL_NORMAL_ARRAY);
-    
+    }    
   }
 
   void display() {
     std::cout << "SHOWING SEPERATOR'S TRANSFORMS\n";
     for (auto& t : transforms)
       t->display();
-    //std::cout << "SHOWING SEPERATOR'S TRANSFORM\n";
-    //transform->display();
-    //std::cout << "SHOWING SEPERATOR'S TRANSFORM (no translations)\n";
-    //transform_sans_trans->display();
     std::cout << "SHOWING SEPERATOR'S MATERIAL\n";
     material->display();
     std::cout << "SHOWING SEPERATOR'S VERTICES\n";
