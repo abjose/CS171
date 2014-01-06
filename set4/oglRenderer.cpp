@@ -97,20 +97,11 @@ void redraw_lines() {
 
   glPushMatrix();
 
-  // apply camera transform?
-  //ui->ApplyViewingTransformation();
+  // apply UI transforms
   ui->applyViewingTransformation();
   glTranslatef(ui->final_tx, -1*ui->final_ty, ui->final_tz);
-  //glRotatef(ui->final_rd, ui->final_rx, -1*ui->final_ry, ui->final_rz);
-  //glTranslatef(3,0,0);
   glRotatef(ui->final_rd, ui->final_rx,ui->final_ry,0);
-  //glTranslatef(-3,0,0);
 
-  //glLoadIdentity();  // might...not need?
-  //glPushMatrix();
-
-  // TODO: so...put this stuff here explicitly?
-  //GLfloat emit[], amb[], diff[], spec[], shiny;
   for (auto& sep : scene->sep_list) {
     // PUSH TRANSFORMATIONS
     glPushMatrix();
@@ -145,8 +136,6 @@ void redraw_lines() {
   glPopMatrix();
   glutSwapBuffers();
 }
-
-
 
 /*
  * GLUT calls this function when any key is pressed while our window has
