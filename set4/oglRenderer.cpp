@@ -35,7 +35,7 @@ void redraw()
   // DO OBJECT STUFF
   for (auto& sep : scene->sep_list) {
     // INITIALIZE MATERIAL FOR THIS SEPARATOR
-    GLfloat emit[] = {0.0, 0.0, 0.0, 1.0}; // wat
+    GLfloat emit[] = {0.0, 0.0, 0.0, 0.0}; // wat
     GLfloat amb[] = {sep->material->ambient[0],
 		     sep->material->ambient[1],
 		     sep->material->ambient[2]};
