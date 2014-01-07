@@ -1,6 +1,6 @@
 
 #include <iostream>
-#include "oglRenderer.hh"
+#include "oglTexRenderer.hh"
 //#include "uistate.h"
 #include "UI/ui.hh"
 
