@@ -31,6 +31,7 @@ public:
   // openGL stuff
   GLfloat *vertices, *normals;
   int n_verts;
+  char* tex_filename;
 
 
 

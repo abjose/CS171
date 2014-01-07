@@ -139,9 +139,11 @@ texcoordline: TEXCOORD open POINT sqopen doubles sqclose close {
 
 teximgline: TEXTURE open FILENAME STRING close {
   // save texture image file name
-  std::cout << "Saving texture filename.\n";
-  std::cout << "String: " << $4 << std::endl;;
-  
+  if(debug) {
+    std::cout << "Saving texture filename.\n";
+    std::cout << "String: " << $4 << std::endl;
+  }
+  separator->tex_filename = $4;
  }
 
 transformline: TRANSFORM open translines close {
