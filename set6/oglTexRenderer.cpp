@@ -29,8 +29,6 @@ void redraw()
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  //glTranslatef(0.01,0,0);
-
   glPushMatrix();
 
   // APPLY UI TRANSFORMS
@@ -40,6 +38,8 @@ void redraw()
 
   // DO OBJECT STUFF
   for (auto& sep : scene->sep_list) {
+
+    /*
     // INITIALIZE MATERIAL FOR THIS SEPARATOR
     GLfloat emit[] = {0.0, 0.0, 0.0, 0.0}; // wat
     GLfloat amb[] = {sep->material->ambient[0],
@@ -58,6 +58,7 @@ void redraw()
     glMaterialfv(GL_FRONT, GL_SPECULAR, spec);
     glMaterialfv(GL_FRONT, GL_EMISSION, emit);
     glMaterialfv(GL_FRONT, GL_SHININESS, &shiny);
+    */
 
     // PUSH TRANSFORMATIONS
     glPushMatrix();
@@ -75,17 +76,24 @@ void redraw()
 	       t->scale[1],
 	       t->scale[2]);
     }
+
+    // load texture? should avoid doing every time...
+    int width, size;
+    //loadTexture(sep->tex_filename, width,size);
 
     // RENDER
     sep->render();  // TODO: change name to populate_blah or something
     glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_NORMAL_ARRAY);
+    //glEnableClientState(GL_NORMAL_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, sep->vertices);
-    glNormalPointer(GL_FLOAT, 0, sep->normals);
+    //glNormalPointer(GL_FLOAT, 0, sep->normals);
+    glTexCoordPointer(2, GL_FLOAT, 0, sep->texcoords);
     glDrawArrays(GL_TRIANGLES, 0, sep->n_verts);
     // deactivate vertex arrays after drawing
     glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableClientState(GL_NORMAL_ARRAY);
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    //glDisableClientState(GL_NORMAL_ARRAY);
     
 
     // POP TRANSFORMATIONS
@@ -96,52 +104,7 @@ void redraw()
   glutSwapBuffers();
 }
 
-void redraw_lines() {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  //glTranslatef(0.01,0,0);
-
-  glPushMatrix();
-
-  // apply UI transforms
-  ui->applyViewingTransformation();
-  glTranslatef(ui->final_tx, -1*ui->final_ty, ui->final_tz);
-  glRotatef(ui->final_rd, ui->final_rx,ui->final_ry,0);
-
-  for (auto& sep : scene->sep_list) {
-    // PUSH TRANSFORMATIONS
-    glPushMatrix();
-    
-    // TRANSFORM TO WORLD SPACE
-    for (auto& t : sep->transforms) {
-      glTranslatef(t->translation[0],
-		   t->translation[1],
-		   t->translation[2]);
-      glRotatef(t->rotation[3],
-		t->rotation[0],
-		t->rotation[1],
-		t->rotation[2]);
-      glScalef(t->scale[0],
-	       t->scale[1],
-	       t->scale[2]);
-    }
-
-    // RENDER 
-    glColor3ub( 255,255,255 );
-    glLineWidth(1.0);
-    
-    glBegin(GL_LINE_STRIP);
-    for (auto& pt : sep->vertex_list)
-      glVertex3f(pt[0], pt[1], pt[2]);
-    glEnd();
-    
-    // POP TRANSFORMATIONS
-    glPopMatrix();
-  }
-  
-  glPopMatrix();
-  glutSwapBuffers();
-}
+// removed redraw_lines
 
 /*
  * GLUT calls this function when any key is pressed while our window has
@@ -220,6 +183,13 @@ void initGL(int mode)
 
   // Enable depth-buffer test.
   glEnable(GL_DEPTH_TEST);
+
+  // The following two lines enable semi transparent
+  glEnable(GL_BLEND);
+  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  // enable textures
+  glEnable(GL_TEXTURE_2D);
     
   // Set up projection and modelview matrices ("camera" settings) 
   // Look up these functions to see what they're doing.
@@ -248,8 +218,8 @@ void initGL(int mode)
   	         -1*scene->camera->position[2]);
 
   // set light parameters if not doing wireframe
-  if (mode != 0 && !scene->is_lines)
-    initLights();
+  //if (mode != 0 && !scene->is_lines)
+  //  initLights();
 }
 
 //--------------------------------------------------------------------------
@@ -290,24 +260,19 @@ void mouse(const int button, const int state, const int x, const int y)
 }
 
 
-//COPIED
-void init(void) {
-  glClearColor(0.0, 0.0, 0.0, 0.0);
-  glEnable(GL_DEPTH_TEST);
-  // The following two lines enable semi transparent
-  glEnable(GL_BLEND);
-  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
- 
-  int width, height;
-  bool hasAlpha;
-  std::string filename("data/cubetex.png");
-  GLuint t = loadTexture(filename, width, height);
-  if (t == 0) std::cout << "UH OH SOMETHING SCREWED UP\n";
-  std::cout << "Image loaded: " << width << " " << height << std::endl;
-
-  glEnable(GL_TEXTURE_2D);
-  //glShadeModel(GL_FLAT);
-}
+// //COPIED
+// void init(void) {
+//   glClearColor(0.0, 0.0, 0.0, 0.0);
+//   glEnable(GL_DEPTH_TEST);
+  
+//   int width, height;
+//   std::string filename("data/cubetex.png");
+//   GLuint t = loadTexture(filename, width, height);
+//   if (t == 0) std::cout << "UH OH SOMETHING SCREWED UP\n";
+//   std::cout << "Image loaded: " << width << " " << height << std::endl;
+  
+//   //glShadeModel(GL_FLAT);
+// }
 
 //COPIED
 void display(void) {
@@ -375,13 +340,6 @@ void myReshape(int w, int h) {
  */
 int main(int argc, char* argv[])
 {
-
-  // From old code
-  scene = parse(std::cin);
-  scene->display();
-
-  /*
-
   // read cmd line args
   int mode;
   mode = std::stoi(argv[1]);
@@ -389,11 +347,12 @@ int main(int argc, char* argv[])
 
   // From old code
   scene = parse(std::cin);
+  //scene->display();
   
   // OpenGL will take out any arguments intended for its use here.
   // Useful ones are -display and -gldebug.
   glutInit(&argc, argv);
-  
+
   // Get a double-buffered, depth-buffer-enabled window, with an
   // alpha channel.
   // These options aren't really necessary but are here for examples.
@@ -402,17 +361,17 @@ int main(int argc, char* argv[])
   glutInitWindowSize(windowWidth, windowHeight);
   glutInitWindowPosition(300, 100);
 
-  glutCreateWindow("CS171 HW4");
+  glutCreateWindow("CS171 HW6");
     
   initGL(mode);
   initUI();
 
   // set up GLUT callbacks.
-  if (scene->is_lines)
+  //if (scene->is_lines)
     // A bit limiting - modes mutually exclusive. But OK for now, hopefully.
-    glutDisplayFunc(redraw_lines);
-  else
-    glutDisplayFunc(redraw);
+    //glutDisplayFunc(redraw_lines);
+  //else
+  glutDisplayFunc(redraw);
   glutReshapeFunc(resize);
   glutKeyboardFunc(keyfunc);
   glutMouseFunc(mouse);
@@ -424,11 +383,11 @@ int main(int argc, char* argv[])
   // so we should never get to this point.
   return 1;
 
-  */
+  
 
 
+  /*
   // COPIED!!
-
 
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH);
@@ -441,7 +400,7 @@ int main(int argc, char* argv[])
   //std::cout << "Use mouse drag to rotate." << std::endl;
   glutMainLoop();
   return 0;
-
+  */
 
 
 }

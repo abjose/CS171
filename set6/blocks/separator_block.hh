@@ -145,33 +145,39 @@ public:
   }
 
   void render() {
-    assert(poly_list.size() == poly_normal_list.size());
-
+    //assert(poly_list.size() == poly_normal_list.size());
     // init vertex/normal arrays
     n_verts = 3*poly_list.size();  // 3 vertices per face
-    int n_floats = 3*n_verts;  // 3 floats per vertex
 
-    vertices = new GLfloat[n_floats];
-    normals  = new GLfloat[n_floats];
-    texcoords = new GLfloat[n_floats];
+    vertices = new GLfloat[3*n_verts]; // because 3 floats per vert
+    normals  = new GLfloat[3*n_verts]; // 3 floats per normal
+    texcoords = new GLfloat[2*n_verts]; // two tex coords per vert
 
     // TODO: considering these arrays are always the same, should just
     // calculate them once?
     // for each polygon (should all be triangles)
     for (int i=0; i < poly_list.size(); i++) {
       auto poly = poly_list[i];
-      auto norm = poly_normal_list[i];
-      auto tex = poly_texture_list[i];
+      //auto norm = poly_normal_list[i];
 
       // insert vertices, normals, tex coords into arrays for rendering
       for (int v=0; v<3; v++) {
 	for (int f=0; f<3; f++) {       	  
 	  vertices[9*i+3*v+f] = vertex_list[poly[v]][f];
-	  normals[9*i+3*v+f]  = normal_list[norm[v]][f];
-	  texcoords[9*i+3*v+f] = texture_list[tex[v]][f];
+	  //normals[9*i+3*v+f]  = normal_list[norm[v]][f];
 	}	
       }
     }    
+
+    for (int i=0; i<poly_list.size(); i++) {
+      auto tex = poly_texture_list[i];
+
+      for (int v=0; v<3; v++) {
+	for (int f=0; f<2; f++) {  
+	  texcoords[6*i+2*v+f] = texture_list[tex[v]][f];
+	}	
+      }
+    }
   }
 
   void display() {
