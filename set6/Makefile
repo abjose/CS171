@@ -6,8 +6,8 @@ CXXFLAGS	= -std=c++0x -g #-Wall
 
 LDFLAGS	= -L/usr/X11R6/lib -lglut -lGL -lGLU -lXi -lXmu -L/usr/x86_64-linux-gnu/libpng.so -lpng
 
-SRCS	= libpng2/ogl_readpng.cpp UI/ui.cpp oglTexRenderer.cpp
-#SRCS	= libpng/readpng.cpp UI/ui.cpp oglTexRenderer.cpp
+#SRCS	= libpng/ogl_readpng.cpp UI/ui.cpp oglTexRenderer.cpp
+SRCS	= libpng/loadtexture.cpp UI/ui.cpp oglTexRenderer.cpp
 OBJS	= parser.tab.o lexer.yy.o $(SRCS:.cpp=.o)
 PROG	= oglTexRenderer
 
@@ -24,4 +24,4 @@ lexer.yy.cpp: parsing/lexer.lex
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 clean:
-	rm -f *.o UI/*.o $(PROG) parser.tab.cpp parser.tab.hpp lexer.yy.cpp
+	rm -f *.o UI/*.o $(PROG) parser.tab.cpp parser.tab.hpp lexer.yy.cpp libpng/*.o

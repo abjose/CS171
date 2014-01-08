@@ -5,12 +5,12 @@
 #include <iostream>
 #include "ogl_readpng.h"
 
-GLubyte *textureImage;
-float rotateX = 0;
-float rotateY = 0;
+// GLubyte *textureImage;
+// float rotateX = 0;
+// float rotateY = 0;
 
-int mouseX;
-int mouseY;
+// int mouseX;
+// int mouseY;
 
 bool loadPngImage(char *name, int &outWidth, int &outHeight, bool &outHasAlpha, GLubyte **outData) {
     png_structp png_ptr;
@@ -127,9 +127,7 @@ bool loadPngImage(char *name, int &outWidth, int &outHeight, bool &outHasAlpha, 
     /* That's it */
     return true;
 }
-
 /*
-
 void init(void) {
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glEnable(GL_DEPTH_TEST);
@@ -139,7 +137,8 @@ void init(void) {
     
     int width, height;
     bool hasAlpha;
-    char filename[] = "logo.png";
+    //char filename[] = "../data/cubetexlogo.png";
+    char filename[] = "../data/cubetex.png";
     bool success = loadPngImage(filename, width, height, hasAlpha, &textureImage);
     if (!success) {
         std::cout << "Unable to load png file" << std::endl;

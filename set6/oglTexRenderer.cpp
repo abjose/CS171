@@ -1,10 +1,12 @@
 
 #include <iostream>
+#include <string>
 #include "oglTexRenderer.hh"
 //#include "uistate.h"
 #include "UI/ui.hh"
-//#include "libpng/readpng.h"
-#include "libpng2/ogl_readpng.h"
+//#include "libpng/ogl_readpng.h"
+#include "libpng/loadtexture.hh"
+
 
 static std::shared_ptr<SceneBlock> scene;
 static UI *ui;
@@ -298,38 +300,21 @@ void init(void) {
  
   int width, height;
   bool hasAlpha;
-  char filename[] = "cubetex.png";
-  /*
-  bool success = loadPngImage(filename, width, height, hasAlpha, &textureImage);
-  //textureImage = readpng(filename, &width, &height);
-  // MAYBE JUST COPY THE VERSION OF libpng FROM THE BLOG
-  //textureImage_ptr = readpng(filename, &width, &height);
-  //if (!success) {
-  //  std::cout << "Unable to load png file" << std::endl;
-  //  return;
-  //}
-  std::cout << "Image loaded " << width << " " << height 
-	    << " alpha " << hasAlpha << std::endl;
-  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-  glTexImage2D(GL_TEXTURE_2D, 0, hasAlpha ? 4 : 3, width,
-	       height, 0, hasAlpha ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE,
-	       textureImage);
-	       //*textureImage_ptr);
-  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  std::string filename("data/cubetex.png");
+  GLuint t = loadTexture(filename, width, height);
+  if (t == 0) std::cout << "UH OH SOMETHING SCREWED UP\n";
+  std::cout << "Image loaded: " << width << " " << height << std::endl;
+
   glEnable(GL_TEXTURE_2D);
-  glShadeModel(GL_FLAT);
-  */
+  //glShadeModel(GL_FLAT);
 }
 
 //COPIED
 void display(void) {
   glLoadIdentity();
   glTranslatef(0.0, 0.0, -3.6);
-  //glRotatef(rotateX, 0,1,0);
-  //glRotatef(rotateY, 1,0,0);
+  glRotatef(rotateX, 0,1,0);
+  glRotatef(rotateY, 1,0,0);
  
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glBegin(GL_QUADS);
@@ -356,6 +341,32 @@ void initUI()
   resize(windowWidth, windowHeight);
   //checkGLErrors("End of uiInit");
 }
+
+
+
+void mousePassive(int x, int y){
+  mouseX = x;
+  mouseY = y;
+}
+
+void mouseMotion(int x, int y){
+  const float SPEED = 2;
+    
+  rotateX += (mouseX-x)/SPEED;
+  rotateY += (mouseY-y)/SPEED;
+  mousePassive(x, y);
+  glutPostRedisplay();
+}
+
+void myReshape(int w, int h) {
+  glViewport(0, 0, w, h);
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  gluPerspective(60.0, 1.0 * (GLfloat) w / (GLfloat) h, 1.0, 30.0);
+  glMatrixMode(GL_MODELVIEW);
+}
+
+
 
 /**
  * Main entrance point.
@@ -417,11 +428,11 @@ int main(int argc, char* argv[])
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH);
   glutCreateWindow("PNG texture");
-  //glutMotionFunc(mouseMotion);
-  //glutPassiveMotionFunc(mousePassive);
+  glutMotionFunc(mouseMotion);
+  glutPassiveMotionFunc(mousePassive);
   init();
-  //glutReshapeFunc(myReshape);
-  //glutDisplayFunc(display);
+  glutReshapeFunc(myReshape);
+  glutDisplayFunc(display);
   //std::cout << "Use mouse drag to rotate." << std::endl;
   glutMainLoop();
   return 0;

@@ -9,8 +9,14 @@
 
 #include "blocks/scene_block.hh"
 
-//GLubyte *textureImage;
-//GLubyte **textureImage_ptr;
+GLubyte *textureImage;
+
+float rotateX = 0;
+float rotateY = 0;
+
+int mouseX;
+int mouseY;
+
 
 /** PROTOTYPES **/
 void initLights();
