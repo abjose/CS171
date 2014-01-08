@@ -78,8 +78,9 @@ void redraw()
     }
 
     // load texture? should avoid doing every time...
-    int width, size;
-    //loadTexture(sep->tex_filename, width,size);
+    int twidth, tsize;
+    GLuint texres = loadTexture(std::string("data/") + sep->tex_filename, 
+				twidth,tsize);
 
     // RENDER
     sep->render();  // TODO: change name to populate_blah or something
@@ -99,7 +100,7 @@ void redraw()
     // POP TRANSFORMATIONS
     glPopMatrix();
   }
-  
+
   glPopMatrix();
   glutSwapBuffers();
 }
