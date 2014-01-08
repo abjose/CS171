@@ -9,12 +9,8 @@
 
 #include "blocks/scene_block.hh"
 
-/* 
- * A quadric can be a cylinder, disk, sphere, cone, etc.
- * We just reuse this memory space each time we draw any sort of quad.
- * GLU supplies this funcionality.
- */
-GLUquadricObj* quad;
+//GLubyte *textureImage;
+//GLubyte **textureImage_ptr;
 
 /** PROTOTYPES **/
 void initLights();

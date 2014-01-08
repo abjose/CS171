@@ -4,9 +4,10 @@ CXX		= g++
 # add -g for debugging info
 CXXFLAGS	= -std=c++0x -g #-Wall
 
-LDFLAGS	= -L/usr/X11R6/lib -lglut -lGL -lGLU -lXi -lXmu
+LDFLAGS	= -L/usr/X11R6/lib -lglut -lGL -lGLU -lXi -lXmu -L/usr/x86_64-linux-gnu/libpng.so -lpng
 
-SRCS	= UI/ui.cpp oglTexRenderer.cpp
+SRCS	= libpng2/ogl_readpng.cpp UI/ui.cpp oglTexRenderer.cpp
+#SRCS	= libpng/readpng.cpp UI/ui.cpp oglTexRenderer.cpp
 OBJS	= parser.tab.o lexer.yy.o $(SRCS:.cpp=.o)
 PROG	= oglTexRenderer
 

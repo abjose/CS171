@@ -3,12 +3,16 @@
 #include "oglTexRenderer.hh"
 //#include "uistate.h"
 #include "UI/ui.hh"
+//#include "libpng/readpng.h"
+#include "libpng2/ogl_readpng.h"
 
 static std::shared_ptr<SceneBlock> scene;
 static UI *ui;
 
 // The current window size.
 int windowWidth = 800, windowHeight = 600;
+
+//GLubyte *textureImage;
 
 /** GLUT callback functions **/
 
@@ -283,6 +287,66 @@ void mouse(const int button, const int state, const int x, const int y)
   ui->mouseFunction(button, state, x, y);
 }
 
+
+//COPIED
+void init(void) {
+  glClearColor(0.0, 0.0, 0.0, 0.0);
+  glEnable(GL_DEPTH_TEST);
+  // The following two lines enable semi transparent
+  glEnable(GL_BLEND);
+  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+ 
+  int width, height;
+  bool hasAlpha;
+  char filename[] = "cubetex.png";
+  /*
+  bool success = loadPngImage(filename, width, height, hasAlpha, &textureImage);
+  //textureImage = readpng(filename, &width, &height);
+  // MAYBE JUST COPY THE VERSION OF libpng FROM THE BLOG
+  //textureImage_ptr = readpng(filename, &width, &height);
+  //if (!success) {
+  //  std::cout << "Unable to load png file" << std::endl;
+  //  return;
+  //}
+  std::cout << "Image loaded " << width << " " << height 
+	    << " alpha " << hasAlpha << std::endl;
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  glTexImage2D(GL_TEXTURE_2D, 0, hasAlpha ? 4 : 3, width,
+	       height, 0, hasAlpha ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE,
+	       textureImage);
+	       //*textureImage_ptr);
+  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glEnable(GL_TEXTURE_2D);
+  glShadeModel(GL_FLAT);
+  */
+}
+
+//COPIED
+void display(void) {
+  glLoadIdentity();
+  glTranslatef(0.0, 0.0, -3.6);
+  //glRotatef(rotateX, 0,1,0);
+  //glRotatef(rotateY, 1,0,0);
+ 
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0.0, 0.0);
+  glVertex3f(-2.0, -1.0, 0.0);
+  glTexCoord2f(0.0, 1.0);
+  glVertex3f(-2.0, 1.0, 0.0);
+  glTexCoord2f(1.0, 1.0);
+  glVertex3f(0.0, 1.0, 0.0);
+  glTexCoord2f(1.0, 0.0);
+  glVertex3f(0.0, -1.0, 0.0);
+ 
+  glEnd();
+  glutSwapBuffers();
+}
+
+
 //--------------------------------------------------------------------------
 // Initializes the UI
 //--------------------------------------------------------------------------
@@ -300,6 +364,8 @@ void initUI()
  */
 int main(int argc, char* argv[])
 {
+  /*
+
   // read cmd line args
   int mode;
   mode = std::stoi(argv[1]);
@@ -341,4 +407,25 @@ int main(int argc, char* argv[])
 
   // so we should never get to this point.
   return 1;
+
+  */
+
+
+  // COPIED!!
+
+
+  glutInit(&argc, argv);
+  glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH);
+  glutCreateWindow("PNG texture");
+  //glutMotionFunc(mouseMotion);
+  //glutPassiveMotionFunc(mousePassive);
+  init();
+  //glutReshapeFunc(myReshape);
+  //glutDisplayFunc(display);
+  //std::cout << "Use mouse drag to rotate." << std::endl;
+  glutMainLoop();
+  return 0;
+
+
+
 }
