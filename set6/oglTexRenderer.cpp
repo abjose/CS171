@@ -375,6 +375,11 @@ void myReshape(int w, int h) {
  */
 int main(int argc, char* argv[])
 {
+
+  // From old code
+  scene = parse(std::cin);
+  scene->display();
+
   /*
 
   // read cmd line args

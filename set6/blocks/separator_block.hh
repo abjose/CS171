@@ -29,15 +29,18 @@ public:
   std::vector<int> temp_poly_normal;
   std::vector<int> temp_poly_texture;
   // openGL stuff
-  GLfloat *vertices, *normals;
+  GLfloat *vertices, *normals, *texcoords;
   int n_verts;
-  char* tex_filename;
+  std::string tex_filename;
 
 
 
 public:
   // default constructor
-  SeparatorBlock() {}
+  SeparatorBlock() {
+    // default...
+    material = std::shared_ptr<MaterialBlock>(new MaterialBlock());
+  }
 
   void add_transform(std::shared_ptr<TransformBlock> t) {
     transforms.push_back(t);
@@ -149,7 +152,8 @@ public:
     int n_floats = 3*n_verts;  // 3 floats per vertex
 
     vertices = new GLfloat[n_floats];
-    normals = new GLfloat[n_floats];
+    normals  = new GLfloat[n_floats];
+    texcoords = new GLfloat[n_floats];
 
     // TODO: considering these arrays are always the same, should just
     // calculate them once?
@@ -157,12 +161,14 @@ public:
     for (int i=0; i < poly_list.size(); i++) {
       auto poly = poly_list[i];
       auto norm = poly_normal_list[i];
+      auto tex = poly_texture_list[i];
 
-      // insert vertices and normals into arrays for rendering
+      // insert vertices, normals, tex coords into arrays for rendering
       for (int v=0; v<3; v++) {
 	for (int f=0; f<3; f++) {       	  
 	  vertices[9*i+3*v+f] = vertex_list[poly[v]][f];
 	  normals[9*i+3*v+f]  = normal_list[norm[v]][f];
+	  texcoords[9*i+3*v+f] = texture_list[tex[v]][f];
 	}	
       }
     }    
@@ -182,6 +188,10 @@ public:
     for (auto &it: normal_list) {
       it.display();
     }
+    std::cout << "SHOWING SEPERATOR'S TEXTURES\n";
+    for (auto &it: texture_list) {
+      it.display();
+    }
     std::cout << "SHOWING SEPERATOR'S POLYGONS\n";
     for (auto &it: poly_list) {
       std::cout << "Polygon: ";
@@ -195,6 +205,14 @@ public:
       std::cout << "Normal set: ";
       for (auto &normal: it) {
 	std::cout << normal << ", ";
+      }
+      std::cout << std::endl;
+    }
+    std::cout << "SHOWING SEPERATOR'S TEXTURE THINGS\n";
+    for (auto &it: poly_texture_list) {
+      std::cout << "Texture set: ";
+      for (auto &tex: it) {
+	std::cout << tex << ", ";
       }
       std::cout << std::endl;
     }

@@ -13,6 +13,12 @@ public:
   //public:
   float shininess;
 
+  MaterialBlock() {
+    set_ambient(1,1,1);
+    set_diffuse(1,1,1);
+    set_specular(1,1,1);
+  }
+
   void set_ambient(float r, float g, float b) {
     ambient = makeVector3<float>(r,g,b);
   }

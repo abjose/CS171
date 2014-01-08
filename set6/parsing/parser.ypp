@@ -15,22 +15,21 @@ int yyerror(const char *s);
 int yylex();
 
 // print debug statements?
-bool debug = true;
-//bool debug = true;
+bool debug = false;
 // vector for storing input numbers
 std::deque<float> in;
 // shared_ptr to a CameraBlock
-std::shared_ptr<CameraBlock> camera(new CameraBlock);
+std::shared_ptr<CameraBlock> camera(new CameraBlock());
 // shared_ptr to a LightBlock
-std::shared_ptr<LightBlock> light(new LightBlock);
+std::shared_ptr<LightBlock> light(new LightBlock());
 // shared_ptr to a TransformBlock
-std::shared_ptr<TransformBlock> transform(new TransformBlock);
+std::shared_ptr<TransformBlock> transform(new TransformBlock());
 // shared_ptr to a MaterialBlock
-std::shared_ptr<MaterialBlock> material(new MaterialBlock);
+std::shared_ptr<MaterialBlock> material(new MaterialBlock());
 // shared_ptr to a SeperatorBock
-std::shared_ptr<SeparatorBlock> separator(new SeparatorBlock);
+std::shared_ptr<SeparatorBlock> separator(new SeparatorBlock());
 // shared_ptr to a SceneBlock
-std::shared_ptr<SceneBlock> scene(new SceneBlock);
+std::shared_ptr<SceneBlock> scene(new SceneBlock());
 %}
 
 %union {
@@ -86,7 +85,7 @@ bottomline: BOTTOM NUMBER { camera->bottom = $2; }
 lightblock: POINTLIGHT open pointlightlines close {
   scene->add_light(light);
   // re-init light
-  light = std::shared_ptr<LightBlock>(new LightBlock);
+  light = std::shared_ptr<LightBlock>(new LightBlock());
 }
 pointlightlines: pointlightline | pointlightline pointlightlines
 pointlightline: light_loc | light_col
@@ -100,7 +99,7 @@ light_col: LCOLOR triple {
 sepblock: SEPARATOR open sepitems close {
   scene->add_separator(separator);
   // re-init separator
-  separator = std::shared_ptr<SeparatorBlock>(new SeparatorBlock);
+  separator = std::shared_ptr<SeparatorBlock>(new SeparatorBlock());
 }
 sepitems: sepitem | sepitem sepitems
 sepitem:  transformline
@@ -143,14 +142,14 @@ teximgline: TEXTURE open FILENAME STRING close {
     std::cout << "Saving texture filename.\n";
     std::cout << "String: " << $4 << std::endl;
   }
-  separator->tex_filename = $4;
+  separator->tex_filename = std::string($4);
  }
 
 transformline: TRANSFORM open translines close {
   separator->add_transform(transform);
   // re-init transform
   //transform = std::make_shared<TransformBlock>();
-  transform = std::shared_ptr<TransformBlock>(new TransformBlock);
+  transform = std::shared_ptr<TransformBlock>(new TransformBlock());
 }
 translines: transline | transline translines
 transline:  translateline | scaleline | rotline
@@ -194,7 +193,7 @@ textureindexline:  TEXINDEX sqopen singles sqclose {
 
 material: MATERIAL open materiallines close {
   separator->set_material(material);
-  material = std::shared_ptr<MaterialBlock>(new MaterialBlock);
+  material = std::shared_ptr<MaterialBlock>(new MaterialBlock());
 }
 materiallines: materialline | materialline materiallines
 materialline: ambient | diffuse | specular | shininess
