@@ -1,4 +1,4 @@
-# Makefile for cs171 HW 4
+# Makefile for cs171 HW 6
 
 CXX		= g++
 # add -g for debugging info

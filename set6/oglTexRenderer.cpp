@@ -10,6 +10,7 @@
 
 static std::shared_ptr<SceneBlock> scene;
 static UI *ui;
+static float water_time;
 
 // The current window size.
 int windowWidth = 800, windowHeight = 600;
@@ -79,9 +80,10 @@ void redraw()
 
     // load texture? should avoid doing every time...
     int twidth, tsize;
-    GLuint texres = loadTexture(std::string("data/") + sep->tex_filename, 
-				twidth,tsize);
+    //GLuint texres = loadTexture(std::string("data/") + sep->tex_filename, 
+    //			twidth,tsize);
 
+    /*
     // RENDER
     sep->render();  // TODO: change name to populate_blah or something
     glEnableClientState(GL_VERTEX_ARRAY);
@@ -95,15 +97,89 @@ void redraw()
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     //glDisableClientState(GL_NORMAL_ARRAY);
-    
+    */
 
     // POP TRANSFORMATIONS
     glPopMatrix();
   }
 
   glPopMatrix();
+
+  //redraw_water();
+
   glutSwapBuffers();
 }
+
+void redraw_water() {
+  // test code for water ripples
+
+  int w,h;
+  // note: intead of loading each time, just switch back and forth
+  // using the texture integer lols
+  loadTexture(std::string("data/sky.png"), w,h);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
+  glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
+  glEnable(GL_TEXTURE_GEN_S);
+  glEnable(GL_TEXTURE_GEN_T);
+
+  // apply UI transformation
+  glPushMatrix();
+  ui->applyViewingTransformation();
+  glTranslatef(ui->final_tx, -1*ui->final_ty, ui->final_tz);
+  glRotatef(ui->final_rd, ui->final_rx,ui->final_ry,0);
+ 
+  Matrix<float,3,1> N1,N2;
+  float dx = 0.1, xmin = -5, xmax = 5;
+  float dy = 0.1, ymin = -5, ymax = 5;
+  float prev_y = ymin;
+
+  // loop to make plane out of triangle strips
+  // this is very inefficient, don't use immediate mode after debug...
+  for(float y=ymin; y<ymax; y+=dy) {
+    glBegin(GL_TRIANGLE_STRIP);
+    for(float x=xmin; x<xmax; x+=dx) {
+      // calculate ripply normals
+      /*
+      N1 = makeVector3<float>(2.*x*sin(x*x + y*y), 
+			      2.*y*sin(x*x + y*y), 
+			      1.);
+      N2 = makeVector3<float>(2.*x*sin(x*x + prev_y*prev_y), 
+			      2.*prev_y*sin(x*x + prev_y*prev_y), 
+			      1.);
+      */
+      // make ripplier?
+      N1 = makeVector3<float>(10.*x*sin(5*(x*x + y*y)),
+			      10.*y*sin(5*(x*x + y*y)),
+			      1.);
+      N2 = makeVector3<float>(10.*x*sin(5*(x*x + prev_y*prev_y)),
+			      10.*prev_y*sin(5*(x*x + prev_y*prev_y)),
+			      1.);
+      N1 = N1.normalize();
+      N2 = N2.normalize();
+      //std::cout << N1 << std::endl;
+
+      // set vertices and texcoords
+      glTexCoord2f(N1[0], N1[1]); glVertex3f(x, y, 1.0);
+      glTexCoord2f(N2[0], N2[1]); glVertex3f(x, prev_y, 1.0);
+    }
+    glEnd();
+    prev_y = y; // could just subtract dy...
+  }
+  
+  glDisable(GL_TEXTURE_GEN_S);
+  glDisable(GL_TEXTURE_GEN_T);
+
+  glPopMatrix();
+  glutSwapBuffers();
+  
+}
+
+void water_clock() {
+  water_time += 1;
+}
+
 
 // removed redraw_lines
 
@@ -341,6 +417,9 @@ void myReshape(int w, int h) {
  */
 int main(int argc, char* argv[])
 {
+  // initialize time for water
+  water_time = 0;
+
   // read cmd line args
   int mode;
   mode = std::stoi(argv[1]);
@@ -368,40 +447,38 @@ int main(int argc, char* argv[])
   initUI();
 
   // set up GLUT callbacks.
-  //if (scene->is_lines)
-    // A bit limiting - modes mutually exclusive. But OK for now, hopefully.
-    //glutDisplayFunc(redraw_lines);
-  //else
-  glutDisplayFunc(redraw);
+  //glutDisplayFunc(redraw);
+  glutDisplayFunc(redraw_water);
+  //glutDisplayFunc(display);
   glutReshapeFunc(resize);
   glutKeyboardFunc(keyfunc);
   glutMouseFunc(mouse);
   glutMotionFunc(motion);
+  glutIdleFunc(water_clock);
 
-  // From here on, GLUT has control,
-  glutMainLoop();
-
-  // so we should never get to this point.
-  return 1;
+ 
 
   
 
 
-  /*
   // COPIED!!
 
-  glutInit(&argc, argv);
-  glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH);
-  glutCreateWindow("PNG texture");
-  glutMotionFunc(mouseMotion);
-  glutPassiveMotionFunc(mousePassive);
-  init();
+  // glutInit(&argc, argv);
+  // glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH);
+  // glutCreateWindow("PNG texture");
+  //glutMotionFunc(mouseMotion);
+  // glutPassiveMotionFunc(mousePassive);
+  // init();
   glutReshapeFunc(myReshape);
-  glutDisplayFunc(display);
+  // glutDisplayFunc(display);
   //std::cout << "Use mouse drag to rotate." << std::endl;
-  glutMainLoop();
-  return 0;
-  */
+    
 
+
+ // From here on, GLUT has control,
+  glutMainLoop();
+
+  // so we should never get to this point.
+  return 1;
 
 }

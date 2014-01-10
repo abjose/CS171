@@ -26,6 +26,8 @@ void initGL();
 void resize(GLint w, GLint h);
 void keyfunc(GLubyte key, GLint x, GLint y);
 
+void redraw_water();
+
 // from old code
 std::shared_ptr<SceneBlock> parse(std::istream &datafile);
 
