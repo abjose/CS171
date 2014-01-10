@@ -141,28 +141,19 @@ void redraw_water() {
     glBegin(GL_TRIANGLE_STRIP);
     for(float x=xmin; x<xmax; x+=dx) {
       // calculate ripply normals
-      /*
       N1 = makeVector3<float>(2.*x*sin(x*x + y*y), 
 			      2.*y*sin(x*x + y*y), 
 			      1.);
       N2 = makeVector3<float>(2.*x*sin(x*x + prev_y*prev_y), 
 			      2.*prev_y*sin(x*x + prev_y*prev_y), 
 			      1.);
-      */
-      // make ripplier?
-      N1 = makeVector3<float>(10.*x*sin(5*(x*x + y*y)),
-			      10.*y*sin(5*(x*x + y*y)),
-			      1.);
-      N2 = makeVector3<float>(10.*x*sin(5*(x*x + prev_y*prev_y)),
-			      10.*prev_y*sin(5*(x*x + prev_y*prev_y)),
-			      1.);
       N1 = N1.normalize();
       N2 = N2.normalize();
       //std::cout << N1 << std::endl;
 
       // set vertices and texcoords
-      glTexCoord2f(N1[0], N1[1]); glVertex3f(x, y, 1.0);
-      glTexCoord2f(N2[0], N2[1]); glVertex3f(x, prev_y, 1.0);
+      glNormal3f(N1[0], N1[1], N1[2]); glVertex3f(x, y, 1.0);
+      glNormal3f(N2[0], N2[1], N2[2]); glVertex3f(x, prev_y, 1.0);
     }
     glEnd();
     prev_y = y; // could just subtract dy...
