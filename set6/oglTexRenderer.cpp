@@ -167,36 +167,6 @@ void keyfunc(GLubyte key, GLint x, GLint y)
 
 /** Utility functions **/
 
-/**
- * Sets up an OpenGL light.  This only needs to be called once
- * and the light will be used during all renders.
- */
-void initLights() {
-  // pretty sure can just add to GL_LIGHT0, but probably shouldn't depend on...
-  int light_consts[] = {GL_LIGHT0, GL_LIGHT1, GL_LIGHT2, GL_LIGHT3, GL_LIGHT4,
-			GL_LIGHT5, GL_LIGHT6, GL_LIGHT7};
-
-  for (int i=0; i<scene->lights.size(); i++) {  
-    auto l   = scene->lights[i];
-    int  l_c = light_consts[i];
-
-    GLfloat amb[] = { 0.0, 0.0, 0.0, 1.0 };
-    GLfloat spec[] = {l->color[0], l->color[1], l->color[2], 1.0f};
-    GLfloat diff[] = {l->color[0], l->color[1], l->color[2], 1.0f};
-    GLfloat lightpos[] = { l->location[0],l->location[1],l->location[2], 1.0f };
-
-    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, amb);
-    glLightfv(l_c, GL_AMBIENT, amb);
-    glLightfv(l_c, GL_DIFFUSE, diff);
-    glLightfv(l_c, GL_SPECULAR, spec);
-    glLightfv(l_c, GL_POSITION, lightpos);
-    glEnable(l_c);
-  }
-
-  // Turn on lighting.  You can turn it off with a similar call to
-  // glDisable().
-  glEnable(GL_LIGHTING);
-}
 
 /**
  * Set up OpenGL state.  This does everything so when we draw we only need to

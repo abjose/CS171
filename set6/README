@@ -1,12 +1,10 @@
-UPDATE ME!
-
 To compile:
 - switch to this directory
 - type 'make'
-An executable 'oglRenderer' should appear
+An executable 'oglTexRenderer' should appear
 
 To run, type:
-./oglRenderer n xRes yRes < iv-file
+./oglTexRenderer n xRes yRes < iv-file
 
 Where n determines what shading mode to use:
 0 = wireframe
@@ -17,15 +15,7 @@ and xRes, yRes are the x and y resolutions of the final image.
 All the iv files are kept in /data.
 
 Actual example, for future reference:
-./oglRenderer 0 800 800 < data/sphere.iv
-
-
-NOTES
-======
-- Currently some weird stuff going on with flat lighting - doesn't seem to
-  be working very well at all. Which is strange because smooth lighting
-  looks alright, and there aren't any differences (aside from the call to
-  gl_enable.
+./oglTexRenderer 2 400 400 < data/geo.iv
 
 
 INTERFACE
@@ -34,12 +24,3 @@ left click + drag to rotate
 center click + drag to translate
 shift + center click + drag to zoom
 'q', 'Q', or esc to quit
-
-
-EXTRA CREDIT
-=============
-Lineset
-Note: Currently, using the Lineset feature (i.e. if the .iv file has
-_any_ LineSet commands in it) switches to a completely different redraw loop.
-So, LineSet and normal rendering are mutually exclusive for now.
-.iv files using LineSet can be found in data/ as usual.
