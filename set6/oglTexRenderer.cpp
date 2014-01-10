@@ -39,28 +39,6 @@ void redraw()
 
   // DO OBJECT STUFF
   for (auto& sep : scene->sep_list) {
-
-    /*
-    // INITIALIZE MATERIAL FOR THIS SEPARATOR
-    GLfloat emit[] = {0.0, 0.0, 0.0, 0.0}; // wat
-    GLfloat amb[] = {sep->material->ambient[0],
-		     sep->material->ambient[1],
-		     sep->material->ambient[2]};
-    GLfloat diff[] = {sep->material->diffuse[0],
-		      sep->material->diffuse[1],
-		      sep->material->diffuse[2]};
-    GLfloat spec[] = {sep->material->specular[0],
-		      sep->material->specular[1],
-		      sep->material->specular[2]};
-    GLfloat shiny = sep->material->shininess;
-    
-    glMaterialfv(GL_FRONT, GL_AMBIENT, amb);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, diff);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, spec);
-    glMaterialfv(GL_FRONT, GL_EMISSION, emit);
-    glMaterialfv(GL_FRONT, GL_SHININESS, &shiny);
-    */
-
     // PUSH TRANSFORMATIONS
     glPushMatrix();
     
@@ -86,16 +64,13 @@ void redraw()
     // RENDER
     sep->render();  // TODO: change name to populate_blah or something
     glEnableClientState(GL_VERTEX_ARRAY);
-    //glEnableClientState(GL_NORMAL_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, sep->vertices);
-    //glNormalPointer(GL_FLOAT, 0, sep->normals);
     glTexCoordPointer(2, GL_FLOAT, 0, sep->texcoords);
     glDrawArrays(GL_TRIANGLES, 0, sep->n_verts);
     // deactivate vertex arrays after drawing
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    //glDisableClientState(GL_NORMAL_ARRAY);
 
     // POP TRANSFORMATIONS
     glPopMatrix();
@@ -115,7 +90,6 @@ void redraw_water() {
   // note: intead of loading each time, just switch back and forth
   // using the texture integer lols
   loadTexture(std::string("data/sky.png"), w,h);
-  //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
   glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
@@ -130,8 +104,8 @@ void redraw_water() {
   glRotatef(ui->final_rd, ui->final_rx,ui->final_ry,0);
  
   Matrix<float,3,1> N1,N2;
-  float dx = 0.1, xmin = -5, xmax = 5;
-  float dy = 0.1, ymin = -5, ymax = 5;
+  Matrix<float,3,1> N3,N4;
+
   float prev_y = ymin;
 
   // loop to make plane out of triangle strips
@@ -140,15 +114,14 @@ void redraw_water() {
     glBegin(GL_TRIANGLE_STRIP);
     for(float x=xmin; x<xmax; x+=dx) {
       // calculate ripply normals
-      N1 = makeVector3<float>(2.*x*sin(x*x + y*y - water_time), 
-			      2.*y*sin(x*x + y*y - water_time), 
-			      1.);
-      N2 = makeVector3<float>(2.*x*sin(x*x + prev_y*prev_y - water_time), 
-			      2.*prev_y*sin(x*x + prev_y*prev_y - water_time), 
-			      1.);
+      N1[0] = 2.*x*sin(x*x + y*y - water_time);
+      N1[1] = 2.*y*sin(x*x + y*y - water_time);
+      N1[2] = 1;
       N1 = N1.normalize();
+      N2[0] = 2.*x*sin(x*x + prev_y*prev_y - water_time);
+      N2[1] = 2.*prev_y*sin(x*x + prev_y*prev_y - water_time);
+      N2[2] = 1;
       N2 = N2.normalize();
-      //std::cout << N1 << std::endl;
 
       // set vertices and texcoords
       glNormal3f(N1[0], N1[1], N1[2]); glVertex3f(y, 0, x);
@@ -284,10 +257,6 @@ void initGL(int mode)
   glTranslatef(-1*scene->camera->position[0], 
  	         -1*scene->camera->position[1], 
   	         -1*scene->camera->position[2]);
-
-  // set light parameters if not doing wireframe
-  //if (mode != 0 && !scene->is_lines)
-  //  initLights();
 }
 
 //--------------------------------------------------------------------------
@@ -328,43 +297,6 @@ void mouse(const int button, const int state, const int x, const int y)
 }
 
 
-// //COPIED
-// void init(void) {
-//   glClearColor(0.0, 0.0, 0.0, 0.0);
-//   glEnable(GL_DEPTH_TEST);
-  
-//   int width, height;
-//   std::string filename("data/cubetex.png");
-//   GLuint t = loadTexture(filename, width, height);
-//   if (t == 0) std::cout << "UH OH SOMETHING SCREWED UP\n";
-//   std::cout << "Image loaded: " << width << " " << height << std::endl;
-  
-//   //glShadeModel(GL_FLAT);
-// }
-
-//COPIED
-void display(void) {
-  glLoadIdentity();
-  glTranslatef(0.0, 0.0, -3.6);
-  glRotatef(rotateX, 0,1,0);
-  glRotatef(rotateY, 1,0,0);
- 
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0.0, 0.0);
-  glVertex3f(-2.0, -1.0, 0.0);
-  glTexCoord2f(0.0, 1.0);
-  glVertex3f(-2.0, 1.0, 0.0);
-  glTexCoord2f(1.0, 1.0);
-  glVertex3f(0.0, 1.0, 0.0);
-  glTexCoord2f(1.0, 0.0);
-  glVertex3f(0.0, -1.0, 0.0);
- 
-  glEnd();
-  glutSwapBuffers();
-}
-
-
 //--------------------------------------------------------------------------
 // Initializes the UI
 //--------------------------------------------------------------------------
@@ -372,7 +304,6 @@ void initUI()
 {
   ui = new UI();
   resize(windowWidth, windowHeight);
-  //checkGLErrors("End of uiInit");
 }
 
 
@@ -411,6 +342,10 @@ int main(int argc, char* argv[])
   // initialize time for water
   water_time = 0;
 
+  // init array for texture normals
+  dx = 0.1; xmin = -5; xmax = 5;
+  dy = 0.1; ymin = -5; ymax = 5;
+
   // read cmd line args
   int mode;
   mode = std::stoi(argv[1]);
@@ -444,30 +379,11 @@ int main(int argc, char* argv[])
   glutMouseFunc(mouse);
   glutMotionFunc(motion);
   glutIdleFunc(water_clock);
-
- 
-
-  
-
-
-  // COPIED!!
-
-  // glutInit(&argc, argv);
-  // glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH);
-  // glutCreateWindow("PNG texture");
-  //glutMotionFunc(mouseMotion);
-  // glutPassiveMotionFunc(mousePassive);
-  // init();
   glutReshapeFunc(myReshape);
-  // glutDisplayFunc(display);
-  //std::cout << "Use mouse drag to rotate." << std::endl;
-    
-
-
- // From here on, GLUT has control,
+ 
+  // From here on, GLUT has control,
   glutMainLoop();
 
-  // so we should never get to this point.
+  // we should never get to this point.
   return 1;
-
 }

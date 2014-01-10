@@ -9,6 +9,11 @@
 
 #include "blocks/scene_block.hh"
 
+GLfloat *rippletexnormals, *rippleverts;
+// ripple loop params
+float dx, xmin, xmax;
+float dy, ymin, ymax;
+
 GLubyte *textureImage;
 
 float rotateX = 0;
