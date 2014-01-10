@@ -80,10 +80,9 @@ void redraw()
 
     // load texture? should avoid doing every time...
     int twidth, tsize;
-    //GLuint texres = loadTexture(std::string("data/") + sep->tex_filename, 
-    //			twidth,tsize);
+    GLuint texres = loadTexture(std::string("data/") + sep->tex_filename, 
+				twidth,tsize);
 
-    /*
     // RENDER
     sep->render();  // TODO: change name to populate_blah or something
     glEnableClientState(GL_VERTEX_ARRAY);
@@ -97,7 +96,6 @@ void redraw()
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     //glDisableClientState(GL_NORMAL_ARRAY);
-    */
 
     // POP TRANSFORMATIONS
     glPopMatrix();
@@ -105,7 +103,7 @@ void redraw()
 
   glPopMatrix();
 
-  //redraw_water();
+  redraw_water();
 
   glutSwapBuffers();
 }
@@ -117,7 +115,7 @@ void redraw_water() {
   // note: intead of loading each time, just switch back and forth
   // using the texture integer lols
   loadTexture(std::string("data/sky.png"), w,h);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
   glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
@@ -127,6 +125,7 @@ void redraw_water() {
   // apply UI transformation
   glPushMatrix();
   ui->applyViewingTransformation();
+  glTranslatef(0, -2.5, -5);
   glTranslatef(ui->final_tx, -1*ui->final_ty, ui->final_tz);
   glRotatef(ui->final_rd, ui->final_rx,ui->final_ry,0);
  
@@ -141,19 +140,19 @@ void redraw_water() {
     glBegin(GL_TRIANGLE_STRIP);
     for(float x=xmin; x<xmax; x+=dx) {
       // calculate ripply normals
-      N1 = makeVector3<float>(2.*x*sin(x*x + y*y), 
-			      2.*y*sin(x*x + y*y), 
+      N1 = makeVector3<float>(2.*x*sin(x*x + y*y - water_time), 
+			      2.*y*sin(x*x + y*y - water_time), 
 			      1.);
-      N2 = makeVector3<float>(2.*x*sin(x*x + prev_y*prev_y), 
-			      2.*prev_y*sin(x*x + prev_y*prev_y), 
+      N2 = makeVector3<float>(2.*x*sin(x*x + prev_y*prev_y - water_time), 
+			      2.*prev_y*sin(x*x + prev_y*prev_y - water_time), 
 			      1.);
       N1 = N1.normalize();
       N2 = N2.normalize();
       //std::cout << N1 << std::endl;
 
       // set vertices and texcoords
-      glNormal3f(N1[0], N1[1], N1[2]); glVertex3f(x, y, 1.0);
-      glNormal3f(N2[0], N2[1], N2[2]); glVertex3f(x, prev_y, 1.0);
+      glNormal3f(N1[0], N1[1], N1[2]); glVertex3f(y, 0, x);
+      glNormal3f(N2[0], N2[1], N2[2]); glVertex3f(prev_y, 0, x);
     }
     glEnd();
     prev_y = y; // could just subtract dy...
@@ -168,7 +167,8 @@ void redraw_water() {
 }
 
 void water_clock() {
-  water_time += 1;
+  water_time += 0.05;
+  glutPostRedisplay();
 }
 
 
@@ -438,9 +438,7 @@ int main(int argc, char* argv[])
   initUI();
 
   // set up GLUT callbacks.
-  //glutDisplayFunc(redraw);
-  glutDisplayFunc(redraw_water);
-  //glutDisplayFunc(display);
+  glutDisplayFunc(redraw);
   glutReshapeFunc(resize);
   glutKeyboardFunc(keyfunc);
   glutMouseFunc(mouse);
