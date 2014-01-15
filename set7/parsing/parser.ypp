@@ -1,0 +1,112 @@
+%{
+#include <stdint.h>
+#include <FlexLexer.h>
+#include <string>
+#include <deque>
+#include <memory>
+#include "blocks/camera_block.hh"
+#include "blocks/light_block.hh"
+#include "blocks/transform_block.hh"
+#include "blocks/separator_block.hh"
+#include "blocks/scene_block.hh"
+//#include "shaded.hh"
+
+int yyerror(const char *s);
+int yylex();
+
+// print debug statements?
+bool debug = false;
+//bool debug = true;
+// vector for storing input numbers
+std::deque<float> in;
+// vector of tuples of frame numbers and transform blocks
+std::vector<std::tuple<int, std::shared_ptr<TransformBlock> > > ft;
+// transform block to append to end of vector
+std::shared_ptr<TransformBlock> trans;
+// current frame number
+int frame;
+// total frames
+int total_frames = -1;
+%}
+
+%union {
+    float fval;
+}
+
+%defines
+%token <fval> NUMBER
+%token FRAME TRANSLAT SCALE ROT
+
+%%
+
+blocks: block | block blocks
+block:  translines
+
+translines: transline | transline translines
+transline:  frameline | translateline | scaleline | rotline
+
+frameline: FRAME single {
+  if(total_frames == -1) {
+    total_frames = in[0];
+    if(debug) std::cout << "Got total frames: " << total_frames << std::endl;
+  }
+  if(debug) std::cout << "Frame: " << in[0] << std::endl;
+  // set total frames if haven't already
+  // should reset trans
+  ft.push_back(std::make_tuple(frame, trans));
+  trans = std::shared_ptr<TransformBlock>(new TransformBlock());
+  // then set current keyframe frame
+  frame = in[0];
+}
+translateline: TRANSLAT triple {
+  if(debug) std::cout << "Got translation: " << in[2] << ' ' << in[1] 
+		      << ' ' << in[0] << std::endl;
+  trans->set_translation(in[2],in[1],in[0]);
+  //trans->display();
+}
+scaleline: SCALE triple {
+  if(debug) std::cout << "Got scale: " << ' ' << in[2] << ' ' 
+		      << in[1] << ' ' << in[0] << std::endl;
+  trans->set_scale(in[2],in[1],in[0]);
+  //trans->display();
+}
+rotline: ROT quad {
+  if(debug) std::cout << "Got rotation: " << ' ' << in[2] << ' ' 
+		      << in[1] << ' ' << in[0] << std::endl;
+  trans->set_rotation(in[3],in[2],in[1],in[0]);
+  //trans->display();
+}
+
+single: NUMBER {
+  if(debug) std::cout << "SINGLE:\t" << $1 << std::endl;
+  in.push_front($1);
+}
+triple:  single single single
+quad:    single single single single
+
+%%
+
+static FlexLexer *lexer;
+
+int yyerror(const char * s) {
+   std::cerr << "Parse error: " << s << std::endl;
+   return 0;
+}
+
+int yylex() {
+   return lexer->yylex();
+}
+
+std::vector<std::tuple<int, std::shared_ptr<TransformBlock> > >
+parse(std::istream &datafile, int* frames) {
+   // Construct the lexer.
+   lexer = new yyFlexLexer(&datafile);
+   // Run the parser.
+   if(yyparse()) {
+       std::cerr << "Parse failed!" << std::endl;
+       exit(1);
+   }
+
+   delete lexer;
+   return ft;
+}
