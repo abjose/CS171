@@ -26,6 +26,6 @@ void keyfunc(GLubyte key, GLint x, GLint y);
 
 // from old code
 std::vector<std::tuple<int, std::shared_ptr<TransformBlock> > >
-parse(std::istream &datafile, int* frames);
+parse(std::istream &datafile, int &frames);
 
 #endif // __SHADED_H_GUARD__

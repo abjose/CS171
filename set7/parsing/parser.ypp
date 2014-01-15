@@ -15,8 +15,8 @@ int yyerror(const char *s);
 int yylex();
 
 // print debug statements?
-bool debug = false;
-//bool debug = true;
+//bool debug = false;
+bool debug = true;
 // vector for storing input numbers
 std::deque<float> in;
 // vector of tuples of frame numbers and transform blocks
@@ -40,14 +40,11 @@ int total_frames = -1;
 %%
 
 blocks: block | block blocks
-block:  translines
-
-translines: transline | transline translines
-transline:  frameline | translateline | scaleline | rotline
+block:  frameline | translateline | scaleline | rotline | single
 
 frameline: FRAME single {
   if(total_frames == -1) {
-    total_frames = in[0];
+    total_frames = in[1]; // have already read frame number
     if(debug) std::cout << "Got total frames: " << total_frames << std::endl;
   }
   if(debug) std::cout << "Frame: " << in[0] << std::endl;
@@ -98,7 +95,7 @@ int yylex() {
 }
 
 std::vector<std::tuple<int, std::shared_ptr<TransformBlock> > >
-parse(std::istream &datafile, int* frames) {
+parse(std::istream &datafile, int &frames) {
    // Construct the lexer.
    lexer = new yyFlexLexer(&datafile);
    // Run the parser.

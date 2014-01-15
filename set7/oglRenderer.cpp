@@ -301,12 +301,13 @@ void initUI()
 int main(int argc, char* argv[])
 {
   // read cmd line args
-  int mode;
-  mode = std::stoi(argv[1]);
-  windowWidth = std::stoi(argv[2]); windowHeight = std::stoi(argv[3]);
+  int mode = 1;
+  //mode = std::stoi(argv[1]);
+  //windowWidth = std::stoi(argv[2]); windowHeight = std::stoi(argv[3]);
 
   // From old code
-  scene = parse(std::cin);
+  int frames;
+  auto ft = parse(std::cin, frames);
   
   // OpenGL will take out any arguments intended for its use here.
   // Useful ones are -display and -gldebug.
