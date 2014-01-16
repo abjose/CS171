@@ -47,8 +47,12 @@ public:
   }
 
   void display() {
+    std::cout << "FRAME:\n";
+    std::cout << frame << std::endl;
     std::cout << "ROTATION:\n";
     rotation.display();
+    std::cout << "QUATROT (well, part of it)...\n";
+    std::cout << quat_rot[0] << std::endl;
     std::cout << "TRANSLATION:\n";
     translation.display();
     std::cout << "SCALE:\n";
