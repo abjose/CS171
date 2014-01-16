@@ -4,11 +4,7 @@
 #include <string>
 #include <deque>
 #include <memory>
-#include "blocks/camera_block.hh"
-#include "blocks/light_block.hh"
-#include "blocks/transform_block.hh"
-#include "blocks/separator_block.hh"
-#include "blocks/scene_block.hh"
+#include "blocks/keyframe_block.hh"
 //#include "shaded.hh"
 
 int yyerror(const char *s);
@@ -19,12 +15,12 @@ int yylex();
 bool debug = true;
 // vector for storing input numbers
 std::deque<float> in;
-// vector of tuples of frame numbers and transform blocks
-std::vector<std::tuple<int, std::shared_ptr<TransformBlock> > > ft;
-// transform block to append to end of vector
-std::shared_ptr<TransformBlock> trans;
+// vector of keyframe blocks
+std::vector<std::shared_ptr<KeyframeBlock> > keys;
+// keyframe block to append to end of vector
+std::shared_ptr<KeyframeBlock> trans;
 // current frame number
-int frame;
+int frame = -1;
 // total frames
 int total_frames = -1;
 %}
@@ -50,8 +46,12 @@ frameline: FRAME single {
   if(debug) std::cout << "Frame: " << in[0] << std::endl;
   // set total frames if haven't already
   // should reset trans
-  ft.push_back(std::make_tuple(frame, trans));
-  trans = std::shared_ptr<TransformBlock>(new TransformBlock());
+  // only add trans to vector if it's populated (so not on first keyframe)
+  if (frame != -1) {
+    trans->set_frame(frame);
+    keys.push_back(trans);
+  }
+    trans = std::shared_ptr<KeyframeBlock>(new KeyframeBlock());
   // then set current keyframe frame
   frame = in[0];
 }
@@ -94,7 +94,7 @@ int yylex() {
    return lexer->yylex();
 }
 
-std::vector<std::tuple<int, std::shared_ptr<TransformBlock> > >
+std::vector<std::shared_ptr<KeyframeBlock> >
 parse(std::istream &datafile, int &frames) {
    // Construct the lexer.
    lexer = new yyFlexLexer(&datafile);
@@ -104,6 +104,7 @@ parse(std::istream &datafile, int &frames) {
        exit(1);
    }
 
+   frames = total_frames;
    delete lexer;
-   return ft;
+   return keys;
 }
