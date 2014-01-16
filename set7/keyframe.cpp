@@ -1,10 +1,8 @@
 
 #include <iostream>
-#include "oglRenderer.hh"
-//#include "uistate.h"
+#include "keyframe.hh"
 #include "UI/ui.hh"
 
-static std::shared_ptr<SceneBlock> scene;
 static UI *ui;
 
 // The current window size.
@@ -32,6 +30,7 @@ void redraw()
   glTranslatef(ui->final_tx, -1*ui->final_ty, ui->final_tz);
   glRotatef(ui->final_rd, ui->final_rx,ui->final_ry,0);
 
+  /*
   // DO OBJECT STUFF
   for (auto& sep : scene->sep_list) {
     // INITIALIZE MATERIAL FOR THIS SEPARATOR
@@ -85,54 +84,7 @@ void redraw()
     // POP TRANSFORMATIONS
     glPopMatrix();
   }
-  
-  glPopMatrix();
-  glutSwapBuffers();
-}
-
-void redraw_lines() {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  //glTranslatef(0.01,0,0);
-
-  glPushMatrix();
-
-  // apply UI transforms
-  ui->applyViewingTransformation();
-  glTranslatef(ui->final_tx, -1*ui->final_ty, ui->final_tz);
-  glRotatef(ui->final_rd, ui->final_rx,ui->final_ry,0);
-
-  for (auto& sep : scene->sep_list) {
-    // PUSH TRANSFORMATIONS
-    glPushMatrix();
-    
-    // TRANSFORM TO WORLD SPACE
-    for (auto& t : sep->transforms) {
-      glTranslatef(t->translation[0],
-		   t->translation[1],
-		   t->translation[2]);
-      glRotatef(t->rotation[3],
-		t->rotation[0],
-		t->rotation[1],
-		t->rotation[2]);
-      glScalef(t->scale[0],
-	       t->scale[1],
-	       t->scale[2]);
-    }
-
-    // RENDER 
-    glColor3ub( 255,255,255 );
-    glLineWidth(1.0);
-    
-    glBegin(GL_LINE_STRIP);
-    for (auto& pt : sep->vertex_list)
-      glVertex3f(pt[0], pt[1], pt[2]);
-    glEnd();
-    
-    // POP TRANSFORMATIONS
-    glPopMatrix();
-  }
-  
+  */
   glPopMatrix();
   glutSwapBuffers();
 }
@@ -162,6 +114,7 @@ void keyfunc(GLubyte key, GLint x, GLint y)
  * and the light will be used during all renders.
  */
 void initLights() {
+  /*
   // pretty sure can just add to GL_LIGHT0, but probably shouldn't depend on...
   int light_consts[] = {GL_LIGHT0, GL_LIGHT1, GL_LIGHT2, GL_LIGHT3, GL_LIGHT4,
 			GL_LIGHT5, GL_LIGHT6, GL_LIGHT7};
@@ -186,6 +139,7 @@ void initLights() {
   // Turn on lighting.  You can turn it off with a similar call to
   // glDisable().
   glEnable(GL_LIGHTING);
+  */
 }
 
 /**
@@ -208,6 +162,8 @@ void initGL(int mode)
     break;
   }  
     
+
+  /*
   // Enable back-face culling:
   glEnable(GL_CULL_FACE);
   glCullFace(GL_BACK);
@@ -244,6 +200,7 @@ void initGL(int mode)
   // set light parameters if not doing wireframe
   if (mode != 0 && !scene->is_lines)
     initLights();
+  */
 }
 
 //--------------------------------------------------------------------------
@@ -300,14 +257,13 @@ void initUI()
  */
 int main(int argc, char* argv[])
 {
-  // read cmd line args
+  // remove this?
   int mode = 1;
-  //mode = std::stoi(argv[1]);
-  //windowWidth = std::stoi(argv[2]); windowHeight = std::stoi(argv[3]);
 
   // From old code
   int frames;
-  auto ft = parse(std::cin, frames);
+  auto keyframes = parse(std::cin, frames);
+  std::cout << "Got total frames by ref: " << frames << std::endl;
   
   // OpenGL will take out any arguments intended for its use here.
   // Useful ones are -display and -gldebug.
@@ -321,17 +277,13 @@ int main(int argc, char* argv[])
   glutInitWindowSize(windowWidth, windowHeight);
   glutInitWindowPosition(300, 100);
 
-  glutCreateWindow("CS171 HW4");
+  glutCreateWindow("CS171 HW7");
     
   initGL(mode);
   initUI();
 
   // set up GLUT callbacks.
-  if (scene->is_lines)
-    // A bit limiting - modes mutually exclusive. But OK for now, hopefully.
-    glutDisplayFunc(redraw_lines);
-  else
-    glutDisplayFunc(redraw);
+  glutDisplayFunc(redraw);
   glutReshapeFunc(resize);
   glutKeyboardFunc(keyfunc);
   glutMouseFunc(mouse);

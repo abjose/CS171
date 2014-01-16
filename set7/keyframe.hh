@@ -7,7 +7,7 @@
 #include "GL/glu.h"
 #include "GL/glut.h"
 
-#include "blocks/scene_block.hh"
+#include "blocks/keyframe_block.hh"
 
 /* 
  * A quadric can be a cylinder, disk, sphere, cone, etc.
@@ -25,7 +25,7 @@ void resize(GLint w, GLint h);
 void keyfunc(GLubyte key, GLint x, GLint y);
 
 // from old code
-std::vector<std::tuple<int, std::shared_ptr<TransformBlock> > >
+std::vector<std::shared_ptr<KeyframeBlock> >
 parse(std::istream &datafile, int &frames);
 
 #endif // __SHADED_H_GUARD__
