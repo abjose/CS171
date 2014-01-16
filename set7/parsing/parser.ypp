@@ -51,7 +51,7 @@ frameline: FRAME single {
     trans->set_frame(frame);
     keys.push_back(trans);
   }
-    trans = std::shared_ptr<KeyframeBlock>(new KeyframeBlock());
+  trans = std::shared_ptr<KeyframeBlock>(new KeyframeBlock());
   // then set current keyframe frame
   frame = in[0];
 }
@@ -102,6 +102,12 @@ parse(std::istream &datafile, int &frames) {
    if(yyparse()) {
        std::cerr << "Parse failed!" << std::endl;
        exit(1);
+   }
+
+   // add final keyframe
+   if (frame != -1) {
+     trans->set_frame(frame);
+     keys.push_back(trans);
    }
 
    frames = total_frames;

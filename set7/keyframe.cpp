@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include "keyframe.hh"
+#include "framer.hh"
 #include "UI/ui.hh"
 
 static UI *ui;
@@ -264,7 +265,10 @@ int main(int argc, char* argv[])
   int frames;
   auto keyframes = parse(std::cin, frames);
   std::cout << "Got total frames by ref: " << frames << std::endl;
-  
+
+  Framer f(keyframes);
+  f.display();
+
   // OpenGL will take out any arguments intended for its use here.
   // Useful ones are -display and -gldebug.
   glutInit(&argc, argv);
@@ -290,7 +294,7 @@ int main(int argc, char* argv[])
   glutMotionFunc(motion);
 
   // From here on, GLUT has control,
-  glutMainLoop();
+  //glutMainLoop();
 
   // so we should never get to this point.
   return 1;

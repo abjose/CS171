@@ -14,29 +14,66 @@ Need...
 - Modify TransformBlock to having a quat?
  */
 
-
-
-void stuff() {
-  auto q  = glm::gtc::quaternion::quat(1,1,1,1);
-  //auto q2 = gtx::quaternion::angleAxis(degrees(RotationAngle), RotationAxis);
-  glm::core::type::mat4 m;
+template <typename T>
+T Framer::basic_interpolate(float u, T k0, T k1) {
+  return k0*(2*pow(u,3)-3*u*u+1) + k1*(3*u*u-2*pow(u,3));
 }
 
+template <typename T>
+T Framer::interpolate(float u, T k0, T k1, T k2, T k3) {
+  // interpolate between k1 and k2 using catmull-rom
+  float dx = 1.;  // what should this be??
+  T k1_p = ((k1-k0)/dx)*0.5 + ((k2-k1)/dx)*0.5;
+  T k2_p = ((k2-k1)/dx)*0.5 + ((k3-k2)/dx)*0.5;
+  return k1*(2*pow(u,3)-3*u*u+1) + k2*(3*u*u-2*pow(u,3)) + 
+    k1_p*(pow(u,3)-2*u*u+u) + k2_p*(pow(u,3)-u*u);
+}
 
 void Framer::quatify() {
   // take keyframe vector and convert rotations to quaternions
   // also copy first and last elements? (to enable better interpolation)
-  
+  for (auto &key : keyframes) {
+    key->find_quat_rot();
+  }
+  // could, instead of copying first and last, just deal with that in the final
+  // loop?
 }
 
 void Framer::framify() {
   // take quatified keyframe vector and populate the frames vector appropriately
-  
+  for (int keyframe_idx=0; keyframe_idx<keyframes.size()-1; keyframe_idx++) {
+    // just doing simple interpolation for now
+    auto f1 = keyframes[keyframe_idx];
+    auto f2 = keyframes[keyframe_idx+1]; // make sure to stop one before end
+    
+    // figure out how many frames to make for current keyframe pair, and du
+    int num_frames = f2->frame - f1->frame - 1; // go s.t. [f1,f2)
+    float du = 1./num_frames;
+
+    // loop to make that many frames, pushing onto frames vector as you go
+    float u = 0;
+    for(int i=0; i<num_frames; i++) {
+      auto frame = std::shared_ptr<KeyframeBlock>(new KeyframeBlock());
+      frame->scale = basic_interpolate<Matrix<float,3,1> >
+	(u, f1->scale, f2->scale);
+      frame->quat_rot = basic_interpolate<glm::gtc::quaternion::quat>
+	(u, f1->quat_rot, f2->quat_rot);
+      frame->translation = basic_interpolate<Matrix<float,3,1> >
+	(u, f1->translation, f2->translation);
+      frames.push_back(frame);
+      u += du;
+    }
+  }
 }
 
 
 void Framer::display() {
-  for (auto &trans : frames) {
-    std::cout << trans << std::endl;
+  std::cout << "Displaying keyframes:\n";
+  for (auto &key : keyframes) {
+    key->display();
+  }
+  std::cout << "Displaying frames:\n";
+  for (auto &f: frames) {
+    std::cout << f << std::endl;
   }
 }
