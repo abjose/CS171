@@ -1,21 +1,24 @@
-#ifndef __TRANSFORM_BLOCK_H_GUARD__
-#define __TRANSFORM_BLOCK_H_GUARD__
+#ifndef __KEYFRAME_BLOCK_H_GUARD__
+#define __KEYFRAME_BLOCK_H_GUARD__
 
 #include <memory>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include "../matrix/matrix.hh"
 #include "../matrix/transform.hh"
 
-class TransformBlock {
+class KeyframeBlock {
 public:
   //private:
-  //Matrix<float,4,1> transform;
   Matrix<float,4,1> rotation;
+  glm::gtc::quaternion::quat quat_rot;
   Matrix<float,3,1> translation;
   Matrix<float,3,1> scale;
+  int frame;
 
   //public:
   // default constructor
-  TransformBlock() {}
+  KeyframeBlock() {}
 
   void set_rotation(float x, float y, float z, float theta) {
     // TODO: put PI somewhere else...
@@ -30,6 +33,19 @@ public:
     scale = makeVector3<float>(a,b,c);
   }
 
+  void find_quat_rot() {
+    // assumes x,y,z,theta in 'rotation'
+    // pass as degrees, x,y,z
+    quat_rot = glm::gtx::quaternion::angleAxis(rotation[3],
+					       rotation[0],
+					       rotation[1],
+					       rotation[2]);
+  }
+
+  void set_frame(int f) {
+    frame = f;
+  }
+
   void display() {
     std::cout << "ROTATION:\n";
     rotation.display();
@@ -42,4 +58,4 @@ public:
 };
 
 
-#endif // __TRANSFORM_BLOCK_H_GUARD__
+#endif // __KEYFRAME_BLOCK_H_GUARD__
