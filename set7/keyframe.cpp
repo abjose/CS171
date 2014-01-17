@@ -1,11 +1,12 @@
 
+#include <memory>
 #include <iostream>
 #include "keyframe.hh"
 #include "framer.hh"
 #include "UI/ui.hh"
 
 static UI *ui;
-static Framer f;
+static std::shared_ptr<Framer> f;
 
 // The current window size.
 int windowWidth = 800, windowHeight = 600;
@@ -30,7 +31,7 @@ void redraw()
   //glTranslatef(ui->final_tx, -1*ui->final_ty, ui->final_tz);
   //glRotatef(ui->final_rd, ui->final_rx,ui->final_ry,0);
   
-  auto T = f.get_next_frame();
+  auto T = f->get_next_frame();
   std::cout << std::endl;
   T->display();
   glScalef(T->scale[0], T->scale[1], T->scale[2]);
@@ -41,24 +42,6 @@ void redraw()
 
   glPopMatrix();
   glutSwapBuffers();
-}
-
-/*
- * GLUT calls this function when any key is pressed while our window has
- * focus.  Here, we just quit if any appropriate key is pressed.  You can
- * do a lot more cool stuff with this here.
- */
-void keyfunc(GLubyte key, GLint x, GLint y)
-{
-  switch (key) {
-  // escape or q or Q
-  case 27:
-  case 'q':
-  case 'Q':
-    exit(0);
-    break;
-  }
-   
 }
 
 /** Utility functions **/
@@ -147,9 +130,6 @@ void initGL()
   gluLookAt(-10, -10, -10, -5, 0, 0, 1, 0, 0);
 }
 
-//--------------------------------------------------------------------------
-// Handles reshaping of the program window
-//--------------------------------------------------------------------------
 void resize(GLint w, GLint h)
 {
   if (h == 0) h = 1;
@@ -165,31 +145,32 @@ void resize(GLint w, GLint h)
   glutPostRedisplay();
 }
 
-
-//--------------------------------------------------------------------------
-// Handles motion of the mouse when a button is being held
-//--------------------------------------------------------------------------
 void motion(const int x, const int y)
 {
   // Just pass it on to the ui controller.
   ui->motionFunction(x, y);
 }
 
-//--------------------------------------------------------------------------
-// Handles mouse clicks and releases
-//--------------------------------------------------------------------------
-void mouse(const int button, const int state, const int x, const int y)
-{
+// void mouse(const int button, const int state, const int x, const int y)
+// {
+//   // Just pass it on to the ui controller.
+//   ui->mouseFunction(button, state, x, y);
+//}
+
+void keyfunc(const GLubyte key, GLint x, GLint y) {
   // Just pass it on to the ui controller.
-  ui->mouseFunction(button, state, x, y);
+  ui->keyFunction(key, x, y);
 }
 
-//--------------------------------------------------------------------------
-// Initializes the UI
-//--------------------------------------------------------------------------
+void specialfunc(const int key, const int x, const int y)
+{
+  // Just pass it on to the ui controller.
+  ui->specialFunction(key, x, y);
+}
+
 void initUI()
 {
-  ui = new UI();
+  ui = new UI(f);
   resize(windowWidth, windowHeight);
   //checkGLErrors("End of uiInit");
 }
@@ -205,9 +186,9 @@ int main(int argc, char* argv[])
   int num_frames;
   auto keyframes = parse(std::cin, num_frames);
   std::cout << "Got total frames by ref: " << num_frames << std::endl;
-
-  f = Framer(keyframes, num_frames);
-  //f.display();
+  
+  f = std::shared_ptr<Framer>(new Framer(keyframes, num_frames));
+  //f->display();
 
   // OpenGL will take out any arguments intended for its use here.
   // Useful ones are -display and -gldebug.
@@ -230,7 +211,8 @@ int main(int argc, char* argv[])
   glutDisplayFunc(redraw);
   glutReshapeFunc(resize);
   glutKeyboardFunc(keyfunc);
-  glutMouseFunc(mouse);
+  glutSpecialFunc(specialfunc);
+  //glutMouseFunc(mouse);
   glutMotionFunc(motion);
 
   // From here on, GLUT has control,

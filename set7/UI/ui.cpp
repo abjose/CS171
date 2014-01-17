@@ -11,54 +11,62 @@ void UI::motionFunction(const int x, const int y) {
 
 
 
-void UI::mouseFunction(int button, int state, int x, int y) {
-  mx = x;
-  my = y;
-
-  switch(button) {
-    case GLUT_LEFT_BUTTON:
-    // rotate on left
-      if(state == GLUT_DOWN) {
-	startRotation();
-      }
-      else if(state == GLUT_UP) {
-	endRotation();
-      }
-      break;
-  case GLUT_MIDDLE_BUTTON:
-    if(state == GLUT_DOWN) {
-      if(glutGetModifiers() == GLUT_ACTIVE_SHIFT)
-	startZoom();
-      else
-	startTranslation();
-    }
-    else if(state == GLUT_UP) {
-      if(glutGetModifiers() == GLUT_ACTIVE_SHIFT)
-	endZoom();
-      else
-	endTranslation();
-    }
-    break;
-  default:
-    break;
-  }
-
-  glutPostRedisplay();
-}
-
-
 void UI::keyFunction(GLubyte key, GLint x, GLint y) {
   switch (key) {
+  case 'p':
+  case 'P':
+    // play
+    break;
+  case 's':
+  case 'S':
+    // stop
+    break;
+  case 'f':
+  case 'F':
+    // forward
+    break;
+  case 'r':
+  case 'R':
+    // reverse
+    break;
+  case 'l':
+  case 'L':
+    // toggle loop mode
+    break;
+  case 'j':
+  case 'J':
+    // jump to frame
+    break;
+  case '0':
+    // jump to start
+    f->curr_frame = 0;
+    break;
   case 27:
   case 'q':
   case 'Q':
     // escape or q or Q
     exit(0);
     break;
-  default:
-    break;
   }
    
+
+  glutPostRedisplay();
+}
+
+void UI::specialFunction(int key, int x, int y) {
+  switch(key) {
+  case GLUT_KEY_UP:
+    break;
+  case GLUT_KEY_DOWN:
+    break;
+  case GLUT_KEY_LEFT:
+    break;
+  case GLUT_KEY_RIGHT:
+    break;
+
+  }
+
+  glutPostRedisplay();
 }
 
 // TRANSLATION
