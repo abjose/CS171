@@ -20,10 +20,7 @@ private:
   // global
   std::shared_ptr<Framer> f;
 
-  // cam stuff
-  float cam_x = -10;
-  float cam_y = -10; 
-  float cam_z = -10;
+ 
 
   // TRANSLATION
   // state variables - set to 0 if off, 1 if on
@@ -73,6 +70,11 @@ public:
   float final_rx;
   float final_ry;
   float final_rz;
+
+  // cam stuff
+  float cam_x = -10;
+  float cam_y = -10; 
+  float cam_z = -10;
 
   UI() {}
   UI(std::shared_ptr<Framer> fp) {

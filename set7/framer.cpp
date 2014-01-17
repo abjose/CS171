@@ -94,8 +94,13 @@ void Framer::dequatify() {
 
 std::shared_ptr<KeyframeBlock> Framer::get_next_frame() {
   // just use an iterator instead?
-  curr_frame = std::max<int>(std::min<int>(frames.size()-1, curr_frame+1), 0);
-  return frames[curr_frame-1];
+  auto frame = frames[std::max<int>(std::min<int>(frames.size()-1, curr_frame),
+				    0)];
+  if (playing)
+    curr_frame += 1;
+  if (looping && curr_frame >= frames.size())
+    curr_frame = 0;
+  return frame;
 }
 
 void Framer::display() {

@@ -26,7 +26,11 @@ void redraw()
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glPushMatrix();
+  //glPushMatrix();
+
+  glLoadIdentity();
+  //gluLookAt(-10, -10, -10, -5, 0, 0, 1, 0, 0);
+  gluLookAt(ui->cam_x, ui->cam_y, ui->cam_z, -5, 0, 0, 1, 0, 0);
 
   // APPLY UI TRANSFORMS
   //ui->applyViewingTransformation();
@@ -41,7 +45,7 @@ void redraw()
 
   makeIbar();
 
-  glPopMatrix();
+  //glPopMatrix();
   glutSwapBuffers();
 }
 
@@ -127,8 +131,8 @@ void initGL()
 
   // from now on, everything should be in modelview
   glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
-  gluLookAt(-10, -10, -10, -5, 0, 0, 1, 0, 0);
+  //glLoadIdentity();
+  //gluLookAt(-10, -10, -10, -5, 0, 0, 1, 0, 0);
 }
 
 void resize(GLint w, GLint h)
@@ -215,6 +219,7 @@ int main(int argc, char* argv[])
 
   // set up GLUT callbacks.
   glutDisplayFunc(redraw);
+  glutIdleFunc(redraw);
   glutReshapeFunc(resize);
   glutKeyboardFunc(keyfunc);
   glutSpecialFunc(specialfunc);

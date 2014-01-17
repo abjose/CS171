@@ -22,6 +22,8 @@ private:
 public:
   std::vector<std::shared_ptr<KeyframeBlock> > frames;
   int curr_frame;
+  bool looping = true;
+  bool playing = true;
 
   // default constructor...don't use...
   Framer() {}
