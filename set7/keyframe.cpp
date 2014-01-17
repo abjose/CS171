@@ -31,9 +31,11 @@ void redraw()
   //glRotatef(ui->final_rd, ui->final_rx,ui->final_ry,0);
   
   auto T = f.get_next_frame();
+  std::cout << std::endl;
+  T->display();
+  glScalef(T->scale[0], T->scale[1], T->scale[2]);
   glRotatef(T->rotation[3], T->rotation[0], T->rotation[1], T->rotation[2]);
   glTranslatef(T->translation[0], T->translation[1], T->translation[2]);
-  glScalef(T->scale[0], T->scale[1], T->scale[2]);
 
   makeIbar();
 
@@ -142,8 +144,7 @@ void initGL()
   // from now on, everything should be in modelview
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  //gluLookAt(0, 0, 10, 0, 0, 0, 1, 0, 0);
-  gluLookAt(0, 0, 20, -5, 0, 0, 1, 0, 0);
+  gluLookAt(-10, -10, -10, -5, 0, 0, 1, 0, 0);
 }
 
 //--------------------------------------------------------------------------
@@ -206,7 +207,7 @@ int main(int argc, char* argv[])
   std::cout << "Got total frames by ref: " << num_frames << std::endl;
 
   f = Framer(keyframes, num_frames);
-  f.display();
+  //f.display();
 
   // OpenGL will take out any arguments intended for its use here.
   // Useful ones are -display and -gldebug.

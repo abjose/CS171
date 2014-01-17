@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <math.h>
+#include <algorithm>
 #include "../matrix/matrix.hh"
 #include "../matrix/transform.hh"
 
@@ -48,7 +49,8 @@ public:
     // assumes quat =(s,v1,v2,v3) has been found, overwrites rotation with
     // stuff to pass to glRotate. Make sure to convert back to degrees.
     // again switching back to x,y,z,theta....lol.
-    float theta = (2*acos(quat[0]))*180 / PI;
+    float q0 = std::min<float>(std::max<float>(-1.0, quat[0]), 1.0);
+    float theta = (2*acos(q0))*180 / PI;
     float x = quat[1]; float y = quat[2]; float z = quat[3];
     rotation = makeVector4<float>(x,y,z, theta);
   }
