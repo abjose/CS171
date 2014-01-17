@@ -1,8 +1,6 @@
 #ifndef __FRAMER_H_GUARD__
 #define __FRAMER_H_GUARD__
 
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/quaternion.hpp>
 #include <memory>
 #include <vector>
 
@@ -15,6 +13,7 @@ private:
 
   void quatify();
   void framify();
+  void dequatify();
   template <typename T>
   T basic_interpolate(float u, T k0, T k1);
   template <typename T>

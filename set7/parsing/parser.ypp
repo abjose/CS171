@@ -11,8 +11,8 @@ int yyerror(const char *s);
 int yylex();
 
 // print debug statements?
-//bool debug = false;
-bool debug = true;
+bool debug = false;
+//bool debug = true;
 // vector for storing input numbers
 std::deque<float> in;
 // vector of keyframe blocks
@@ -68,7 +68,7 @@ scaleline: SCALE triple {
   //trans->display();
 }
 rotline: ROT quad {
-  if(debug) std::cout << "Got rotation: " << ' ' << in[2] << ' ' 
+  if(debug) std::cout << "Got rotation: " << in[3] << ' ' << in[2] << ' ' 
 		      << in[1] << ' ' << in[0] << std::endl;
   trans->set_rotation(in[3],in[2],in[1],in[0]);
   //trans->display();

@@ -261,13 +261,13 @@ int main(int argc, char* argv[])
   // remove this?
   int mode = 1;
 
-  // From old code
-  int frames;
-  auto keyframes = parse(std::cin, frames);
-  std::cout << "Got total frames by ref: " << frames << std::endl;
+  // parse stuff
+  int num_frames;
+  auto keyframes = parse(std::cin, num_frames);
+  std::cout << "Got total frames by ref: " << num_frames << std::endl;
 
-  Framer f(keyframes);
-  f.display();
+  Framer f(keyframes, num_frames);
+  //f.display();
 
   // OpenGL will take out any arguments intended for its use here.
   // Useful ones are -display and -gldebug.

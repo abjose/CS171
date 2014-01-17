@@ -31,23 +31,21 @@ T Framer::interpolate(float u, T k0, T k1, T k2, T k3) {
 
 void Framer::quatify() {
   // take keyframe vector and convert rotations to quaternions
-  // also copy first and last elements? (to enable better interpolation)
-  for (auto &key : keyframes) {
-    key->find_quat_rot();
-  }
-  // could, instead of copying first and last, just deal with that in the final
-  // loop?
+  for (auto &key : keyframes)
+    key->find_quat();
 }
 
 void Framer::framify() {
   // copy the last frame with the desired final number of frames if necessary
+  // should probably do something like this for first set as well...
   auto back = keyframes.back();
   auto last = std::shared_ptr<KeyframeBlock>(new KeyframeBlock());
   last->scale = back->scale;
-  last->quat_rot = back->quat_rot;
+  last->quat = back->quat;
   last->translation = back->translation;
   last->frame = num_frames;
   keyframes.push_back(last);
+  // TODO: DO THIS PART LESS UGLY
 
   // take quatified keyframe vector and populate the frames vector appropriately
   for (int keyframe_idx=0; keyframe_idx<keyframes.size()-1; keyframe_idx++) {
@@ -70,8 +68,8 @@ void Framer::framify() {
       auto frame = std::shared_ptr<KeyframeBlock>(new KeyframeBlock());
       frame->scale = basic_interpolate<Matrix<float,3,1> >
 	(u, f1->scale, f2->scale);
-      frame->quat_rot = basic_interpolate<glm::gtc::quaternion::quat>
-	(u, f1->quat_rot, f2->quat_rot);
+      frame->quat = basic_interpolate<Matrix<float,4,1> >
+	(u, f1->quat, f2->quat);
       frame->translation = basic_interpolate<Matrix<float,3,1> >
 	(u, f1->translation, f2->translation);
       frames.push_back(frame);
@@ -83,7 +81,9 @@ void Framer::framify() {
 }
 
 void Framer::dequatify() {
-  // take generated frames and convert quaternions back old rotations
+  // take generated frames and convert quaternions back to  old rotations
+  for (auto &f : frames)
+    f->find_rot();
 }
 
 

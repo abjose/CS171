@@ -2,16 +2,17 @@
 #define __KEYFRAME_BLOCK_H_GUARD__
 
 #include <memory>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/quaternion.hpp>
+#include <math.h>
 #include "../matrix/matrix.hh"
 #include "../matrix/transform.hh"
+
+#define PI 3.14159265
 
 class KeyframeBlock {
 public:
   //private:
   Matrix<float,4,1> rotation;
-  glm::gtc::quaternion::quat quat_rot;
+  Matrix<float,4,1> quat;
   Matrix<float,3,1> translation;
   Matrix<float,3,1> scale;
   int frame;
@@ -21,10 +22,9 @@ public:
   KeyframeBlock() {}
 
   void set_rotation(float x, float y, float z, float theta) {
-    // TODO: put PI somewhere else...
-    float PI  = 3.14159265;
-    float deg = (theta * 180) / PI;
-    rotation = makeVector4<float>(x,y,z,deg);
+    //float deg = (theta * 180) / PI;
+    //rotation = makeVector4<float>(x,y,z,deg);
+    rotation = makeVector4<float>(x,y,z,theta); // theta already in degrees
   }
   void set_translation(float x, float y, float z) {
     translation = makeVector3<float>(x,y,z);
@@ -33,13 +33,24 @@ public:
     scale = makeVector3<float>(a,b,c);
   }
 
-  void find_quat_rot() {
-    // assumes x,y,z,theta in 'rotation'
-    // pass as degrees, x,y,z
-    quat_rot = glm::gtx::quaternion::angleAxis(rotation[3],
-					       rotation[0],
-					       rotation[1],
-					       rotation[2]);
+  void find_quat() {
+    // assumes x,y,z,theta in 'rotation'. Convert theta to radians.
+    float half_theta = 0.5*(rotation[3]*PI / 180.0);
+    float x = rotation[0]; float y = rotation[1]; float z = rotation[2];
+    quat = makeVector4<float>(cos(half_theta),
+			      x*sin(half_theta),
+			      y*sin(half_theta),
+			      z*sin(half_theta));
+    quat = quat.normalize();
+  }
+
+  void find_rot() {
+    // assumes quat =(s,v1,v2,v3) has been found, overwrites rotation with
+    // stuff to pass to glRotate. Make sure to convert back to degrees.
+    // again switching back to x,y,z,theta....lol.
+    float theta = (2*acos(quat[0]))*180 / PI;
+    float x = quat[1]; float y = quat[2]; float z = quat[3];
+    rotation = makeVector4<float>(x,y,z, theta);
   }
 
   void set_frame(int f) {
@@ -51,8 +62,8 @@ public:
     std::cout << frame << std::endl;
     std::cout << "ROTATION:\n";
     rotation.display();
-    std::cout << "QUATROT (well, part of it)...\n";
-    std::cout << quat_rot[0] << std::endl;
+    std::cout << "QUAT\n";
+    quat.display();
     std::cout << "TRANSLATION:\n";
     translation.display();
     std::cout << "SCALE:\n";
