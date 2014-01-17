@@ -11,7 +11,6 @@ Need...
 
 template <typename T>
 T Framer::basic_interpolate(float u, T k0, T k1) {
-
   return k0*(2*pow(u,3)-3*u*u+1) + k1*(3*u*u-2*pow(u,3));
 }
 
@@ -82,6 +81,12 @@ void Framer::dequatify() {
     f->find_rot();
 }
 
+std::shared_ptr<KeyframeBlock> Framer::get_next_frame() {
+  // just use an iterator instead?
+  if (curr_frame < frames.size())
+    curr_frame += 1;
+  return frames[curr_frame-1];
+}
 
 void Framer::display() {
   std::cout << "Displaying keyframes:\n";

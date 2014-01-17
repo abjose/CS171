@@ -10,6 +10,7 @@ class Framer {
 private:
   std::vector<std::shared_ptr<KeyframeBlock> > keyframes;
   int num_frames;
+  int curr_frame;
 
   void quatify();
   void framify();
@@ -25,6 +26,7 @@ public:
   // default constructor...don't use...
   Framer() {}
   Framer(std::vector<std::shared_ptr<KeyframeBlock> > k, int f) {
+    curr_frame = 0;
     keyframes = k;
     num_frames = f;
     //std::cout << "num_frames in framer: " << num_frames << std::endl;
@@ -34,7 +36,7 @@ public:
     dequatify();
   }
 
-
+  std::shared_ptr<KeyframeBlock> get_next_frame();
   void display();
 
 };

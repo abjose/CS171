@@ -29,6 +29,11 @@ void redraw()
   //ui->applyViewingTransformation();
   //glTranslatef(ui->final_tx, -1*ui->final_ty, ui->final_tz);
   //glRotatef(ui->final_rd, ui->final_rx,ui->final_ry,0);
+  
+  auto T = f.get_next_frame();
+  glRotatef(T->rotation[3], T->rotation[0], T->rotation[1], T->rotation[2]);
+  glTranslatef(T->translation[0], T->translation[1], T->translation[2]);
+  glScalef(T->scale[0], T->scale[1], T->scale[2]);
 
   makeIbar();
 
@@ -131,12 +136,14 @@ void initGL()
   // Look up these functions to see what they're doing.
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  glFrustum(-0.5, 0.5, -0.5, 0.5, 1, 10);
+  //glFrustum(-0.5, 0.5, -0.5, 0.5, 1, 100);
+  glFrustum(-1., 1., -1., 1., 1, 100);
 
   // from now on, everything should be in modelview
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  gluLookAt(0, 0, 5, 0, 0, 0, 1, 0, 0);
+  //gluLookAt(0, 0, 10, 0, 0, 0, 1, 0, 0);
+  gluLookAt(0, 0, 20, -5, 0, 0, 1, 0, 0);
 }
 
 //--------------------------------------------------------------------------
