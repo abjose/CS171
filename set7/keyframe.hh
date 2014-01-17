@@ -1,7 +1,8 @@
-#ifndef __SHADED_H_GUARD__
-#define __SHADED_H_GUARD__
+#ifndef __KEYFRAME_H_GUARD__
+#define __KEYFRAME_H_GUARD__
 
 #include <memory>
+#include <fstream>
 
 #include "GL/gl.h"
 #include "GL/glu.h"
@@ -29,4 +30,4 @@ void keyfunc(GLubyte key, GLint x, GLint y);
 std::vector<std::shared_ptr<KeyframeBlock> >
 parse(std::istream &datafile, int &frames);
 
-#endif // __SHADED_H_GUARD__
+#endif // __KEYFRAME_H_GUARD__

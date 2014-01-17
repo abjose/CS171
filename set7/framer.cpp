@@ -54,10 +54,10 @@ void Framer::framify() {
     // figure out how many frames to make for current keyframe pair, and du
     int num_frames = f2->frame - f1->frame; // go s.t. [f1,f2)
     float du = 1./num_frames;
-    std::cout << "f1 frame: " << f1->frame << std::endl;
-    std::cout << "f2 frame: " << f2->frame << std::endl;
-    std::cout << "Number of frames to make for this pair: " << num_frames << std::endl;
-    std::cout << "du: " << du << std::endl;
+    // std::cout << "f1 frame: " << f1->frame << std::endl;
+    // std::cout << "f2 frame: " << f2->frame << std::endl;
+    // std::cout << "Number of frames to make for this pair: " << num_frames << std::endl;
+    // std::cout << "du: " << du << std::endl;
 
 
     // loop to make that many frames, pushing onto frames vector as you go
@@ -94,8 +94,7 @@ void Framer::dequatify() {
 
 std::shared_ptr<KeyframeBlock> Framer::get_next_frame() {
   // just use an iterator instead?
-  if (curr_frame < frames.size())
-    curr_frame += 1;
+  curr_frame = std::max<int>(std::min<int>(frames.size()-1, curr_frame+1), 0);
   return frames[curr_frame-1];
 }
 

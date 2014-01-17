@@ -1,6 +1,8 @@
 
 #include <memory>
+#include <string>
 #include <iostream>
+#include <fstream>
 #include "keyframe.hh"
 #include "framer.hh"
 #include "UI/ui.hh"
@@ -32,8 +34,7 @@ void redraw()
   //glRotatef(ui->final_rd, ui->final_rx,ui->final_ry,0);
   
   auto T = f->get_next_frame();
-  std::cout << std::endl;
-  T->display();
+  //T->display();
   glScalef(T->scale[0], T->scale[1], T->scale[2]);
   glRotatef(T->rotation[3], T->rotation[0], T->rotation[1], T->rotation[2]);
   glTranslatef(T->translation[0], T->translation[1], T->translation[2]);
@@ -182,11 +183,16 @@ void initUI()
  */
 int main(int argc, char* argv[])
 {
+  // open file
+  std::string filename(argv[1]);
+  std::ifstream file(filename);
+  if (!file.is_open())
+    exit(1);
+
   // parse stuff
   int num_frames;
-  auto keyframes = parse(std::cin, num_frames);
-  std::cout << "Got total frames by ref: " << num_frames << std::endl;
-  
+  //auto keyframes = parse(std::cin, num_frames);  
+  auto keyframes = parse(file, num_frames);  
   f = std::shared_ptr<Framer>(new Framer(keyframes, num_frames));
   //f->display();
 

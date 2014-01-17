@@ -1,5 +1,8 @@
 
+#include <iostream>
+
 #include "ui.hh"
+
 
 void UI::motionFunction(const int x, const int y) {
   mx = x; 
@@ -36,6 +39,10 @@ void UI::keyFunction(GLubyte key, GLint x, GLint y) {
   case 'j':
   case 'J':
     // jump to frame
+    int test;
+    std::cout << "Jump to frame: ";
+    std::cin >> test;
+    //std::cout << "test: " << test << std::endl;
     break;
   case '0':
     // jump to start
