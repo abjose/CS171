@@ -18,6 +18,7 @@ GLUquadricObj* quad;
 
 /** PROTOTYPES **/
 void initLights();
+void makeIbar();
 void initMaterial();
 void redraw();
 void initGL();

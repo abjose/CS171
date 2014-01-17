@@ -5,6 +5,7 @@
 #include "UI/ui.hh"
 
 static UI *ui;
+static Framer f;
 
 // The current window size.
 int windowWidth = 800, windowHeight = 600;
@@ -22,70 +23,15 @@ void redraw()
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  //glTranslatef(0.01,0,0);
-
   glPushMatrix();
 
   // APPLY UI TRANSFORMS
-  ui->applyViewingTransformation();
-  glTranslatef(ui->final_tx, -1*ui->final_ty, ui->final_tz);
-  glRotatef(ui->final_rd, ui->final_rx,ui->final_ry,0);
+  //ui->applyViewingTransformation();
+  //glTranslatef(ui->final_tx, -1*ui->final_ty, ui->final_tz);
+  //glRotatef(ui->final_rd, ui->final_rx,ui->final_ry,0);
 
-  /*
-  // DO OBJECT STUFF
-  for (auto& sep : scene->sep_list) {
-    // INITIALIZE MATERIAL FOR THIS SEPARATOR
-    GLfloat emit[] = {0.0, 0.0, 0.0, 0.0}; // wat
-    GLfloat amb[] = {sep->material->ambient[0],
-		     sep->material->ambient[1],
-		     sep->material->ambient[2]};
-    GLfloat diff[] = {sep->material->diffuse[0],
-		      sep->material->diffuse[1],
-		      sep->material->diffuse[2]};
-    GLfloat spec[] = {sep->material->specular[0],
-		      sep->material->specular[1],
-		      sep->material->specular[2]};
-    GLfloat shiny = sep->material->shininess;
-    
-    glMaterialfv(GL_FRONT, GL_AMBIENT, amb);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, diff);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, spec);
-    glMaterialfv(GL_FRONT, GL_EMISSION, emit);
-    glMaterialfv(GL_FRONT, GL_SHININESS, &shiny);
+  makeIbar();
 
-    // PUSH TRANSFORMATIONS
-    glPushMatrix();
-    
-    // TRANSFORM TO WORLD SPACE
-    for (auto& t : sep->transforms) {
-      glTranslatef(t->translation[0],
-		   t->translation[1],
-		   t->translation[2]);
-      glRotatef(t->rotation[3],
-		t->rotation[0],
-		t->rotation[1],
-		t->rotation[2]);
-      glScalef(t->scale[0],
-	       t->scale[1],
-	       t->scale[2]);
-    }
-
-    // RENDER
-    sep->render();  // TODO: change name to populate_blah or something
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_NORMAL_ARRAY);
-    glVertexPointer(3, GL_FLOAT, 0, sep->vertices);
-    glNormalPointer(GL_FLOAT, 0, sep->normals);
-    glDrawArrays(GL_TRIANGLES, 0, sep->n_verts);
-    // deactivate vertex arrays after drawing
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableClientState(GL_NORMAL_ARRAY);
-    
-
-    // POP TRANSFORMATIONS
-    glPopMatrix();
-  }
-  */
   glPopMatrix();
   glutSwapBuffers();
 }
@@ -110,61 +56,70 @@ void keyfunc(GLubyte key, GLint x, GLint y)
 
 /** Utility functions **/
 
-/**
- * Sets up an OpenGL light.  This only needs to be called once
- * and the light will be used during all renders.
- */
-void initLights() {
-  /*
-  // pretty sure can just add to GL_LIGHT0, but probably shouldn't depend on...
-  int light_consts[] = {GL_LIGHT0, GL_LIGHT1, GL_LIGHT2, GL_LIGHT3, GL_LIGHT4,
-			GL_LIGHT5, GL_LIGHT6, GL_LIGHT7};
+void makeIbar() {
+  float r = 0.1;
 
-  for (int i=0; i<scene->lights.size(); i++) {  
-    auto l   = scene->lights[i];
-    int  l_c = light_consts[i];
+  GLUquadricObj *lbot;
+  GLUquadricObj *rbot;
+  GLUquadricObj *mid;
+  GLUquadricObj *ltop;
+  GLUquadricObj *rtop;
+  
+  // bottom-left cylinder
+  glPushMatrix();
+  lbot = gluNewQuadric();
+  glColor3f(1.0, 0.0, 0.0);
+  glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);
+  glTranslatef(0.0f, -1.0f, 0.0f);
+  gluCylinder(lbot,r,r,1.0f,32,32);
+  glPopMatrix();
 
-    GLfloat amb[] = { 0.0, 0.0, 0.0, 1.0 };
-    GLfloat spec[] = {l->color[0], l->color[1], l->color[2], 1.0f};
-    GLfloat diff[] = {l->color[0], l->color[1], l->color[2], 1.0f};
-    GLfloat lightpos[] = { l->location[0],l->location[1],l->location[2], 1.0f };
+  // bottom-right cylinder
+  glPushMatrix();
+  rbot = gluNewQuadric();
+  glColor3f(0.0, 1.0, 0.0);
+  glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+  glTranslatef(0.0f, -1.0f, 0.0f);
+  gluCylinder(rbot,r,r,1.0f,32,32);
+  glPopMatrix();
 
-    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, amb);
-    glLightfv(l_c, GL_AMBIENT, amb);
-    glLightfv(l_c, GL_DIFFUSE, diff);
-    glLightfv(l_c, GL_SPECULAR, spec);
-    glLightfv(l_c, GL_POSITION, lightpos);
-    glEnable(l_c);
-  }
+  // middle cylinder
+  glPushMatrix();
+  mid  = gluNewQuadric();
+  glColor3f(1.0, 0.0, 1.0);
+  glTranslatef(0.0f, 1.0f, 0.0f);
+  glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
 
-  // Turn on lighting.  You can turn it off with a similar call to
-  // glDisable().
-  glEnable(GL_LIGHTING);
-  */
+  gluCylinder(mid ,r,r,2.0f,32,32);
+  glPopMatrix();
+
+  // top-left cylinder
+  glPushMatrix();
+  ltop = gluNewQuadric();
+  glColor3f(0.0, 0.0, 1.0);
+  glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);
+  glTranslatef(0.0f, 1.0f, 0.0f);
+  gluCylinder(ltop,r,r,1.0f,32,32);
+  glPopMatrix();
+
+  // top-right cylinder
+  glPushMatrix();
+  rtop = gluNewQuadric();
+  glColor3f(0.0, 1.0, 1.0);
+  glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+  glTranslatef(0.0f, 1.0f, 0.0f);
+  gluCylinder(rtop,r,r,1.0f,32,32);
+  glPopMatrix();
 }
 
 /**
  * Set up OpenGL state.  This does everything so when we draw we only need to
  * actually draw the sphere, and OpenGL remembers all of our other settings.
  */
-void initGL(int mode)
+void initGL()
 {
-  switch(mode) {
-  case 0: // wireframe
-    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-    break;
-  case 1: // flat
-    glShadeModel(GL_FLAT);   // flat 
-    break;
-  case 2: // gouraud
-    glShadeModel(GL_SMOOTH); // gouraud
-    break;
-  default:
-    break;
-  }  
+  glShadeModel(GL_SMOOTH); // gouraud
     
-
-  /*
   // Enable back-face culling:
   glEnable(GL_CULL_FACE);
   glCullFace(GL_BACK);
@@ -176,32 +131,12 @@ void initGL(int mode)
   // Look up these functions to see what they're doing.
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  glFrustum(scene->camera->left,
-	    scene->camera->right,
-	    scene->camera->bottom,
-	    scene->camera->top,
-	    scene->camera->near,
-	    scene->camera->far);
+  glFrustum(-0.5, 0.5, -0.5, 0.5, 1, 10);
 
   // from now on, everything should be in modelview
   glMatrixMode(GL_MODELVIEW);
-
   glLoadIdentity();
-
-  // camera rotate -theta
-  glRotatef(-1*scene->camera->rotation[3],
-	    scene->camera->rotation[0],
-	    scene->camera->rotation[1],
-	    scene->camera->rotation[2]);
-  // camera -translate
-  glTranslatef(-1*scene->camera->position[0], 
- 	         -1*scene->camera->position[1], 
-  	         -1*scene->camera->position[2]);
-
-  // set light parameters if not doing wireframe
-  if (mode != 0 && !scene->is_lines)
-    initLights();
-  */
+  gluLookAt(0, 0, 5, 0, 0, 0, 1, 0, 0);
 }
 
 //--------------------------------------------------------------------------
@@ -258,16 +193,13 @@ void initUI()
  */
 int main(int argc, char* argv[])
 {
-  // remove this?
-  int mode = 1;
-
   // parse stuff
   int num_frames;
   auto keyframes = parse(std::cin, num_frames);
   std::cout << "Got total frames by ref: " << num_frames << std::endl;
 
-  Framer f(keyframes, num_frames);
-  //f.display();
+  f = Framer(keyframes, num_frames);
+  f.display();
 
   // OpenGL will take out any arguments intended for its use here.
   // Useful ones are -display and -gldebug.
@@ -283,7 +215,7 @@ int main(int argc, char* argv[])
 
   glutCreateWindow("CS171 HW7");
     
-  initGL(mode);
+  initGL();
   initUI();
 
   // set up GLUT callbacks.
@@ -294,7 +226,7 @@ int main(int argc, char* argv[])
   glutMotionFunc(motion);
 
   // From here on, GLUT has control,
-  //glutMainLoop();
+  glutMainLoop();
 
   // so we should never get to this point.
   return 1;

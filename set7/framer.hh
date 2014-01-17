@@ -22,14 +22,16 @@ private:
 public:
   std::vector<std::shared_ptr<KeyframeBlock> > frames;
 
-  // default constructor
+  // default constructor...don't use...
+  Framer() {}
   Framer(std::vector<std::shared_ptr<KeyframeBlock> > k, int f) {
     keyframes = k;
     num_frames = f;
-    std::cout << "num_frames in framer: " << num_frames << std::endl;
+    //std::cout << "num_frames in framer: " << num_frames << std::endl;
     quatify();
     framify();
-    std::cout << "Number of frames made: " << frames.size() << std::endl;
+    //std::cout << "Number of frames made: " << frames.size() << std::endl;
+    dequatify();
   }
 
 

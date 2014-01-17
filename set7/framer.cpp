@@ -5,12 +5,8 @@
 
 /*
 Need...
-- something to take keyframes, copy them if necessary for later passing on to
-  interpolation thing (for the slopes), and convert rotations to quaternions
-- something to take processed keyframes and interpolate, filling up a new
-  vector with the actual frames
-- Modify TransformBlock to having a quat?
-- SHOULD WRITE ANOTHER THING TO GO BACK FROM QUAT TO ROTATION STUFF
+- TODO: if part of transformation left un-filled, need to...take one from
+  previous frame!!
  */
 
 template <typename T>
@@ -45,7 +41,7 @@ void Framer::framify() {
   last->translation = back->translation;
   last->frame = num_frames;
   keyframes.push_back(last);
-  // TODO: DO THIS PART LESS UGLY
+  // TODO: MAKE THAT PART LESS UGLY
 
   // take quatified keyframe vector and populate the frames vector appropriately
   for (int keyframe_idx=0; keyframe_idx<keyframes.size()-1; keyframe_idx++) {
@@ -55,11 +51,11 @@ void Framer::framify() {
     
     // figure out how many frames to make for current keyframe pair, and du
     int num_frames = f2->frame - f1->frame; // go s.t. [f1,f2)
-    std::cout << "f1 frame: " << f1->frame << std::endl;
-    std::cout << "f2 frame: " << f2->frame << std::endl;
-    std::cout << "Number of frames to make for this pair: " << num_frames << std::endl;
     float du = 1./num_frames;
-    std::cout << "du: " << du << std::endl;
+    //std::cout << "f1 frame: " << f1->frame << std::endl;
+    //std::cout << "f2 frame: " << f2->frame << std::endl;
+    //std::cout << "Number of frames to make for this pair: " << num_frames << std::endl;
+    //std::cout << "du: " << du << std::endl;
 
 
     // loop to make that many frames, pushing onto frames vector as you go
