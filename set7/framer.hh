@@ -31,10 +31,8 @@ public:
     curr_frame = 0;
     keyframes = k;
     num_frames = f;
-    //std::cout << "num_frames in framer: " << num_frames << std::endl;
     quatify();
     framify();
-    //std::cout << "Number of frames made: " << frames.size() << std::endl;
     dequatify();
   }
 

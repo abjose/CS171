@@ -26,34 +26,26 @@ void redraw()
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  //glPushMatrix();
-
+  // move camera as desired and look at origin
   glLoadIdentity();
-  //gluLookAt(-10, -10, -10, -5, 0, 0, 1, 0, 0);
   gluLookAt(ui->cam_x, ui->cam_y, ui->cam_z, -5, 0, 0, 1, 0, 0);
-
-  // APPLY UI TRANSFORMS
-  //ui->applyViewingTransformation();
-  //glTranslatef(ui->final_tx, -1*ui->final_ty, ui->final_tz);
-  //glRotatef(ui->final_rd, ui->final_rx,ui->final_ry,0);
   
+  // get current frame's transformations
   auto T = f->get_next_frame();
-  //T->display();
   glScalef(T->scale[0], T->scale[1], T->scale[2]);
   glRotatef(T->rotation[3], T->rotation[0], T->rotation[1], T->rotation[2]);
   glTranslatef(T->translation[0], T->translation[1], T->translation[2]);
 
+  // draw I-bar
   makeIbar();
-
-  //glPopMatrix();
   glutSwapBuffers();
 }
 
 /** Utility functions **/
 
 void makeIbar() {
+  // draw the I-bar
   float r = 0.1;
-
   GLUquadricObj *lbot;
   GLUquadricObj *rbot;
   GLUquadricObj *mid;
@@ -126,13 +118,10 @@ void initGL()
   // Look up these functions to see what they're doing.
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  //glFrustum(-0.5, 0.5, -0.5, 0.5, 1, 100);
   glFrustum(-1., 1., -1., 1., 1, 100);
 
   // from now on, everything should be in modelview
   glMatrixMode(GL_MODELVIEW);
-  //glLoadIdentity();
-  //gluLookAt(-10, -10, -10, -5, 0, 0, 1, 0, 0);
 }
 
 void resize(GLint w, GLint h)
@@ -155,12 +144,6 @@ void motion(const int x, const int y)
   // Just pass it on to the ui controller.
   ui->motionFunction(x, y);
 }
-
-// void mouse(const int button, const int state, const int x, const int y)
-// {
-//   // Just pass it on to the ui controller.
-//   ui->mouseFunction(button, state, x, y);
-//}
 
 void keyfunc(const GLubyte key, GLint x, GLint y) {
   // Just pass it on to the ui controller.
@@ -223,7 +206,6 @@ int main(int argc, char* argv[])
   glutReshapeFunc(resize);
   glutKeyboardFunc(keyfunc);
   glutSpecialFunc(specialfunc);
-  //glutMouseFunc(mouse);
   glutMotionFunc(motion);
 
   // From here on, GLUT has control,

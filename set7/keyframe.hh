@@ -26,7 +26,7 @@ void initGL();
 void resize(GLint w, GLint h);
 void keyfunc(GLubyte key, GLint x, GLint y);
 
-// from old code
+// parsing stuff
 std::vector<std::shared_ptr<KeyframeBlock> >
 parse(std::istream &datafile, int &frames);
 
