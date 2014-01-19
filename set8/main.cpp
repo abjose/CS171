@@ -21,12 +21,30 @@ static GLenum shaderProgram;
 static string vertProgFileName, fragProgFileName;
 static GLenum skyTex, leafTex;
 static GLint leafUniformPos, skyUniformPos;
-static GLint tUniformPos;
+static GLint tUniformPos, pervertUniformPos;;
 static GLuint displayList;
+
+bool per_vert;
 
 static double clip(double x, double a, double b) {
    double y = (x>a)?x:a;
    return (y<b)?y:b;
+}
+
+void keyfunc(GLubyte key, GLint x, GLint y){
+  // escape or q or Q
+  switch (key) {
+  case 27:
+  case 'q':
+  case 'Q':
+    exit(0);
+    break;
+  case ' ':
+    per_vert = !per_vert;
+    break;
+  default:
+    break;
+  }
 }
 
 static void initGL() {
@@ -95,6 +113,7 @@ static void readShaders() {
    leafUniformPos = glGetUniformLocation(shaderProgram, "leaf");
    skyUniformPos = glGetUniformLocation(shaderProgram, "sky");
    tUniformPos = glGetUniformLocation(shaderProgram, "t");
+   pervertUniformPos = glGetUniformLocation(shaderProgram, "per_vert");
 
    glActiveTexture(GL_TEXTURE0);
    glBindTexture(GL_TEXTURE_2D, skyTex);
@@ -147,6 +166,7 @@ static void doList() {
    //glDisable(GL_TEXTURE_2D);
    glUseProgram(shaderProgram);
    glUniform1f(tUniformPos, t);
+   glUniform1f(pervertUniformPos, per_vert);
 
    glCallList(displayList);
 
@@ -219,6 +239,7 @@ int main(int argc, char *argv[]) {
    glutIdleFunc(doList);
    glutMouseFunc(mouseButton);
    glutMotionFunc(motion);
+   glutKeyboardFunc(keyfunc);
    glutMainLoop();
    return 0;
 }
