@@ -7,7 +7,10 @@ uniform bool per_vert;
 void main() {
 
   float vx = gl_Vertex.x; float vy = gl_Vertex.y;
-  gl_Position = gl_ModelViewProjectionMatrix * vec4(vx, vy, 1, 1);
+  // not sure if supposed to give 'actual' height or not...
+  float height = .2*cos(vx*vx+vy*vy);
+  // set position
+  gl_Position = gl_ModelViewProjectionMatrix * vec4(vx, vy, height, 1);
 
   // If the per-vertex normal mode is on, calculate normal 
   if (per_vert) {    
