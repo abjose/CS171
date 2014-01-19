@@ -1,0 +1,13 @@
+CS171 SET THE LAST
+
+TO RUN:
+- cd here
+- type 'make'
+An executable 'glslRenderer' should appear.
+To run, type something like './glslRenderer'. A new window should appear with
+some wavy, leafy water displayed in it.
+
+
+COMMANDS:
+Hit spacebar to switch between fragment (default) and vertex normal-finding.
+'q' or 'Q' or esc to exit.
